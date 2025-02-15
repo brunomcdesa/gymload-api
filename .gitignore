@@ -3,3 +3,6 @@ target/
 .idea/
 *.log
 *.class
+
+# Mac
+.DS_Store
