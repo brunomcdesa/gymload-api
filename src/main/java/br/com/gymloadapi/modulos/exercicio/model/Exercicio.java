@@ -29,12 +29,4 @@ public class Exercicio {
     @JoinColumn(name = "FK_GRUPO_MUSCULAR", referencedColumnName = "ID",
             foreignKey = @ForeignKey(name = "FK_GRUPO_MUSCULAR"), nullable = false)
     private GrupoMuscular grupoMuscular;
-
-    public static Exercicio of(ExercicioRequest request, GrupoMuscular grupoMuscular) {
-        return Exercicio.builder()
-                .nome(request.nome())
-                .descricao(request.descricao())
-                .grupoMuscular(grupoMuscular)
-                .build();
-    }
 }

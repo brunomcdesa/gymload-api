@@ -16,8 +16,3 @@ spring:
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console

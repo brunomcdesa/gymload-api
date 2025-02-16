@@ -22,5 +22,4 @@ public class GrupoMuscular {
 
     @Column(nullable = false)
     private String codigo;
-
 }
