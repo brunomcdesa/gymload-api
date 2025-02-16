@@ -7,6 +7,8 @@ import br.com.gymloadapi.modulos.grupomuscular.service.GrupoMuscularService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ExercicioService {
@@ -17,5 +19,9 @@ public class ExercicioService {
     public void salvar(ExercicioRequest request) {
         var grupoMuscular = grupoMuscularService.findById(request.grupoMuscularId());
         repository.save(Exercicio.of(request, grupoMuscular));
+    }
+
+    public List<Exercicio> buscarTodos() {
+        return repository.findAll();
     }
 }
