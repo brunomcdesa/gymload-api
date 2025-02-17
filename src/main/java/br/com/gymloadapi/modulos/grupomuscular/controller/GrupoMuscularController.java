@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.grupomuscular.controller;
 
+import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
 import br.com.gymloadapi.modulos.grupomuscular.dto.GrupoMuscularRequest;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
 import br.com.gymloadapi.modulos.grupomuscular.service.GrupoMuscularService;
@@ -24,8 +25,8 @@ public class GrupoMuscularController {
         service.salvar(request);
     }
 
-    @GetMapping
-    public List<GrupoMuscular> findAll() {
-        return service.findAll();
+    @GetMapping("select")
+    public List<SelectResponse> findAllSelect() {
+        return service.findAllSelect();
     }
 }
