@@ -23,12 +23,12 @@ public class GrupoMuscularService {
 
     public List<SelectResponse> findAllSelect() {
         return repository.findAll().stream()
-                .map(mapper::mapToSelectResponse)
-                .toList();
+            .map(mapper::mapToSelectResponse)
+            .toList();
     }
 
     public GrupoMuscular findById(Integer id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Grupo Muscular não encontrado"));
+            .orElseThrow(() -> new RuntimeException("Grupo Muscular não encontrado"));
     }
 }

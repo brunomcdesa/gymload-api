@@ -4,5 +4,10 @@ public enum ETipoExercicio {
     HALTER,
     BARRA,
     MAQUINA,
-    POLIA
+    POLIA,
+    ANILHA,
+    BOLA,
+    KETLLEBEL,
+    BAG,
+    CORPORAL
 }

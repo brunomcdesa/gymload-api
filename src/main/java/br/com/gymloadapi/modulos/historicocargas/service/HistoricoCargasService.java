@@ -1,11 +1,10 @@
-package br.com.gymloadapi.modulos.historicoCargas.service;
+package br.com.gymloadapi.modulos.historicocargas.service;
 
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
-import br.com.gymloadapi.modulos.historicoCargas.dto.HistoricoCargasRequest;
-import br.com.gymloadapi.modulos.historicoCargas.dto.HistoricoCargasResponse;
-import br.com.gymloadapi.modulos.historicoCargas.mapper.HistoricoCargasMapper;
-import br.com.gymloadapi.modulos.historicoCargas.model.HistoricoCargas;
-import br.com.gymloadapi.modulos.historicoCargas.repository.HistoricoCargasRepository;
+import br.com.gymloadapi.modulos.historicocargas.dto.HistoricoCargasRequest;
+import br.com.gymloadapi.modulos.historicocargas.dto.HistoricoCargasResponse;
+import br.com.gymloadapi.modulos.historicocargas.mapper.HistoricoCargasMapper;
+import br.com.gymloadapi.modulos.historicocargas.repository.HistoricoCargasRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +24,9 @@ public class HistoricoCargasService {
         repository.save(mapper.mapToModel(request, exercicio));
     }
 
-    public List<HistoricoCargasResponse> findAll() {
-        return repository.findAll().stream()
-                .map(mapper::mapToResponse)
-                .toList();
+    public List<HistoricoCargasResponse> findByExercicioId(Integer exercicioId) {
+        return repository.findAllByExercicioId(exercicioId).stream()
+            .map(mapper::mapToResponse)
+            .toList();
     }
 }

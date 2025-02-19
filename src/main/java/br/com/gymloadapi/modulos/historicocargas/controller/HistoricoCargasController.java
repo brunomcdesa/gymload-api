@@ -1,10 +1,9 @@
-package br.com.gymloadapi.modulos.historicoCargas.controller;
+package br.com.gymloadapi.modulos.historicocargas.controller;
 
-import br.com.gymloadapi.modulos.historicoCargas.dto.HistoricoCargasRequest;
-import br.com.gymloadapi.modulos.historicoCargas.dto.HistoricoCargasResponse;
-import br.com.gymloadapi.modulos.historicoCargas.service.HistoricoCargasService;
+import br.com.gymloadapi.modulos.historicocargas.dto.HistoricoCargasRequest;
+import br.com.gymloadapi.modulos.historicocargas.dto.HistoricoCargasResponse;
+import br.com.gymloadapi.modulos.historicocargas.service.HistoricoCargasService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +23,8 @@ public class HistoricoCargasController {
         service.salvar(request);
     }
 
-    @GetMapping
-    public List<HistoricoCargasResponse> findAll() {
-        return service.findAll();
+    @GetMapping("{exercicioId}")
+    public List<HistoricoCargasResponse> findByExercicioId(@PathVariable Integer exercicioId) {
+        return service.findByExercicioId(exercicioId);
     }
 }

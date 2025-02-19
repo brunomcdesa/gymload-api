@@ -1,7 +1,8 @@
 package br.com.gymloadapi.modulos.grupomuscular.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+
+import jakarta.persistence.*;
 
 @Table
 @Getter

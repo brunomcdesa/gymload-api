@@ -16,7 +16,7 @@ public interface ExercicioMapper {
     @Mapping(target = "grupoMuscular", source = "grupoMuscular")
     Exercicio mapToModel(ExercicioRequest request, GrupoMuscular grupoMuscular);
 
-    @Mapping( target = "grupoMuscularNome", source = "exercicio.grupoMuscular.nome")
+    @Mapping(target = "grupoMuscularNome", source = "exercicio.grupoMuscular.nome")
     ExercicioResponse mapModelToResponse(Exercicio exercicio);
 
     @Mapping(target = "value", source = "exercicio.nome")

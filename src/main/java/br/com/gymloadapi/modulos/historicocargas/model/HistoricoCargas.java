@@ -1,9 +1,10 @@
-package br.com.gymloadapi.modulos.historicoCargas.model;
+package br.com.gymloadapi.modulos.historicocargas.model;
 
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
-import br.com.gymloadapi.modulos.historicoCargas.enums.EUnidadePeso;
-import jakarta.persistence.*;
+import br.com.gymloadapi.modulos.historicocargas.enums.EUnidadePeso;
 import lombok.*;
+
+import jakarta.persistence.*;
 
 @Table
 @Getter
@@ -26,9 +27,12 @@ public class HistoricoCargas {
     @Enumerated(EnumType.STRING)
     private EUnidadePeso unidadePeso;
 
+    @Column
+    private Integer qtdRepeticoes;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_EXERCICIO", referencedColumnName = "ID",
-            foreignKey = @ForeignKey(name = "FK_EXERCICIO"), nullable = false)
+        foreignKey = @ForeignKey(name = "FK_EXERCICIO"), nullable = false)
     private Exercicio exercicio;
 
     public String getCargaComUnidadePeso() {

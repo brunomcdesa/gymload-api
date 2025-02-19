@@ -1,9 +1,9 @@
-package br.com.gymloadapi.modulos.historicoCargas.mapper;
+package br.com.gymloadapi.modulos.historicocargas.mapper;
 
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
-import br.com.gymloadapi.modulos.historicoCargas.dto.HistoricoCargasRequest;
-import br.com.gymloadapi.modulos.historicoCargas.dto.HistoricoCargasResponse;
-import br.com.gymloadapi.modulos.historicoCargas.model.HistoricoCargas;
+import br.com.gymloadapi.modulos.historicocargas.dto.HistoricoCargasRequest;
+import br.com.gymloadapi.modulos.historicocargas.dto.HistoricoCargasResponse;
+import br.com.gymloadapi.modulos.historicocargas.model.HistoricoCargas;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

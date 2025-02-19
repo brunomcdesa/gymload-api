@@ -28,18 +28,18 @@ public class ExercicioService {
 
     public List<ExercicioResponse> buscarTodos() {
         return repository.findAll().stream()
-                .map(mapper::mapModelToResponse)
-                .toList();
+            .map(mapper::mapModelToResponse)
+            .toList();
     }
 
     public Exercicio findById(Integer id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exercício não encontrado."));
+            .orElseThrow(() -> new RuntimeException("Exercício não encontrado."));
     }
 
     public List<SelectResponse> findAllSelect(ExercicioFiltros filtros) {
-        return repository.findAllBy(filtros.toPredicate().build()).stream()
-                .map(mapper::mapToSelectResponse)
-                .toList();
+        return repository.findAllByPredicate(filtros.toPredicate().build()).stream()
+            .map(mapper::mapToSelectResponse)
+            .toList();
     }
 }

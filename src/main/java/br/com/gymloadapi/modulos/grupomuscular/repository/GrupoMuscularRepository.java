@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GrupoMuscularRepository extends JpaRepository<GrupoMuscular, Integer>,
-        QuerydslPredicateExecutor<GrupoMuscular> {
+    QuerydslPredicateExecutor<GrupoMuscular> {
 }

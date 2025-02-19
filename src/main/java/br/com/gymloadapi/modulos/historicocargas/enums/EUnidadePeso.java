@@ -1,4 +1,4 @@
-package br.com.gymloadapi.modulos.historicoCargas.enums;
+package br.com.gymloadapi.modulos.historicocargas.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
