@@ -19,6 +19,11 @@
         <java.version>21</java.version>
         <lombok.version>1.18.34</lombok.version>
         <org.mapstruct.version>1.6.2</org.mapstruct.version>
+        <querydsl.version>5.1.0</querydsl.version>
+        <mysema.maven.apt.version>1.1.3</mysema.maven.apt.version>
+        <apache.commons.lang.3.version>3.14.0</apache.commons.lang.3.version>
+        <maven.checkstyle.version>3.3.1</maven.checkstyle.version>
+        <puppycrawl.checkstyle.version>10.12.6</puppycrawl.checkstyle.version>
     </properties>
 
     <dependencies>
@@ -69,10 +74,26 @@
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
         </dependency>
+
+        <!-- Query Dsl -->
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <version>${querydsl.version}</version>
+            <classifier>jakarta</classifier>
+        </dependency>
+
+        <!-- Commons lang 3-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${apache.commons.lang.3.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <!-- MapStruct -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -97,6 +118,65 @@
                             -Amapstruct.defaultComponentModel=spring
                         </compilerArg>
                     </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <!-- Querydsl -->
+            <plugin>
+                <groupId>com.mysema.maven</groupId>
+                <artifactId>apt-maven-plugin</artifactId>
+                <version>${mysema.maven.apt.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/generated-sources/java</outputDirectory>
+                            <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.querydsl</groupId>
+                        <artifactId>querydsl-apt</artifactId>
+                        <version>${querydsl.version}</version>
+                        <classifier>jakarta</classifier>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!-- Checkstyle -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${puppycrawl.checkstyle.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>verify-style</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <consoleOutput>true</consoleOutput>
+                            <violationSeverity>warning</violationSeverity>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <configLocation>src/main/resources/checkstyle/google_checks.xml</configLocation>
+                    <suppressionsLocation>src/main/resources/checkstyle/checkstyle-suppressions.xml
+                    </suppressionsLocation>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,9 +1,11 @@
 package br.com.gymloadapi.modulos.exercicio.model;
 
-import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
+import br.com.gymloadapi.modulos.exercicio.enums.ETipoExercicio;
+import br.com.gymloadapi.modulos.exercicio.enums.ETipoPegada;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
-import jakarta.persistence.*;
 import lombok.*;
+
+import jakarta.persistence.*;
 
 @Table
 @Getter
@@ -25,8 +27,16 @@ public class Exercicio {
     @Column(nullable = false)
     private String descricao;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private ETipoExercicio tipoExercicio;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private ETipoPegada tipoPegada;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_GRUPO_MUSCULAR", referencedColumnName = "ID",
-            foreignKey = @ForeignKey(name = "FK_GRUPO_MUSCULAR"), nullable = false)
+        foreignKey = @ForeignKey(name = "FK_GRUPO_MUSCULAR"), nullable = false)
     private GrupoMuscular grupoMuscular;
 }

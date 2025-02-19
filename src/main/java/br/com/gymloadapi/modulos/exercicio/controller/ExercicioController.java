@@ -1,8 +1,9 @@
 package br.com.gymloadapi.modulos.exercicio.controller;
 
+import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
+import br.com.gymloadapi.modulos.exercicio.dto.ExercicioFiltros;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioResponse;
-import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -27,5 +28,10 @@ public class ExercicioController {
     @GetMapping
     public List<ExercicioResponse> buscarTodos() {
         return service.buscarTodos();
+    }
+
+    @GetMapping("select")
+    public List<SelectResponse> getSelect(ExercicioFiltros filtros) {
+        return service.findAllSelect(filtros);
     }
 }
