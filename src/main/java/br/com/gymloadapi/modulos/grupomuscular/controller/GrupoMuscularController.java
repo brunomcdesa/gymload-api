@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.grupomuscular.controller;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
 import br.com.gymloadapi.modulos.grupomuscular.dto.GrupoMuscularRequest;
+import br.com.gymloadapi.modulos.grupomuscular.dto.GrupoMuscularResponse;
 import br.com.gymloadapi.modulos.grupomuscular.service.GrupoMuscularService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,11 @@ public class GrupoMuscularController {
     @ResponseStatus(CREATED)
     public void salvar(@RequestBody GrupoMuscularRequest request) {
         service.salvar(request);
+    }
+
+    @GetMapping
+    public List<GrupoMuscularResponse> buscar() {
+        return service.findAllResponse();
     }
 
     @GetMapping("select")

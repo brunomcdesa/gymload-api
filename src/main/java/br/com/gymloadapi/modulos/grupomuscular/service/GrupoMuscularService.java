@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.grupomuscular.service;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
 import br.com.gymloadapi.modulos.grupomuscular.dto.GrupoMuscularRequest;
+import br.com.gymloadapi.modulos.grupomuscular.dto.GrupoMuscularResponse;
 import br.com.gymloadapi.modulos.grupomuscular.mapper.GrupoMuscularMapper;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
 import br.com.gymloadapi.modulos.grupomuscular.repository.GrupoMuscularRepository;
@@ -21,10 +22,20 @@ public class GrupoMuscularService {
         repository.save(mapper.mapToModel(request));
     }
 
+    public List<GrupoMuscularResponse> findAllResponse() {
+        return this.findAll().stream()
+            .map(mapper::mapToResponse)
+            .toList();
+    }
+
     public List<SelectResponse> findAllSelect() {
-        return repository.findAll().stream()
+        return this.findAll().stream()
             .map(mapper::mapToSelectResponse)
             .toList();
+    }
+
+    private List<GrupoMuscular> findAll() {
+        return repository.findAll();
     }
 
     public GrupoMuscular findById(Integer id) {
