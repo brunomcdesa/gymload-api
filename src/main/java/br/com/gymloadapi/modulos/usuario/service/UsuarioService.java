@@ -10,10 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -41,10 +39,5 @@ public class UsuarioService {
         return repository.findAll().stream()
             .map(mapper::mapModelToResponse)
             .toList();
-    }
-
-    public Usuario findById(UUID id) {
-        return repository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
     }
 }

@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -24,9 +23,8 @@ public class HistoricoCargasController {
         service.salvar(request);
     }
 
-    @GetMapping("{exercicioId}/{usuarioId}")
-    public List<HistoricoCargasResponse> buscarExerciciosDoUsuario(@PathVariable Integer exercicioId,
-                                                                   @PathVariable UUID usuarioId) {
-        return service.buscarExerciciosDoUsuario(exercicioId, usuarioId);
+    @GetMapping("{exercicioId}")
+    public List<HistoricoCargasResponse> buscarExerciciosDoUsuario(@PathVariable Integer exercicioId) {
+        return service.buscarExerciciosDoUsuario(exercicioId);
     }
 }

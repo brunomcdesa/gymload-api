@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,5 +41,25 @@ public class AutenticacaoService implements UserDetailsService {
 
     public void cadastrarUsuario(CadastroRequest cadastroRequest) {
         usuarioService.cadastrar(cadastroRequest);
+    }
+
+    public Usuario getUsuarioAutenticado() {
+        var userDetails = this.getAuthentication();
+
+        if (!(userDetails instanceof Usuario)) {
+            throw new RuntimeException("Usuário autenticado não é uma instância de Usuario");
+        }
+
+        return (Usuario) userDetails;
+    }
+
+    private UserDetails getAuthentication() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+            throw new RuntimeException("Usuário não autenticado");
+        }
+
+        return (UserDetails) authentication.getPrincipal();
     }
 }
