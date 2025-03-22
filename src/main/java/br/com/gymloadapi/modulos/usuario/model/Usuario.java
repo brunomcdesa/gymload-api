@@ -12,6 +12,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_ADMIN;
+import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_USER;
+
 @Table
 @Getter
 @Setter
@@ -78,7 +81,7 @@ public class Usuario implements UserDetails {
             .nome(cadastroRequest.nome())
             .username(cadastroRequest.username())
             .senha(encryptedPassword)
-            .roles(cadastroRequest.roles())
+            .roles(cadastroRequest.cadastroAdmin() ? ROLES_ADMIN : ROLES_USER)
             .build();
     }
 }

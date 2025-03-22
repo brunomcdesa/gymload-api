@@ -24,6 +24,8 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
+    private static final int ENCRYPTOR_STRENGTH = 12;
+
     private final SecurityFilter securityFilter;
 
     @Bean
@@ -34,11 +36,11 @@ public class SecurityConfiguration {
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(POST, "/auth/login")
+                .requestMatchers("/auth/**")
                 .permitAll()
-                .requestMatchers(POST, "api/exercicios", "api/grupos-musculares", "/auth/cadastro")
+                .requestMatchers(POST, "api/exercicios", "api/grupos-musculares")
                 .hasRole(ADMIN.name())
-                .requestMatchers(GET, "api/usuarios")
+                .requestMatchers("api/usuarios/**")
                 .hasRole(ADMIN.name())
                 .anyRequest().authenticated()
             )
@@ -53,6 +55,6 @@ public class SecurityConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(ENCRYPTOR_STRENGTH);
     }
 }

@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.historicocargas.model;
 
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.historicocargas.enums.EUnidadePeso;
+import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.*;
 
 import jakarta.persistence.*;
@@ -34,6 +35,11 @@ public class HistoricoCargas {
     @JoinColumn(name = "FK_EXERCICIO", referencedColumnName = "ID",
         foreignKey = @ForeignKey(name = "FK_EXERCICIO"), nullable = false)
     private Exercicio exercicio;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_USUARIO", referencedColumnName = "ID", columnDefinition = "UUID",
+        foreignKey = @ForeignKey(name = "FK_USUARIO"), nullable = false)
+    private Usuario usuario;
 
     public String getCargaComUnidadePeso() {
         return this.carga + " (" + unidadePeso.name() + ")";

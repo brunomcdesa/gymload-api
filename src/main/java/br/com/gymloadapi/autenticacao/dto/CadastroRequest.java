@@ -1,13 +1,11 @@
 package br.com.gymloadapi.autenticacao.dto;
 
-import br.com.gymloadapi.modulos.usuario.enums.EUserRole;
-
-import java.util.List;
+import jakarta.validation.constraints.NotBlank;
 
 public record CadastroRequest(
-    String nome,
-    String username,
-    String password,
-    List<EUserRole> roles
+    @NotBlank String nome,
+    @NotBlank String username,
+    @NotBlank String password,
+    boolean cadastroAdmin
 ) {
 }
