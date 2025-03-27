@@ -84,4 +84,10 @@ public class Usuario implements UserDetails {
             .roles(cadastroRequest.cadastroAdmin() ? ROLES_ADMIN : ROLES_USER)
             .build();
     }
+
+    public String[] getRolesArray() {
+        return this.roles.stream()
+            .map(EUserRole::mapRole)
+            .toArray(String[]::new);
+    }
 }
