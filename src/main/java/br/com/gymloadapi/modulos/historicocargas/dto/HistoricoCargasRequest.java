@@ -6,6 +6,7 @@ public record HistoricoCargasRequest(
     Double carga,
     EUnidadePeso unidadePeso,
     Integer exercicioId,
-    Integer qtdRepeticoes
+    Integer qtdRepeticoes,
+    Integer qtdSeries
 ) {
 }

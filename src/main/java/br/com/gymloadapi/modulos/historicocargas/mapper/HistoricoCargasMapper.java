@@ -8,12 +8,15 @@ import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+import java.time.LocalDate;
+
+@Mapper(imports = LocalDate.class)
 public interface HistoricoCargasMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "exercicio", source = "exercicio")
     @Mapping(target = "usuario", source = "usuario")
+    @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
     HistoricoCargas mapToModel(HistoricoCargasRequest request, Exercicio exercicio, Usuario usuario);
 
     @Mapping(target = "exercicioNome", source = "historicoCargas.exercicio.nome")

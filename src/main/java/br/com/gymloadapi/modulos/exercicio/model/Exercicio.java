@@ -39,4 +39,8 @@ public class Exercicio {
     @JoinColumn(name = "FK_GRUPO_MUSCULAR", referencedColumnName = "ID",
         foreignKey = @ForeignKey(name = "FK_GRUPO_MUSCULAR"), nullable = false)
     private GrupoMuscular grupoMuscular;
+
+    public String getNomeComTipoExercicio() {
+        return this.nome + " (" + this.tipoExercicio.name() + ")";
+    }
 }

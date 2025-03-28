@@ -42,4 +42,8 @@ public class ExercicioService {
             .map(mapper::mapToSelectResponse)
             .toList();
     }
+
+    public List<Exercicio> findByIdIn(List<Integer> exercicioIds) {
+        return repository.findByIdIn(exercicioIds);
+    }
 }

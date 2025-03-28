@@ -6,6 +6,7 @@ import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.*;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Table
 @Getter
@@ -30,6 +31,12 @@ public class HistoricoCargas {
 
     @Column
     private Integer qtdRepeticoes;
+
+    @Column
+    private LocalDate dataCadastro;
+
+    @Column
+    private Integer qtdSeries;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_EXERCICIO", referencedColumnName = "ID",
