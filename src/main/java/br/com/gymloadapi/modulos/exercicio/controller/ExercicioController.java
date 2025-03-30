@@ -34,4 +34,9 @@ public class ExercicioController {
     public List<SelectResponse> getSelect(ExercicioFiltros filtros) {
         return service.findAllSelect(filtros);
     }
+
+    @GetMapping("treino/{treinoId}")
+    public List<ExercicioResponse> buscarExerciciosPorTreino(@PathVariable Integer treinoId) {
+        return service.buscarExerciciosPorTreino(treinoId);
+    }
 }

@@ -22,6 +22,5 @@ public interface TreinoMapper {
     @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
     Treino mapToModel(TreinoRequest request, Usuario usuario, List<Exercicio> exercicios);
 
-    @Mapping(target = "exercicios", expression = "java(exercicioMapper.mapToResponseList(treino.getExercicios()))")
-    TreinoResponse mapToResponse(Treino treino, ExercicioMapper exercicioMapper);
+    TreinoResponse mapToResponse(Treino treino);
 }

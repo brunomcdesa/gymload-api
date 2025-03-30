@@ -3,9 +3,11 @@ package br.com.gymloadapi.modulos.exercicio.model;
 import br.com.gymloadapi.modulos.exercicio.enums.ETipoExercicio;
 import br.com.gymloadapi.modulos.exercicio.enums.ETipoPegada;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
+import br.com.gymloadapi.modulos.treino.model.Treino;
 import lombok.*;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Table
 @Getter
@@ -39,6 +41,15 @@ public class Exercicio {
     @JoinColumn(name = "FK_GRUPO_MUSCULAR", referencedColumnName = "ID",
         foreignKey = @ForeignKey(name = "FK_GRUPO_MUSCULAR"), nullable = false)
     private GrupoMuscular grupoMuscular;
+
+    @ManyToMany
+    @SuppressWarnings("Indentation")
+    @JoinTable(name = "TREINO_EXERCICIO", joinColumns = {
+        @JoinColumn(name = "FK_EXERCICIO", referencedColumnName = "ID",
+            foreignKey = @ForeignKey(name = "FK_EXERCICIO"))}, inverseJoinColumns = {
+        @JoinColumn(name = "FK_TREINO", referencedColumnName = "ID",
+            foreignKey = @ForeignKey(name = "FK_TREINO"))})
+    private List<Treino> treinos;
 
     public String getNomeComTipoExercicio() {
         return this.nome + " (" + this.tipoExercicio.name() + ")";

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/usuarios")
@@ -21,8 +23,14 @@ public class UsuarioController {
         return service.buscarTodos();
     }
 
+    @PostMapping("cadastro")
+    @ResponseStatus(CREATED)
+    public void cadastrar(@RequestBody @Valid CadastroRequest cadastroRequest) {
+        service.cadastrar(cadastroRequest, false);
+    }
+
     @PostMapping("cadastro/admin")
     public void cadastrarAdmin(@RequestBody @Valid CadastroRequest cadastroRequest) {
-        service.cadastrar(cadastroRequest);
+        service.cadastrar(cadastroRequest, true);
     }
 }

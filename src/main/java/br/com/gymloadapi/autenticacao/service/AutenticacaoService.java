@@ -1,6 +1,5 @@
 package br.com.gymloadapi.autenticacao.service;
 
-import br.com.gymloadapi.autenticacao.dto.CadastroRequest;
 import br.com.gymloadapi.autenticacao.dto.LoginRequest;
 import br.com.gymloadapi.autenticacao.dto.LoginResponse;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
@@ -37,10 +36,6 @@ public class AutenticacaoService implements UserDetailsService {
         var token = tokenService.generateToken((Usuario) auth.getPrincipal());
 
         return new LoginResponse(token);
-    }
-
-    public void cadastrarUsuario(CadastroRequest cadastroRequest) {
-        usuarioService.cadastrar(cadastroRequest);
     }
 
     public Usuario getUsuarioAutenticado() {

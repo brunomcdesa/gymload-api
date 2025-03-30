@@ -1,7 +1,6 @@
 package br.com.gymloadapi.modulos.treino.service;
 
 import br.com.gymloadapi.autenticacao.service.AutenticacaoService;
-import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapper;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.treino.dto.TreinoRequest;
 import br.com.gymloadapi.modulos.treino.dto.TreinoResponse;
@@ -17,9 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TreinoService {
 
-    private final TreinoMapper mapper;
+    private final TreinoMapper treinoMapper;
     private final TreinoRepository repository;
-    private final ExercicioMapper exercicioMapper;
     private final ExercicioService exercicioService;
     private final AutenticacaoService autenticacaoService;
 
@@ -27,13 +25,13 @@ public class TreinoService {
         var usuario = this.getUsuarioAutenticado();
         var exercicios = exercicioService.findByIdIn(request.exerciciosIds());
 
-        repository.save(mapper.mapToModel(request, usuario, exercicios));
+        repository.save(treinoMapper.mapToModel(request, usuario, exercicios));
     }
 
     public List<TreinoResponse> listarTodosDoUsuario() {
         var usuario = this.getUsuarioAutenticado();
         return repository.findByUsuarioId(usuario.getId()).stream()
-            .map(treino -> mapper.mapToResponse(treino, exercicioMapper))
+            .map(treinoMapper::mapToResponse)
             .toList();
     }
 

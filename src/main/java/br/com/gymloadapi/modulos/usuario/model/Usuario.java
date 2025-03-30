@@ -76,12 +76,12 @@ public class Usuario implements UserDetails {
         return UserDetails.super.isEnabled();
     }
 
-    public static Usuario createUser(CadastroRequest cadastroRequest, String encryptedPassword) {
+    public static Usuario createUser(CadastroRequest cadastroRequest, String encryptedPassword, boolean isCadastroAdmin) {
         return Usuario.builder()
             .nome(cadastroRequest.nome())
             .username(cadastroRequest.username())
             .senha(encryptedPassword)
-            .roles(cadastroRequest.cadastroAdmin() ? ROLES_ADMIN : ROLES_USER)
+            .roles(isCadastroAdmin ? ROLES_ADMIN : ROLES_USER)
             .build();
     }
 

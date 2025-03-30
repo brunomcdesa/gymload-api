@@ -15,22 +15,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GrupoMuscularService {
 
-    private final GrupoMuscularMapper mapper;
     private final GrupoMuscularRepository repository;
+    private final GrupoMuscularMapper grupoMuscularMapper;
 
     public void salvar(GrupoMuscularRequest request) {
-        repository.save(mapper.mapToModel(request));
+        repository.save(grupoMuscularMapper.mapToModel(request));
     }
 
     public List<GrupoMuscularResponse> findAllResponse() {
         return this.findAll().stream()
-            .map(mapper::mapToResponse)
+            .map(grupoMuscularMapper::mapToResponse)
             .toList();
     }
 
     public List<SelectResponse> findAllSelect() {
         return this.findAll().stream()
-            .map(mapper::mapToSelectResponse)
+            .map(grupoMuscularMapper::mapToSelectResponse)
             .toList();
     }
 

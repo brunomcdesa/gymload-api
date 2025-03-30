@@ -17,16 +17,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UsuarioService {
 
-    private final UsuarioMapper mapper;
+    private final UsuarioMapper usuarioMapper;
     private final UsuarioRepository repository;
 
-    public void cadastrar(CadastroRequest cadastroRequest) {
+    public void cadastrar(CadastroRequest cadastroRequest, boolean isCadastroAdmin) {
         if (repository.existsByUsername(cadastroRequest.username())) {
             throw new ValidationException("Já existe um usuário com este username.");
         }
 
         var encryptedPassword = new BCryptPasswordEncoder().encode(cadastroRequest.password());
-        var novoUsuario = Usuario.createUser(cadastroRequest, encryptedPassword);
+        var novoUsuario = Usuario.createUser(cadastroRequest, encryptedPassword, isCadastroAdmin);
 
         repository.save(novoUsuario);
     }
@@ -37,7 +37,7 @@ public class UsuarioService {
 
     public List<UsuarioResponse> buscarTodos() {
         return repository.findAll().stream()
-            .map(mapper::mapModelToResponse)
+            .map(usuarioMapper::mapModelToResponse)
             .toList();
     }
 }

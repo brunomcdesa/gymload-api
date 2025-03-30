@@ -16,22 +16,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HistoricoCargasService {
 
-    private final HistoricoCargasMapper mapper;
     private final ExercicioService exercicioService;
     private final HistoricoCargasRepository repository;
     private final AutenticacaoService autenticacaoService;
+    private final HistoricoCargasMapper historicoCargasMapper;
 
     public void salvar(HistoricoCargasRequest request) {
         var usuarioAutenticado = this.getUsuarioAutenticado();
         var exercicio = exercicioService.findById(request.exercicioId());
 
-        repository.save(mapper.mapToModel(request, exercicio, usuarioAutenticado));
+        repository.save(historicoCargasMapper.mapToModel(request, exercicio, usuarioAutenticado));
     }
 
     public List<HistoricoCargasResponse> buscarExerciciosDoUsuario(Integer exercicioId) {
         var usuarioAutenticadoId = this.getUsuarioAutenticado().getId();
         return repository.findAllByExercicioIdAndUsuario_Id(exercicioId, usuarioAutenticadoId).stream()
-            .map(mapper::mapToResponse)
+            .map(historicoCargasMapper::mapToResponse)
             .toList();
     }
 
