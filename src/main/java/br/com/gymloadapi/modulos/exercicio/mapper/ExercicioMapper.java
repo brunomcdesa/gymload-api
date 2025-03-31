@@ -8,8 +8,6 @@ import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
-
 @Mapper
 public interface ExercicioMapper {
 
@@ -21,8 +19,8 @@ public interface ExercicioMapper {
     @Mapping(target = "grupoMuscularNome", source = "exercicio.grupoMuscular.nome")
     ExercicioResponse mapModelToResponse(Exercicio exercicio);
 
-    @Mapping(target = "value", expression = "java(exercicio.getNomeComTipoExercicio())")
+    @Mapping(target = "value", source = "exercicio.id")
+    @Mapping(target = "label", expression = "java(exercicio.getNomeComTipoExercicio())")
     SelectResponse mapToSelectResponse(Exercicio exercicio);
 
-    List<ExercicioResponse> mapToResponseList(List<Exercicio> exercicios);
 }
