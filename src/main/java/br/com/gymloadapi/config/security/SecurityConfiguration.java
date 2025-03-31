@@ -35,7 +35,7 @@ public class SecurityConfiguration {
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/auth/**")
+                .requestMatchers("/auth/**", "/api/usuarios/cadastro")
                 .permitAll()
                 .requestMatchers(POST, "api/exercicios", "api/grupos-musculares")
                 .hasRole(ADMIN.name())
