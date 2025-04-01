@@ -1,7 +1,7 @@
 package br.com.gymloadapi.modulos.exercicio.dto;
 
-import br.com.gymloadapi.modulos.exercicio.enums.ETipoExercicio;
-import br.com.gymloadapi.modulos.exercicio.enums.ETipoPegada;
+import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
+import br.com.gymloadapi.modulos.comum.enums.ETipoPegada;
 
 public record ExercicioResponse(
     Integer id,

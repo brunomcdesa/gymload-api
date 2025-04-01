@@ -1,8 +1,8 @@
 package br.com.gymloadapi.modulos.exercicio.predicate;
 
 import br.com.gymloadapi.modulos.comum.predicate.PredicateBase;
-import br.com.gymloadapi.modulos.exercicio.enums.ETipoExercicio;
-import br.com.gymloadapi.modulos.exercicio.enums.ETipoPegada;
+import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
+import br.com.gymloadapi.modulos.comum.enums.ETipoPegada;
 
 import static br.com.gymloadapi.modulos.exercicio.model.QExercicio.exercicio;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;

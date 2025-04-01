@@ -1,7 +1,7 @@
 package br.com.gymloadapi.modulos.historicocargas.dto;
 
 import br.com.gymloadapi.modulos.comum.anotations.DatePatternResponse;
-import br.com.gymloadapi.modulos.exercicio.enums.ETipoExercicio;
+import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
 
 import java.time.LocalDate;
 

@@ -1,7 +1,7 @@
 package br.com.gymloadapi.modulos.exercicio.model;
 
-import br.com.gymloadapi.modulos.exercicio.enums.ETipoExercicio;
-import br.com.gymloadapi.modulos.exercicio.enums.ETipoPegada;
+import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
+import br.com.gymloadapi.modulos.comum.enums.ETipoPegada;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
 import br.com.gymloadapi.modulos.treino.model.Treino;
 import lombok.*;
