@@ -25,4 +25,9 @@ public class EnumController {
     public List<SelectResponse> getTiposPegadasSelect() {
         return enumService.getTiposPegadasSelect();
     }
+
+    @GetMapping("unidades-pesos/select")
+    public List<SelectResponse> getUnidadesPesosSelect() {
+        return enumService.getUnidadesPesosSelect();
+    }
 }

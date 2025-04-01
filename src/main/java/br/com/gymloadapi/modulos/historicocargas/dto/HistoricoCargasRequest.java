@@ -1,6 +1,6 @@
 package br.com.gymloadapi.modulos.historicocargas.dto;
 
-import br.com.gymloadapi.modulos.historicocargas.enums.EUnidadePeso;
+import br.com.gymloadapi.modulos.comum.enums.EUnidadePeso;
 
 public record HistoricoCargasRequest(
     Double carga,

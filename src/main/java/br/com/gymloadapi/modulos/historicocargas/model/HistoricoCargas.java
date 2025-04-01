@@ -1,7 +1,7 @@
 package br.com.gymloadapi.modulos.historicocargas.model;
 
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
-import br.com.gymloadapi.modulos.historicocargas.enums.EUnidadePeso;
+import br.com.gymloadapi.modulos.comum.enums.EUnidadePeso;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.*;
 
