@@ -13,7 +13,8 @@ public interface GrupoMuscularMapper {
     @Mapping(target = "id", ignore = true)
     GrupoMuscular mapToModel(GrupoMuscularRequest request);
 
-    @Mapping(target = "value", source = "grupoMuscular.nome")
+    @Mapping(target = "value", source = "grupoMuscular.id")
+    @Mapping(target = "label", source = "grupoMuscular.nome")
     SelectResponse mapToSelectResponse(GrupoMuscular grupoMuscular);
 
     GrupoMuscularResponse mapToResponse(GrupoMuscular grupoMuscular);
