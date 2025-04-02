@@ -59,11 +59,14 @@ public class HistoricoCargasService {
     }
 
     private Double getMaiorCargaDoHistorico(List<HistoricoCargas> historicoCargas) {
-        return historicoCargas.stream()
+        var optionalMaiorCarga = historicoCargas.stream()
             .map(HistoricoCargas::getCarga)
             .mapToDouble(Double::doubleValue)
-            .max()
-            .orElse(0.0);
+            .max();
+
+        return optionalMaiorCarga.isPresent()
+            ? optionalMaiorCarga.getAsDouble()
+            : null;
     }
 
     private List<HistoricoCargas> getHistoricoUltimoDia(List<HistoricoCargas> historicoCargas) {
