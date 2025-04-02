@@ -29,13 +29,13 @@ public class HistoricoCargas {
     @Enumerated(EnumType.STRING)
     private EUnidadePeso unidadePeso;
 
-    @Column
+    @Column(nullable = false)
     private Integer qtdRepeticoes;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate dataCadastro;
 
-    @Column
+    @Column(nullable = false)
     private Integer qtdSeries;
 
     @ManyToOne(fetch = FetchType.LAZY)
