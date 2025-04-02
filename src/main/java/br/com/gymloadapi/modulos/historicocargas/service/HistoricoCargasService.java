@@ -2,9 +2,10 @@ package br.com.gymloadapi.modulos.historicocargas.service;
 
 import br.com.gymloadapi.autenticacao.service.AutenticacaoService;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
+import br.com.gymloadapi.modulos.historicocargas.dto.CargaResponse;
 import br.com.gymloadapi.modulos.historicocargas.dto.HistoricoCargasRequest;
-import br.com.gymloadapi.modulos.historicocargas.dto.HistoricoCargasResponse;
 import br.com.gymloadapi.modulos.historicocargas.mapper.HistoricoCargasMapper;
+import br.com.gymloadapi.modulos.historicocargas.model.HistoricoCargas;
 import br.com.gymloadapi.modulos.historicocargas.repository.HistoricoCargasRepository;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +29,27 @@ public class HistoricoCargasService {
         repository.save(historicoCargasMapper.mapToModel(request, exercicio, usuarioAutenticado));
     }
 
-    public List<HistoricoCargasResponse> buscarExerciciosDoUsuario(Integer exercicioId) {
+    public CargaResponse buscarExerciciosDoUsuario(Integer exercicioId) {
         var usuarioAutenticadoId = this.getUsuarioAutenticado().getId();
-        return repository.findAllByExercicioIdAndUsuario_Id(exercicioId, usuarioAutenticadoId).stream()
-            .map(historicoCargasMapper::mapToResponse)
-            .toList();
+        var historicoCargas = repository.findAllByExercicioIdAndUsuario_Id(exercicioId, usuarioAutenticadoId);
+
+        return new CargaResponse(
+            this.getMaiorCargaDoHistorico(historicoCargas),
+            historicoCargas.stream()
+                .map(historicoCargasMapper::mapToResponse)
+                .toList()
+        );
     }
 
-    public Usuario getUsuarioAutenticado() {
+    private Usuario getUsuarioAutenticado() {
         return autenticacaoService.getUsuarioAutenticado();
+    }
+
+    private Double getMaiorCargaDoHistorico(List<HistoricoCargas> historicoCargas) {
+        return historicoCargas.stream()
+            .map(HistoricoCargas::getCarga)
+            .mapToDouble(Double::doubleValue)
+            .max()
+            .orElse(0.0);
     }
 }
