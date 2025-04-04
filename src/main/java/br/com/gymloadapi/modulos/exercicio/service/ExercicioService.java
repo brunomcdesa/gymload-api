@@ -2,7 +2,7 @@ package br.com.gymloadapi.modulos.exercicio.service;
 
 import br.com.gymloadapi.autenticacao.service.AutenticacaoService;
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
-import br.com.gymloadapi.modulos.exercicio.dto.ExercicioFiltros;
+import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioResponse;
 import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapper;
@@ -29,18 +29,18 @@ public class ExercicioService {
     }
 
     public List<ExercicioResponse> buscarTodos() {
-        return repository.findAll().stream()
+        return this.findAll().stream()
             .map(exercicioMapper::mapModelToResponse)
             .toList();
     }
 
     public Exercicio findById(Integer id) {
         return repository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Exercício não encontrado."));
+            .orElseThrow(() -> new NotFoundException("Exercício não encontrado."));
     }
 
-    public List<SelectResponse> findAllSelect(ExercicioFiltros filtros) {
-        return repository.findAllByPredicate(filtros.toPredicate().build()).stream()
+    public List<SelectResponse> buscarTodosSelect() {
+        return this.findAll().stream()
             .map(exercicioMapper::mapToSelectResponse)
             .toList();
     }
@@ -54,5 +54,9 @@ public class ExercicioService {
         return repository.buscarExerciciosPorTreinoAndUsuario(treinoId, usuarioAutenticado.getId()).stream()
             .map(exercicioMapper::mapModelToResponse)
             .toList();
+    }
+
+    private List<Exercicio> findAll() {
+        return repository.findAll();
     }
 }

@@ -1,13 +1,13 @@
 package br.com.gymloadapi.modulos.exercicio.controller;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
-import br.com.gymloadapi.modulos.exercicio.dto.ExercicioFiltros;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioResponse;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -21,7 +21,7 @@ public class ExercicioController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public void salvar(@RequestBody ExercicioRequest request) {
+    public void salvar(@RequestBody @Valid ExercicioRequest request) {
         service.salvar(request);
     }
 
@@ -31,8 +31,8 @@ public class ExercicioController {
     }
 
     @GetMapping("select")
-    public List<SelectResponse> getSelect(ExercicioFiltros filtros) {
-        return service.findAllSelect(filtros);
+    public List<SelectResponse> buscarTodosSelect() {
+        return service.buscarTodosSelect();
     }
 
     @GetMapping("treino/{treinoId}")
