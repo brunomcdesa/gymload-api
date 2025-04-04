@@ -12,10 +12,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.ADMIN;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -26,6 +28,7 @@ public class SecurityConfiguration {
     private static final int ENCRYPTOR_STRENGTH = 12;
 
     private final SecurityFilter securityFilter;
+    private final JwtAccessDeinedHandler accessDeniedHandler;
 
     @Bean
     @SneakyThrows
@@ -34,6 +37,10 @@ public class SecurityConfiguration {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint(new HttpStatusEntryPoint(UNAUTHORIZED))
+                .accessDeniedHandler(accessDeniedHandler)
+            )
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/auth/**", "/api/usuarios/cadastro")
                 .permitAll()

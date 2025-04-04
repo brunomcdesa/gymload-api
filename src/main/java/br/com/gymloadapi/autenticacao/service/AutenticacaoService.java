@@ -2,6 +2,7 @@ package br.com.gymloadapi.autenticacao.service;
 
 import br.com.gymloadapi.autenticacao.dto.LoginRequest;
 import br.com.gymloadapi.autenticacao.dto.LoginResponse;
+import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class AutenticacaoService implements UserDetailsService {
         var userDetails = this.getAuthentication();
 
         if (!(userDetails instanceof Usuario)) {
-            throw new RuntimeException("Usuário autenticado não é uma instância de Usuario");
+            throw new ValidacaoException("Usuário autenticado não é uma instância de Usuario");
         }
 
         return (Usuario) userDetails;
@@ -52,7 +53,7 @@ public class AutenticacaoService implements UserDetailsService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
-            throw new RuntimeException("Usuário não autenticado");
+            throw new ValidacaoException("Usuário não autenticado");
         }
 
         return (UserDetails) authentication.getPrincipal();

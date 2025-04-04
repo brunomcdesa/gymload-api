@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.usuario.service;
 
 import br.com.gymloadapi.autenticacao.dto.CadastroRequest;
+import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioResponse;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapper;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
@@ -10,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import jakarta.validation.ValidationException;
 import java.util.List;
 
 @Service
@@ -22,7 +22,7 @@ public class UsuarioService {
 
     public void cadastrar(CadastroRequest cadastroRequest, boolean isCadastroAdmin) {
         if (repository.existsByUsername(cadastroRequest.username())) {
-            throw new ValidationException("Já existe um usuário com este username.");
+            throw new ValidacaoException("Já existe um usuário com este username.");
         }
 
         var encryptedPassword = new BCryptPasswordEncoder().encode(cadastroRequest.password());
