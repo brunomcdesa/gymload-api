@@ -7,6 +7,7 @@ import br.com.gymloadapi.modulos.grupomuscular.service.GrupoMuscularService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -20,7 +21,7 @@ public class GrupoMuscularController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public void salvar(@RequestBody GrupoMuscularRequest request) {
+    public void salvar(@RequestBody @Valid GrupoMuscularRequest request) {
         service.salvar(request);
     }
 

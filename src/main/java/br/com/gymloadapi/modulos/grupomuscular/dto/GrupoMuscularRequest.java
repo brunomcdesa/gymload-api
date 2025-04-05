@@ -1,7 +1,9 @@
 package br.com.gymloadapi.modulos.grupomuscular.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record GrupoMuscularRequest(
-    String nome,
-    String codigo
+    @NotBlank String nome,
+    @NotBlank String codigo
 ) {
 }
