@@ -30,4 +30,14 @@ class GrupoMuscularMapperTest {
             () -> assertEquals("Costas", selectResponse.label())
         );
     }
+
+    @Test
+    void mapToResponse_deveFazerOMapeamentoCorreto_quandoSolicitado() {
+        var response = mapper.mapToResponse(umGrupoMuscularCostas());
+
+        assertAll(
+            () -> assertEquals(2, response.id()),
+            () -> assertEquals("Costas", response.nome())
+        );
+    }
 }

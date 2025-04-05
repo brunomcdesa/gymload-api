@@ -41,6 +41,6 @@ public class GrupoMuscularService {
 
     public GrupoMuscular findById(Integer id) {
         return repository.findById(id)
-            .orElseThrow(() -> new NotFoundException("Grupo Muscular não encontrado"));
+            .orElseThrow(() -> new NotFoundException("Grupo Muscular não encontrado."));
     }
 }

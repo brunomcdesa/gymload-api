@@ -4,6 +4,8 @@ import br.com.gymloadapi.modulos.grupomuscular.dto.GrupoMuscularRequest;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
 import lombok.experimental.UtilityClass;
 
+import java.util.List;
+
 @UtilityClass
 public class GrupoMuscularHelper {
 
@@ -25,5 +27,9 @@ public class GrupoMuscularHelper {
             .nome("Costas")
             .codigo("COSTAS")
             .build();
+    }
+
+    public static List<GrupoMuscular> umaListaGrupoMusculares() {
+        return List.of(umGrupoMuscularPeitoral(), umGrupoMuscularCostas());
     }
 }
