@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.treino.mapper;
 
-import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapper;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.treino.dto.TreinoRequest;
 import br.com.gymloadapi.modulos.treino.dto.TreinoResponse;
@@ -12,7 +11,7 @@ import org.mapstruct.Mapping;
 import java.time.LocalDate;
 import java.util.List;
 
-@Mapper(imports = LocalDate.class, uses = ExercicioMapper.class)
+@Mapper(imports = LocalDate.class)
 public interface TreinoMapper {
 
     @Mapping(target = "id", ignore = true)

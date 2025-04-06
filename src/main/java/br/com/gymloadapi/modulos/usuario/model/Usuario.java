@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.usuario.model;
 
-import br.com.gymloadapi.autenticacao.dto.CadastroRequest;
 import br.com.gymloadapi.modulos.usuario.enums.EUserRole;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,9 +10,6 @@ import jakarta.persistence.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-
-import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_ADMIN;
-import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_USER;
 
 @Table
 @Getter
@@ -74,15 +70,6 @@ public class Usuario implements UserDetails {
     @Override
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
-    }
-
-    public static Usuario createUser(CadastroRequest cadastroRequest, String encryptedPassword, boolean isCadastroAdmin) {
-        return Usuario.builder()
-            .nome(cadastroRequest.nome())
-            .username(cadastroRequest.username())
-            .senha(encryptedPassword)
-            .roles(isCadastroAdmin ? ROLES_ADMIN : ROLES_USER)
-            .build();
     }
 
     public String[] getRolesArray() {

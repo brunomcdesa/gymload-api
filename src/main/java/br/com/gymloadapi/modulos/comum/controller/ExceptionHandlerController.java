@@ -3,7 +3,6 @@ package br.com.gymloadapi.modulos.comum.controller;
 import br.com.gymloadapi.modulos.comum.dto.ExceptionErrorMessage;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,7 +32,7 @@ public class ExceptionHandlerController {
 
     @ResponseBody
     @ExceptionHandler(BindException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(BAD_REQUEST)
     public List<ExceptionErrorMessage> bindValidationError(BindException exception) {
         return exception.getBindingResult().getFieldErrors().stream()
             .map(error -> {

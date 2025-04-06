@@ -59,6 +59,15 @@ public class TestsHelper {
     }
 
     @SneakyThrows
+    public static void isOk(MockHttpServletRequestBuilder endpoint, MockMvc mockMvc, Object request) {
+        mockMvc.perform(endpoint
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(convertObjectToJsonBytes(request)))
+            .andExpect(status().isOk());
+    }
+
+    @SneakyThrows
     public static void isCreated(MockHttpServletRequestBuilder endpoint, MockMvc mockMvc, Object request) {
         mockMvc.perform(endpoint
                 .accept(APPLICATION_JSON)

@@ -1,6 +1,6 @@
 package br.com.gymloadapi.modulos.usuario.controller;
 
-import br.com.gymloadapi.autenticacao.dto.CadastroRequest;
+import br.com.gymloadapi.modulos.usuario.dto.UsuarioRequest;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioResponse;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +23,15 @@ public class UsuarioController {
         return service.buscarTodos();
     }
 
-    @PostMapping("cadastro")
     @ResponseStatus(CREATED)
-    public void cadastrar(@RequestBody @Valid CadastroRequest cadastroRequest) {
-        service.cadastrar(cadastroRequest, false);
+    @PostMapping("cadastro")
+    public void cadastrar(@RequestBody @Valid UsuarioRequest usuarioRequest) {
+        service.cadastrar(usuarioRequest, false);
     }
 
+    @ResponseStatus(CREATED)
     @PostMapping("cadastro/admin")
-    public void cadastrarAdmin(@RequestBody @Valid CadastroRequest cadastroRequest) {
-        service.cadastrar(cadastroRequest, true);
+    public void cadastrarAdmin(@RequestBody @Valid UsuarioRequest usuarioRequest) {
+        service.cadastrar(usuarioRequest, true);
     }
 }

@@ -1,10 +1,9 @@
 package br.com.gymloadapi.modulos.usuario.service;
 
-import br.com.gymloadapi.autenticacao.dto.CadastroRequest;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
+import br.com.gymloadapi.modulos.usuario.dto.UsuarioRequest;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioResponse;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapper;
-import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import br.com.gymloadapi.modulos.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_ADMIN;
+import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_USER;
+
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
@@ -20,13 +22,13 @@ public class UsuarioService {
     private final UsuarioMapper usuarioMapper;
     private final UsuarioRepository repository;
 
-    public void cadastrar(CadastroRequest cadastroRequest, boolean isCadastroAdmin) {
-        if (repository.existsByUsername(cadastroRequest.username())) {
+    public void cadastrar(UsuarioRequest usuarioRequest, boolean isCadastroAdmin) {
+        if (repository.existsByUsername(usuarioRequest.username())) {
             throw new ValidacaoException("Já existe um usuário com este username.");
         }
 
-        var encryptedPassword = new BCryptPasswordEncoder().encode(cadastroRequest.password());
-        var novoUsuario = Usuario.createUser(cadastroRequest, encryptedPassword, isCadastroAdmin);
+        var encryptedPassword = new BCryptPasswordEncoder().encode(usuarioRequest.password());
+        var novoUsuario = usuarioMapper.mapToModel(usuarioRequest, encryptedPassword, isCadastroAdmin ? ROLES_ADMIN : ROLES_USER);
 
         repository.save(novoUsuario);
     }
