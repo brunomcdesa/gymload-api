@@ -13,8 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
+
+import static java.util.Comparator.comparing;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +46,7 @@ public class HistoricoCargasService {
 
     public List<HistoricoCargasResponse> buscarHistoricoCargasCompleto(Integer exercicioId) {
         return this.getAllByExercicioId(exercicioId).stream()
-            .sorted(Comparator.comparing(HistoricoCargas::getDataCadastro).reversed())
+            .sorted(comparing(HistoricoCargas::getDataCadastro).reversed())
             .map(historicoCargasMapper::mapToResponse)
             .toList();
     }
