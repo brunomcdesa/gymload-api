@@ -44,9 +44,9 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/auth/**", "/api/usuarios/cadastro")
                 .permitAll()
-                .requestMatchers(POST, "api/exercicios", "api/grupos-musculares")
+                .requestMatchers(POST, "/api/exercicios", "/api/grupos-musculares")
                 .hasRole(ADMIN.name())
-                .requestMatchers("api/usuarios/**")
+                .requestMatchers("/api/usuarios/**")
                 .hasRole(ADMIN.name())
                 .anyRequest().authenticated()
             )
