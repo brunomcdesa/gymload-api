@@ -34,6 +34,7 @@ public class Treino {
     private Usuario usuario;
 
     @ManyToMany
+    @OrderColumn(name = "ORDEM_EXERCICIO")
     @SuppressWarnings("Indentation")
     @JoinTable(name = "TREINO_EXERCICIO", joinColumns = {
         @JoinColumn(name = "FK_TREINO", referencedColumnName = "ID",
@@ -41,4 +42,10 @@ public class Treino {
         @JoinColumn(name = "FK_EXERCICIO", referencedColumnName = "ID",
             foreignKey = @ForeignKey(name = "FK_EXERCICIO"))})
     private List<Exercicio> exercicios;
+
+    public List<Integer> getExerciciosIds() {
+        return exercicios.stream()
+            .map(Exercicio::getId)
+            .toList();
+    }
 }
