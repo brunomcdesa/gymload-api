@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.exercicio.service;
 
-import br.com.gymloadapi.autenticacao.service.AutenticacaoService;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapper;
 import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapperImpl;
@@ -22,7 +21,6 @@ import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
-import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,14 +35,12 @@ class ExercicioServiceTest {
     private ExercicioRepository repository;
     @Mock
     private GrupoMuscularService grupoMuscularService;
-    @Mock
-    private AutenticacaoService autenticacaoService;
     @Captor
     private ArgumentCaptor<Exercicio> exercicioCaptor;
 
     @BeforeEach
     void setUp() {
-        service = new ExercicioService(repository, mapper, grupoMuscularService, autenticacaoService);
+        service = new ExercicioService(repository, mapper, grupoMuscularService);
     }
 
     @Test
@@ -71,7 +67,7 @@ class ExercicioServiceTest {
 
     @Test
     void buscarTodos_deveRetornarTodosOsExercicios_quandoSolicitado() {
-        when(repository.findAll()).thenReturn(umaListaDeExercicios());
+        when(repository.findAllComplete()).thenReturn(umaListaDeExercicios());
 
         var responses = service.buscarTodos();
 
@@ -82,7 +78,7 @@ class ExercicioServiceTest {
             () -> assertEquals("PUXADA ALTA", responses.getLast().nome())
         );
 
-        verify(repository).findAll();
+        verify(repository).findAllComplete();
     }
 
     @Test
@@ -110,7 +106,7 @@ class ExercicioServiceTest {
 
     @Test
     void buscarTodosSelect_deveRetornarSelectDeExercicios_quandoSolicitado() {
-        when(repository.findAll()).thenReturn(umaListaDeExercicios());
+        when(repository.findAllComplete()).thenReturn(umaListaDeExercicios());
 
         var exerciciosSelect = service.buscarTodosSelect();
         assertAll(
@@ -120,7 +116,7 @@ class ExercicioServiceTest {
             () -> assertEquals("PUXADA ALTA (MAQUINA)", exerciciosSelect.getLast().label())
         );
 
-        verify(repository).findAll();
+        verify(repository).findAllComplete();
     }
 
     @Test
@@ -141,10 +137,7 @@ class ExercicioServiceTest {
 
     @Test
     void buscarExerciciosPorTreino_deveRetornarExerciciosPorTreinoEUsuario_quandoSolicitado() {
-        var usuarioAdmin = umUsuarioAdmin();
-
-        when(autenticacaoService.getUsuarioAutenticado()).thenReturn(usuarioAdmin);
-        when(repository.buscarExerciciosPorTreinoAndUsuario(1, usuarioAdmin.getId()))
+        when(repository.buscarExerciciosPorTreino(1))
             .thenReturn(umaListaDeExercicios());
 
         var exercicios = service.buscarExerciciosPorTreino(1);
@@ -156,6 +149,6 @@ class ExercicioServiceTest {
             () -> assertEquals("PUXADA ALTA", exercicios.getLast().nome())
         );
 
-        verify(repository).buscarExerciciosPorTreinoAndUsuario(1, usuarioAdmin.getId());
+        verify(repository).buscarExerciciosPorTreino(1);
     }
 }

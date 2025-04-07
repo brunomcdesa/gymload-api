@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.exercicio.service;
 
-import br.com.gymloadapi.autenticacao.service.AutenticacaoService;
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
@@ -21,7 +20,6 @@ public class ExercicioService {
     private final ExercicioRepository repository;
     private final ExercicioMapper exercicioMapper;
     private final GrupoMuscularService grupoMuscularService;
-    private final AutenticacaoService autenticacaoService;
 
     public void salvar(ExercicioRequest request) {
         var grupoMuscular = grupoMuscularService.findById(request.grupoMuscularId());
@@ -50,13 +48,12 @@ public class ExercicioService {
     }
 
     public List<ExercicioResponse> buscarExerciciosPorTreino(Integer treinoId) {
-        var usuarioAutenticado = autenticacaoService.getUsuarioAutenticado();
-        return repository.buscarExerciciosPorTreinoAndUsuario(treinoId, usuarioAutenticado.getId()).stream()
+        return repository.buscarExerciciosPorTreino(treinoId).stream()
             .map(exercicioMapper::mapModelToResponse)
             .toList();
     }
 
     private List<Exercicio> findAll() {
-        return repository.findAll();
+        return repository.findAllComplete();
     }
 }

@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 
 import jakarta.persistence.EntityManager;
 import java.util.List;
-import java.util.UUID;
 
 import static br.com.gymloadapi.modulos.exercicio.model.QExercicio.exercicio;
+import static br.com.gymloadapi.modulos.grupomuscular.model.QGrupoMuscular.grupoMuscular;
 
 @RequiredArgsConstructor
 public class ExercicioRepositoryImpl implements ExercicioRepositoryCustom {
@@ -16,11 +16,21 @@ public class ExercicioRepositoryImpl implements ExercicioRepositoryCustom {
     private final EntityManager entityManager;
 
     @Override
-    public List<Exercicio> buscarExerciciosPorTreinoAndUsuario(Integer treinoId, UUID usuarioId) {
+    public List<Exercicio> findAllComplete() {
         return new JPAQueryFactory(entityManager)
             .selectFrom(exercicio)
-            .where(exercicio.treinos.any().id.eq(treinoId)
-                .and(exercicio.treinos.any().usuario.id.eq(usuarioId)))
+            .innerJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
+            .leftJoin(exercicio.treinos).fetchJoin()
+            .fetch();
+    }
+
+    @Override
+    public List<Exercicio> buscarExerciciosPorTreino(Integer treinoId) {
+        return new JPAQueryFactory(entityManager)
+            .selectFrom(exercicio)
+            .innerJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
+            .leftJoin(exercicio.treinos).fetchJoin()
+            .where(exercicio.treinos.any().id.eq(treinoId))
             .fetch();
     }
 }

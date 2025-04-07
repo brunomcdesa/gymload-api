@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,8 +16,8 @@ public class ExercicioRepositoryTest {
     private ExercicioRepository repository;
 
     @Test
-    void buscarExerciciosPorTreinoAndUsuario_deveRetornarExercicioPorTreino_quandoSolicitado() {
-        var exercicios = repository.buscarExerciciosPorTreinoAndUsuario(1, umUsuarioAdmin().getId());
+    void buscarExerciciosPorTreino_deveRetornarExercicioPorTreino_quandoSolicitado() {
+        var exercicios = repository.buscarExerciciosPorTreino(1);
         assertAll(
             () -> assertEquals(1, exercicios.getFirst().getId()),
             () -> assertEquals("SUPINO RETO", exercicios.getFirst().getNome())

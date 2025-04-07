@@ -28,7 +28,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws IOException {
+                                    @NonNull FilterChain filterChain) throws IOException, ServletException {
         try {
             var token = this.recoveryToken(request);
             if (token != null) {
@@ -39,7 +39,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
             filterChain.doFilter(request, response);
-        } catch (BadCredentialsException | IOException | ServletException exception) {
+        } catch (BadCredentialsException exception) {
             response.setStatus(SC_UNAUTHORIZED);
             response.setContentType(APPLICATION_JSON_VALUE);
             response.getWriter().write("{\"error\": \"Token inválido ou expirado\"}");
