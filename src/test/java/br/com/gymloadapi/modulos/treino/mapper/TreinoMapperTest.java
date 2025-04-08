@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
+import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umaListaDeExercicios;
 import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.umTreino;
 import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.umTreinoRequest;
@@ -21,6 +22,7 @@ class TreinoMapperTest {
 
         assertAll(
             () -> assertEquals("Um Treino", model.getNome()),
+            () -> assertEquals(ATIVO, model.getSituacao()),
             () -> assertEquals("Usuario Admin", model.getUsuario().getNome()),
             () -> assertEquals("SUPINO RETO", model.getExercicios().getFirst().getNome()),
             () -> assertEquals("PUXADA ALTA", model.getExercicios().getLast().getNome())
@@ -29,12 +31,13 @@ class TreinoMapperTest {
 
     @Test
     void mapToResponse_deveFazerMapeamentoCorreto_quandoSolicitado() {
-        var response = mapper.mapToResponse(umTreino());
+        var response = mapper.mapToResponse(umTreino(ATIVO));
 
         assertAll(
             () -> assertEquals(1, response.id()),
             () -> assertEquals("Um Treino", response.nome()),
-            () -> assertEquals(LocalDate.of(2025, 4, 6), response.dataCadastro())
+            () -> assertEquals(LocalDate.of(2025, 4, 6), response.dataCadastro()),
+            () -> assertEquals(ATIVO, response.situacao())
         );
     }
 }

@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.treino.model;
 
+import br.com.gymloadapi.modulos.comum.enums.ESituacao;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.*;
@@ -7,6 +8,10 @@ import lombok.*;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+
+import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
+import static br.com.gymloadapi.modulos.comum.enums.ESituacao.INATIVO;
+import static jakarta.persistence.EnumType.STRING;
 
 @Table
 @Getter
@@ -28,6 +33,10 @@ public class Treino {
     @Column(nullable = false)
     private LocalDate dataCadastro;
 
+    @Enumerated(STRING)
+    @Column(nullable = false)
+    private ESituacao situacao;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_USUARIO", referencedColumnName = "ID", columnDefinition = "UUID",
         foreignKey = @ForeignKey(name = "FK_USUARIO"), nullable = false)
@@ -47,5 +56,9 @@ public class Treino {
         return exercicios.stream()
             .map(Exercicio::getId)
             .toList();
+    }
+
+    public void alterarSituacao() {
+        this.setSituacao(this.situacao == ATIVO ? INATIVO : ATIVO);
     }
 }

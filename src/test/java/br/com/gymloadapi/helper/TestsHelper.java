@@ -29,7 +29,7 @@ public class TestsHelper {
     @SneakyThrows
     public static void isUnauthorized(MockHttpServletRequestBuilder endpoint, MockMvc mockMvc) {
         mockMvc.perform(endpoint
-            .contentType(APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
             .andExpect(status().isUnauthorized());
     }
 
@@ -82,6 +82,13 @@ public class TestsHelper {
                 .contentType(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .content(convertObjectToJsonBytes(request)))
+            .andExpect(status().isNoContent());
+    }
+
+    @SneakyThrows
+    public static void isNoContent(MockHttpServletRequestBuilder endpoint, MockMvc mvc) {
+        mvc.perform(endpoint
+                .accept(APPLICATION_JSON))
             .andExpect(status().isNoContent());
     }
 }

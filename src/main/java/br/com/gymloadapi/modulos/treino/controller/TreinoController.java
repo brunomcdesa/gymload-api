@@ -40,4 +40,16 @@ public class TreinoController {
     public void editar(@PathVariable Integer id, @RequestBody @Validated(Alteracao.class) TreinoRequest request) {
         service.editar(id, request);
     }
+
+    @PutMapping("{id}/ativar")
+    @ResponseStatus(NO_CONTENT)
+    public void ativar(@PathVariable Integer id) {
+        service.ativar(id);
+    }
+
+    @PutMapping("{id}/inativar")
+    @ResponseStatus(NO_CONTENT)
+    public void inativar(@PathVariable Integer id) {
+        service.inativar(id);
+    }
 }

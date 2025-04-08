@@ -1,6 +1,8 @@
 package br.com.gymloadapi.modulos.treino.service;
 
+import br.com.gymloadapi.modulos.comum.enums.ESituacao;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
+import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.treino.dto.TreinoRequest;
 import br.com.gymloadapi.modulos.treino.dto.TreinoResponse;
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+
+import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
+import static br.com.gymloadapi.modulos.comum.enums.ESituacao.INATIVO;
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +48,28 @@ public class TreinoService {
         }
     }
 
+    public void ativar(Integer id) {
+        var treino = this.findCompleteById(id);
+        this.validarSituacao(treino.getSituacao(), ATIVO);
+        treino.alterarSituacao();
+        repository.save(treino);
+    }
+
+    public void inativar(Integer id) {
+        var treino = this.findCompleteById(id);
+        this.validarSituacao(treino.getSituacao(), INATIVO);
+        treino.alterarSituacao();
+        repository.save(treino);
+    }
+
     private Treino findCompleteById(Integer id) {
         return repository.findCompleteById(id)
             .orElseThrow(() -> new NotFoundException("Treino não encontrado."));
+    }
+
+    private void validarSituacao(ESituacao situacaoAtual, ESituacao situacaoDestino) {
+        if (situacaoAtual == situacaoDestino) {
+            throw new ValidacaoException("O treino já está na situacão " + situacaoDestino);
+        }
     }
 }

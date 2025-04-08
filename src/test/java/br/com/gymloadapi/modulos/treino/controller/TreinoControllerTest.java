@@ -21,6 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
@@ -86,10 +87,11 @@ class TreinoControllerTest {
         verify(service).listarTodosDoUsuario(UUID.fromString("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9"));
     }
 
-    @Test
+    @ParameterizedTest
     @WithAnonymousUser
-    void editar_deveRetornarUnauthorized_quandoUsuarioNaoAutenticado() {
-        isUnauthorized(put(URL + "/1/editar"), mockMvc);
+    @ValueSource(strings = {"/1/editar", "/1/ativar", "/1/inativar"})
+    void puts_devemRetornarUnauthorized_quandoUsuarioNaoAutenticado(String endpoint) {
+        isUnauthorized(put(URL + endpoint), mockMvc);
         verifyNoInteractions(service);
     }
 
@@ -111,5 +113,17 @@ class TreinoControllerTest {
         isNoContent(put(URL + "/1/editar"), mockMvc, request);
 
         verify(service).editar(1, request);
+    }
+
+    @WithMockUser
+    @ParameterizedTest
+    @ValueSource(strings = {"/1/ativar", "/1/inativar"})
+    void puts_devemRetornarNoContent_quandoUsuarioAutenticado(String endpoint) {
+        isNoContent(put(URL + endpoint), mockMvc);
+
+        Map.<String, Runnable>of(
+            "/1/ativar", () -> verify(service).ativar(1),
+            "/1/inativar", () -> verify(service).inativar(1)
+        ).get(endpoint).run();
     }
 }

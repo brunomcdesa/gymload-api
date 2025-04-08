@@ -7,6 +7,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 
+import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -24,6 +25,7 @@ class TreinoRepositoryTest {
             () -> assertEquals(1, treino.getId()),
             () -> assertEquals("TREINO 1", treino.getNome()),
             () -> assertEquals(LocalDate.of(2025, 3, 4), treino.getDataCadastro()),
+            () -> assertEquals(ATIVO, treino.getSituacao()),
             () -> assertEquals(1, treino.getExercicios().getFirst().getId())
         );
     }
