@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.ADMIN;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.EAGER;
 
@@ -79,5 +80,9 @@ public class Usuario implements UserDetails {
         return this.roles.stream()
             .map(EUserRole::mapRole)
             .toArray(String[]::new);
+    }
+
+    public boolean isAdmin() {
+        return this.roles.contains(ADMIN);
     }
 }

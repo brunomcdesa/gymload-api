@@ -16,7 +16,9 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.ADMIN;
+import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.USER;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -46,6 +48,8 @@ public class SecurityConfiguration {
                 .permitAll()
                 .requestMatchers(POST, "/api/exercicios", "/api/grupos-musculares")
                 .hasRole(ADMIN.name())
+                .requestMatchers(PUT, "/api/usuarios/{id}/editar")
+                .hasAnyRole(ADMIN.name(), USER.name())
                 .requestMatchers("/api/usuarios/**")
                 .hasRole(ADMIN.name())
                 .anyRequest().authenticated()

@@ -2,18 +2,17 @@ package br.com.gymloadapi.modulos.comum.controller;
 
 import br.com.gymloadapi.modulos.comum.dto.ExceptionErrorMessage;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
+import br.com.gymloadapi.modulos.comum.exception.PermissaoException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
 
 import static java.lang.String.format;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
 public class ExceptionHandlerController {
@@ -30,10 +29,9 @@ public class ExceptionHandlerController {
         return new ExceptionErrorMessage(exception.getMessage(), null);
     }
 
-    @ResponseBody
-    @ExceptionHandler(BindException.class)
     @ResponseStatus(BAD_REQUEST)
-    public List<ExceptionErrorMessage> bindValidationError(BindException exception) {
+    @ExceptionHandler(BindException.class)
+    public List<ExceptionErrorMessage> handleBindException(BindException exception) {
         return exception.getBindingResult().getFieldErrors().stream()
             .map(error -> {
                 var field = error.getField();
@@ -42,5 +40,11 @@ public class ExceptionHandlerController {
                     field
                 );
             }).toList();
+    }
+
+    @ResponseStatus(FORBIDDEN)
+    @ExceptionHandler(PermissaoException.class)
+    public ExceptionErrorMessage handlePermissaoException(PermissaoException exception) {
+        return new ExceptionErrorMessage(String.format("Acesso negado. %s", exception.getMessage()), null);
     }
 }

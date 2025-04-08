@@ -64,16 +64,16 @@ class ExceptionHandlerControllerTest {
 
     @Test
     @SneakyThrows
-    void bindValidationError_deveRetornarBadRequest_quandoBindExceptionForLancado() {
+    void handleBindException_deveRetornarBadRequest_quandoBindExceptionForLancado() {
         var fieldError1 = new FieldError("objeto", "nome", "é obrigatório");
         var fieldError2 = new FieldError("objeto", "email", "deve ser válido");
 
         when(bindException.getBindingResult()).thenReturn(bindingResult);
         when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError1, fieldError2));
 
-        var annotation = ExceptionHandlerController.class.getMethod("bindValidationError", BindException.class)
+        var annotation = ExceptionHandlerController.class.getMethod("handleBindException", BindException.class)
             .getAnnotation(ResponseStatus.class);
-        var resultado = exceptionHandlerController.bindValidationError(bindException);
+        var resultado = exceptionHandlerController.handleBindException(bindException);
 
         assertAll(
             () -> assertEquals(BAD_REQUEST, annotation.value()),

@@ -4,8 +4,7 @@ import br.com.gymloadapi.modulos.usuario.dto.UsuarioRequest;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioResponse;
 import br.com.gymloadapi.modulos.usuario.enums.EUserRole;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -18,4 +17,9 @@ public interface UsuarioMapper {
     Usuario mapToModel(UsuarioRequest usuarioRequest, String encryptedPassword, List<EUserRole> roles);
 
     UsuarioResponse mapModelToResponse(Usuario usuario);
+
+    @BeanMapping(
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
+    void editar(UsuarioRequest usuarioRequest, @MappingTarget Usuario usuario);
 }
