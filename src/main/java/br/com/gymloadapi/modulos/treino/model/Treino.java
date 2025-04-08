@@ -12,6 +12,8 @@ import java.util.List;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.INATIVO;
 import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.GenerationType.SEQUENCE;
 
 @Table
 @Getter
@@ -23,7 +25,7 @@ import static jakarta.persistence.EnumType.STRING;
 public class Treino {
 
     @Id
-    @GeneratedValue(generator = "SEQ_TREINO", strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "SEQ_TREINO", strategy = SEQUENCE)
     @SequenceGenerator(name = "SEQ_TREINO", sequenceName = "SEQ_TREINO", allocationSize = 1)
     private Integer id;
 
@@ -37,7 +39,7 @@ public class Treino {
     @Column(nullable = false)
     private ESituacao situacao;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "FK_USUARIO", referencedColumnName = "ID", columnDefinition = "UUID",
         foreignKey = @ForeignKey(name = "FK_USUARIO"), nullable = false)
     private Usuario usuario;

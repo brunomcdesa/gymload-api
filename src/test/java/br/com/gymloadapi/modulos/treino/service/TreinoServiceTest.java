@@ -24,6 +24,7 @@ import static br.com.gymloadapi.modulos.comum.enums.ESituacao.INATIVO;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.outraListaDeExercicios;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umaListaDeExercicios;
 import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.*;
+import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.USUARIO_ADMIN_ID;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -38,12 +39,14 @@ class TreinoServiceTest {
     private TreinoRepository repository;
     @Mock
     private ExercicioService exercicioService;
+    @Mock
+    private TreinoHistoricoService historicoService;
     @Captor
     private ArgumentCaptor<Treino> captor;
 
     @BeforeEach
     void setUp() {
-        service = new TreinoService(mapper, repository, exercicioService);
+        service = new TreinoService(mapper, repository, exercicioService, historicoService);
     }
 
     @Test
@@ -85,7 +88,7 @@ class TreinoServiceTest {
         when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
         when(exercicioService.findByIdIn(List.of(3, 4))).thenReturn(outraListaDeExercicios());
 
-        service.editar(1, outroTreinoRequest());
+        service.editar(1, outroTreinoRequest(), USUARIO_ADMIN_ID);
 
         verify(repository).findCompleteById(1);
         verify(exercicioService).findByIdIn(List.of(3, 4));
@@ -102,7 +105,7 @@ class TreinoServiceTest {
     void editar_naoDeveEditarExerciciosDoTreino_quandoForListaIgualDaAnterior() {
         when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
 
-        service.editar(1, umTreinoRequest());
+        service.editar(1, umTreinoRequest(), USUARIO_ADMIN_ID);
 
         verify(repository).findCompleteById(1);
         verifyNoInteractions(exercicioService);
@@ -113,7 +116,10 @@ class TreinoServiceTest {
     void editar_deveLancarException_quandoNaoEncontrarTreino() {
         when(repository.findCompleteById(1)).thenReturn(Optional.empty());
 
-        var exception = assertThrowsExactly(NotFoundException.class, () -> service.editar(1, umTreinoRequest()));
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.editar(1, umTreinoRequest(), USUARIO_ADMIN_ID)
+        );
         assertEquals("Treino não encontrado.", exception.getMessage());
 
         verify(repository).findCompleteById(1);
@@ -125,7 +131,10 @@ class TreinoServiceTest {
     void ativar_deveLancarException_quandoNaoEncontrTreino() {
         when(repository.findCompleteById(1)).thenReturn(Optional.empty());
 
-        var exception = assertThrowsExactly(NotFoundException.class, () -> service.ativar(1));
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.ativar(1, USUARIO_ADMIN_ID)
+        );
         assertEquals("Treino não encontrado.", exception.getMessage());
 
         verify(repository).findCompleteById(1);
@@ -137,7 +146,10 @@ class TreinoServiceTest {
         var treino = umTreino(ATIVO);
         when(repository.findCompleteById(1)).thenReturn(Optional.of(treino));
 
-        var exception = assertThrowsExactly(ValidacaoException.class, () -> service.ativar(1));
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.ativar(1, USUARIO_ADMIN_ID)
+        );
         assertEquals("O treino já está na situacão ATIVO", exception.getMessage());
 
         verify(repository).findCompleteById(1);
@@ -149,7 +161,7 @@ class TreinoServiceTest {
         var treino = umTreino(INATIVO);
         when(repository.findCompleteById(1)).thenReturn(Optional.of(treino));
 
-        service.ativar(1);
+        service.ativar(1, USUARIO_ADMIN_ID);
 
         verify(repository).findCompleteById(1);
         verify(repository).save(captor.capture());
@@ -161,7 +173,10 @@ class TreinoServiceTest {
     void inativar_deveLancarException_quandoNaoEncontrTreino() {
         when(repository.findCompleteById(1)).thenReturn(Optional.empty());
 
-        var exception = assertThrowsExactly(NotFoundException.class, () -> service.inativar(1));
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.inativar(1, USUARIO_ADMIN_ID)
+        );
         assertEquals("Treino não encontrado.", exception.getMessage());
 
         verify(repository).findCompleteById(1);
@@ -173,7 +188,10 @@ class TreinoServiceTest {
         var treino = umTreino(INATIVO);
         when(repository.findCompleteById(1)).thenReturn(Optional.of(treino));
 
-        var exception = assertThrowsExactly(ValidacaoException.class, () -> service.inativar(1));
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.inativar(1, USUARIO_ADMIN_ID)
+        );
         assertEquals("O treino já está na situacão INATIVO", exception.getMessage());
 
         verify(repository).findCompleteById(1);
@@ -185,7 +203,7 @@ class TreinoServiceTest {
         var treino = umTreino(ATIVO);
         when(repository.findCompleteById(1)).thenReturn(Optional.of(treino));
 
-        service.inativar(1);
+        service.inativar(1, USUARIO_ADMIN_ID);
 
         verify(repository).findCompleteById(1);
         verify(repository).save(captor.capture());

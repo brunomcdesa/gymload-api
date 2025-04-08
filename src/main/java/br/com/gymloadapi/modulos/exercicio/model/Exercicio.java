@@ -9,6 +9,10 @@ import lombok.*;
 import jakarta.persistence.*;
 import java.util.List;
 
+import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.GenerationType.SEQUENCE;
+
 @Table
 @Getter
 @Setter
@@ -19,7 +23,7 @@ import java.util.List;
 public class Exercicio {
 
     @Id
-    @GeneratedValue(generator = "SEQ_EXERCICIO", strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "SEQ_EXERCICIO", strategy = SEQUENCE)
     @SequenceGenerator(name = "SEQ_EXERCICIO", sequenceName = "SEQ_EXERCICIO", allocationSize = 1)
     private Integer id;
 
@@ -30,14 +34,14 @@ public class Exercicio {
     private String descricao;
 
     @Column
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     private ETipoExercicio tipoExercicio;
 
     @Column
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     private ETipoPegada tipoPegada;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "FK_GRUPO_MUSCULAR", referencedColumnName = "ID",
         foreignKey = @ForeignKey(name = "FK_GRUPO_MUSCULAR"), nullable = false)
     private GrupoMuscular grupoMuscular;

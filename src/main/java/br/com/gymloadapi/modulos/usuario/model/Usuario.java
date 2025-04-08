@@ -11,6 +11,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.EAGER;
+
 @Table
 @Getter
 @Setter
@@ -35,8 +38,8 @@ public class Usuario implements UserDetails {
     private String senha;
 
     @Column(name = "ROLE")
-    @Enumerated(EnumType.STRING)
-    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(STRING)
+    @ElementCollection(fetch = EAGER)
     @CollectionTable(name = "USUARIO_ROLE", joinColumns = @JoinColumn(name = "USUARIO_ID"))
     private List<EUserRole> roles;
 

@@ -37,19 +37,20 @@ public class TreinoController {
 
     @PutMapping("{id}/editar")
     @ResponseStatus(NO_CONTENT)
-    public void editar(@PathVariable Integer id, @RequestBody @Validated(Alteracao.class) TreinoRequest request) {
-        service.editar(id, request);
+    public void editar(@PathVariable Integer id, @RequestBody @Validated(Alteracao.class) TreinoRequest request,
+                       @AuthenticationPrincipal Usuario usuario) {
+        service.editar(id, request, usuario.getId());
     }
 
     @PutMapping("{id}/ativar")
     @ResponseStatus(NO_CONTENT)
-    public void ativar(@PathVariable Integer id) {
-        service.ativar(id);
+    public void ativar(@PathVariable Integer id, @AuthenticationPrincipal Usuario usuario) {
+        service.ativar(id, usuario.getId());
     }
 
     @PutMapping("{id}/inativar")
     @ResponseStatus(NO_CONTENT)
-    public void inativar(@PathVariable Integer id) {
-        service.inativar(id);
+    public void inativar(@PathVariable Integer id, @AuthenticationPrincipal Usuario usuario ) {
+        service.inativar(id, usuario.getId());
     }
 }

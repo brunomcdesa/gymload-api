@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
+import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.USUARIO_ADMIN_ID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -21,8 +22,7 @@ class HistoricoCargasRepositoryTest {
 
     @Test
     void findAllByExercicioIdAndUsuarioId_deveRetornarCargas_quandoEncontrarCargasParaOExercicioEUsuario() {
-        var historicoCargas = repository.findAllByExercicioIdAndUsuarioId(1,
-            UUID.fromString("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9"));
+        var historicoCargas = repository.findAllByExercicioIdAndUsuarioId(1, USUARIO_ADMIN_ID);
 
         assertAll(
             () -> assertEquals(1, historicoCargas.getFirst().getId()),

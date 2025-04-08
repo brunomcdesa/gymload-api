@@ -14,6 +14,8 @@ import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_USER;
 @UtilityClass
 public class UsuarioHelper {
 
+    public static final UUID USUARIO_ADMIN_ID = UUID.fromString("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9");
+
     public static UsuarioRequest umUsuarioRequest() {
         return new UsuarioRequest("Usuario", "usuario", "123456");
     }
@@ -24,7 +26,7 @@ public class UsuarioHelper {
 
     public static Usuario umUsuarioAdmin() {
         return Usuario.builder()
-            .id(UUID.fromString("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9"))
+            .id(USUARIO_ADMIN_ID)
             .nome("Usuario Admin")
             .roles(ROLES_ADMIN)
             .username("usuarioAdmin")

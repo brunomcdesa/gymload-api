@@ -18,10 +18,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
-import java.util.UUID;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
 import static br.com.gymloadapi.modulos.historicocargas.helper.HistoricoCargasHelper.umHistoricoCargasRequest;
+import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.USUARIO_ADMIN_ID;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -70,10 +70,9 @@ class HistoricoCargasControllerTest {
     void gets_devemRetornarOk_quandoUsuarioAutenticado(String endpoint) {
         isOk(get(URL + endpoint), mockMvc);
 
-        var usuarioId = UUID.fromString("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9");
         Map.<String, Runnable>of(
-            "/1", () -> verify(service).buscarUltimoHistoricoCargas(1, usuarioId),
-            "/1/completo", () -> verify(service).buscarHistoricoCargasCompleto(1, usuarioId)
+            "/1", () -> verify(service).buscarUltimoHistoricoCargas(1, USUARIO_ADMIN_ID),
+            "/1/completo", () -> verify(service).buscarHistoricoCargasCompleto(1, USUARIO_ADMIN_ID)
         ).get(endpoint).run();
     }
 }

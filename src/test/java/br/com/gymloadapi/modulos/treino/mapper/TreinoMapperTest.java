@@ -4,13 +4,14 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
+import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umaListaDeExercicios;
 import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.umTreino;
 import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.umTreinoRequest;
+import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.USUARIO_ADMIN_ID;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TreinoMapperTest {
 
@@ -38,6 +39,18 @@ class TreinoMapperTest {
             () -> assertEquals("Um Treino", response.nome()),
             () -> assertEquals(LocalDate.of(2025, 4, 6), response.dataCadastro()),
             () -> assertEquals(ATIVO, response.situacao())
+        );
+    }
+
+    @Test
+    void mapToHistorico_deveFazerMapeamentoCorreto_quandoSolicitado() {
+        var historico = mapper.mapToHistorico(umTreino(ATIVO), USUARIO_ADMIN_ID, CADASTRO);
+
+        assertAll(
+            () -> assertNull(historico.getId()),
+            () -> assertEquals(CADASTRO, historico.getAcao()),
+            () -> assertEquals(USUARIO_ADMIN_ID, historico.getUsuarioCadastroId()),
+            () -> assertEquals(1, historico.getTreino().getId())
         );
     }
 }

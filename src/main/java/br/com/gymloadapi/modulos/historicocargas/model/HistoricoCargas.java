@@ -8,6 +8,8 @@ import lombok.*;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+import static jakarta.persistence.GenerationType.SEQUENCE;
+
 @Table
 @Getter
 @Setter
@@ -18,7 +20,7 @@ import java.time.LocalDate;
 public class HistoricoCargas {
 
     @Id
-    @GeneratedValue(generator = "SEQ_HISTORICO_CARGAS", strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "SEQ_HISTORICO_CARGAS", strategy = SEQUENCE)
     @SequenceGenerator(name = "SEQ_HISTORICO_CARGAS", sequenceName = "SEQ_HISTORICO_CARGAS", allocationSize = 1)
     private Integer id;
 

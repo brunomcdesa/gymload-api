@@ -4,6 +4,8 @@ import lombok.*;
 
 import jakarta.persistence.*;
 
+import static jakarta.persistence.GenerationType.SEQUENCE;
+
 @Table
 @Getter
 @Setter
@@ -14,7 +16,7 @@ import jakarta.persistence.*;
 public class GrupoMuscular {
 
     @Id
-    @GeneratedValue(generator = "SEQ_GRUPO_MUSCULAR", strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "SEQ_GRUPO_MUSCULAR", strategy = SEQUENCE)
     @SequenceGenerator(name = "SEQ_GRUPO_MUSCULAR", sequenceName = "SEQ_GRUPO_MUSCULAR", allocationSize = 1)
     private Integer id;
 
