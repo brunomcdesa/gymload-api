@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.historicocargas.service;
 
-import br.com.gymloadapi.autenticacao.service.AutenticacaoService;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.historicocargas.dto.CargaResponse;
 import br.com.gymloadapi.modulos.historicocargas.dto.HistoricoCargasRequest;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import static java.util.Comparator.comparing;
 
@@ -23,18 +23,15 @@ public class HistoricoCargasService {
 
     private final ExercicioService exercicioService;
     private final HistoricoCargasRepository repository;
-    private final AutenticacaoService autenticacaoService;
     private final HistoricoCargasMapper historicoCargasMapper;
 
-    public void salvar(HistoricoCargasRequest request) {
-        var usuarioAutenticado = this.getUsuarioAutenticado();
+    public void salvar(HistoricoCargasRequest request, Usuario usuario) {
         var exercicio = exercicioService.findById(request.exercicioId());
-
-        repository.save(historicoCargasMapper.mapToModel(request, exercicio, usuarioAutenticado));
+        repository.save(historicoCargasMapper.mapToModel(request, exercicio, usuario));
     }
 
-    public CargaResponse buscarUltimoHistoricoCargas(Integer exercicioId) {
-        var historicoCargas = this.getAllByExercicioId(exercicioId);
+    public CargaResponse buscarUltimoHistoricoCargas(Integer exercicioId, UUID usuarioId) {
+        var historicoCargas = this.getAllByExercicioId(exercicioId, usuarioId);
 
         return new CargaResponse(
             this.getMaiorCargaDoHistorico(historicoCargas),
@@ -44,19 +41,15 @@ public class HistoricoCargasService {
         );
     }
 
-    public List<HistoricoCargasResponse> buscarHistoricoCargasCompleto(Integer exercicioId) {
-        return this.getAllByExercicioId(exercicioId).stream()
+    public List<HistoricoCargasResponse> buscarHistoricoCargasCompleto(Integer exercicioId, UUID usuarioId) {
+        return this.getAllByExercicioId(exercicioId, usuarioId).stream()
             .sorted(comparing(HistoricoCargas::getDataCadastro).reversed())
             .map(historicoCargasMapper::mapToResponse)
             .toList();
     }
 
-    private List<HistoricoCargas> getAllByExercicioId(Integer exercicioId) {
-        return repository.findAllByExercicioIdAndUsuario_Id(exercicioId, this.getUsuarioAutenticado().getId());
-    }
-
-    private Usuario getUsuarioAutenticado() {
-        return autenticacaoService.getUsuarioAutenticado();
+    private List<HistoricoCargas> getAllByExercicioId(Integer exercicioId, UUID usuarioId) {
+        return repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId);
     }
 
     private Double getMaiorCargaDoHistorico(List<HistoricoCargas> historicoCargas) {

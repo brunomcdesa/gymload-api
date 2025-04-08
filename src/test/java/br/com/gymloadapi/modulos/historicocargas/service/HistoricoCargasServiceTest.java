@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.historicocargas.service;
 
-import br.com.gymloadapi.autenticacao.service.AutenticacaoService;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.historicocargas.mapper.HistoricoCargasMapper;
 import br.com.gymloadapi.modulos.historicocargas.mapper.HistoricoCargasMapperImpl;
@@ -36,24 +35,20 @@ class HistoricoCargasServiceTest {
     private ExercicioService exercicioService;
     @Mock
     private HistoricoCargasRepository repository;
-    @Mock
-    private AutenticacaoService autenticacaoService;
     @Captor
     private ArgumentCaptor<HistoricoCargas> historicoCargasCaptor;
 
     @BeforeEach
     void setUp() {
-        service = new HistoricoCargasService(exercicioService, repository, autenticacaoService, mapper);
+        service = new HistoricoCargasService(exercicioService, repository, mapper);
     }
 
     @Test
     void salvar_deveSalvarHistoricoCargas_quandoSolicitado() {
-        when(autenticacaoService.getUsuarioAutenticado()).thenReturn(umUsuarioAdmin());
         when(exercicioService.findById(1)).thenReturn(umExercicio(1));
 
-        service.salvar(umHistoricoCargasRequest());
+        service.salvar(umHistoricoCargasRequest(), umUsuarioAdmin());
 
-        verify(autenticacaoService).getUsuarioAutenticado();
         verify(exercicioService).findById(1);
         verify(repository).save(historicoCargasCaptor.capture());
 
@@ -73,28 +68,25 @@ class HistoricoCargasServiceTest {
     void buscarUltimoHistoricoCargas_deveRetornarResponseComDadosNull_quandoExercicioNaoPossuirNenhumHistoricoCargas() {
         var usuario = umUsuarioAdmin();
 
-        when(autenticacaoService.getUsuarioAutenticado()).thenReturn(usuario);
-        when(repository.findAllByExercicioIdAndUsuario_Id(1, usuario.getId())).thenReturn(emptyList());
+        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(emptyList());
 
-        var response = service.buscarUltimoHistoricoCargas(1);
+        var response = service.buscarUltimoHistoricoCargas(1, usuario.getId());
 
         assertAll(
             () -> assertNull(response.maiorCarga()),
             () -> assertTrue(response.historicoCargas().isEmpty())
         );
 
-        verify(autenticacaoService).getUsuarioAutenticado();
-        verify(repository).findAllByExercicioIdAndUsuario_Id(1, usuario.getId());
+        verify(repository).findAllByExercicioIdAndUsuarioId(1, usuario.getId());
     }
 
     @Test
     void buscarUltimoHistoricoCargas_deveRetornarMaiorCargaECargasDoUltimoDiaRegistrado_quandoSolicitado() {
         var usuario = umUsuarioAdmin();
 
-        when(autenticacaoService.getUsuarioAutenticado()).thenReturn(usuario);
-        when(repository.findAllByExercicioIdAndUsuario_Id(1, usuario.getId())).thenReturn(umaListaHistoricoCargas());
+        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaHistoricoCargas());
 
-        var response = service.buscarUltimoHistoricoCargas(1);
+        var response = service.buscarUltimoHistoricoCargas(1, usuario.getId());
 
         assertAll(
             () -> assertEquals(27.2, response.maiorCarga()),
@@ -104,31 +96,27 @@ class HistoricoCargasServiceTest {
             () -> assertEquals(3, response.historicoCargas().getFirst().qtdSeries())
         );
 
-        verify(autenticacaoService).getUsuarioAutenticado();
-        verify(repository).findAllByExercicioIdAndUsuario_Id(1, usuario.getId());
+        verify(repository).findAllByExercicioIdAndUsuarioId(1, usuario.getId());
     }
 
     @Test
     void buscarHistoricoCargasCompleto_deveRetornarListaVazia_quandoExercicioNaoPossuirNenhumHistoricoCargas() {
         var usuario = umUsuarioAdmin();
 
-        when(autenticacaoService.getUsuarioAutenticado()).thenReturn(usuario);
-        when(repository.findAllByExercicioIdAndUsuario_Id(1, usuario.getId())).thenReturn(emptyList());
+        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(emptyList());
 
-        assertTrue(service.buscarHistoricoCargasCompleto(1).isEmpty());
+        assertTrue(service.buscarHistoricoCargasCompleto(1, usuario.getId()).isEmpty());
 
-        verify(autenticacaoService).getUsuarioAutenticado();
-        verify(repository).findAllByExercicioIdAndUsuario_Id(1, usuario.getId());
+        verify(repository).findAllByExercicioIdAndUsuarioId(1, usuario.getId());
     }
 
     @Test
     void buscarHistoricoCargasCompleto_deveRetornarHistoricoCompleto_quandoExercicioPossuirHistoricoCargas() {
         var usuario = umUsuarioAdmin();
 
-        when(autenticacaoService.getUsuarioAutenticado()).thenReturn(usuario);
-        when(repository.findAllByExercicioIdAndUsuario_Id(1, usuario.getId())).thenReturn(umaListaHistoricoCargas());
+        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaHistoricoCargas());
 
-        var responses = service.buscarHistoricoCargasCompleto(1);
+        var responses = service.buscarHistoricoCargasCompleto(1, usuario.getId());
 
         assertAll(
             () -> assertEquals("27.2 (KG)", responses.getFirst().carga()),
@@ -147,7 +135,6 @@ class HistoricoCargasServiceTest {
             () -> assertEquals(4, responses.getLast().qtdSeries())
         );
 
-        verify(autenticacaoService).getUsuarioAutenticado();
-        verify(repository).findAllByExercicioIdAndUsuario_Id(1, usuario.getId());
+        verify(repository).findAllByExercicioIdAndUsuarioId(1, usuario.getId());
     }
 }

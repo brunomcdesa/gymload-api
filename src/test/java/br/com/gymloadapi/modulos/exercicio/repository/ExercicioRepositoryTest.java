@@ -16,6 +16,15 @@ public class ExercicioRepositoryTest {
     private ExercicioRepository repository;
 
     @Test
+    void findAllComplete_deveRetornarTodosOsExercicios_quandoSolicitado() {
+        var exercicios = repository.findAllComplete();
+        assertAll(
+            () -> assertEquals(1, exercicios.getFirst().getId()),
+            () -> assertEquals("SUPINO RETO", exercicios.getFirst().getNome())
+        );
+    }
+
+    @Test
     void buscarExerciciosPorTreino_deveRetornarExercicioPorTreino_quandoSolicitado() {
         var exercicios = repository.buscarExerciciosPorTreino(1);
         assertAll(

@@ -5,7 +5,9 @@ import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Cadastr
 import br.com.gymloadapi.modulos.treino.dto.TreinoRequest;
 import br.com.gymloadapi.modulos.treino.dto.TreinoResponse;
 import br.com.gymloadapi.modulos.treino.service.TreinoService;
+import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,13 +25,14 @@ public class TreinoController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public void salvar(@RequestBody @Validated(Cadastro.class) TreinoRequest request) {
-        service.salvar(request);
+    public void salvar(@RequestBody @Validated(Cadastro.class) TreinoRequest request,
+                       @AuthenticationPrincipal Usuario usuario) {
+        service.salvar(request, usuario);
     }
 
     @GetMapping
-    public List<TreinoResponse> listarTodosDoUsuario() {
-        return service.listarTodosDoUsuario();
+    public List<TreinoResponse> listarTodosDoUsuario(@AuthenticationPrincipal Usuario usuario) {
+        return service.listarTodosDoUsuario(usuario.getId());
     }
 
     @PutMapping("{id}/editar")

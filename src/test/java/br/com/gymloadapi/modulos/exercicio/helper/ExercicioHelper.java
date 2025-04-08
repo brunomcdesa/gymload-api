@@ -47,4 +47,8 @@ public class ExercicioHelper {
     public static List<Exercicio> umaListaDeExercicios() {
         return List.of(umExercicio(1), outroExercicio(2));
     }
+
+    public static List<Exercicio> outraListaDeExercicios() {
+        return List.of(umExercicio(3), outroExercicio(4));
+    }
 }

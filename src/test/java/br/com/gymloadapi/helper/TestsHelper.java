@@ -75,4 +75,13 @@ public class TestsHelper {
                 .content(convertObjectToJsonBytes(request)))
             .andExpect(status().isCreated());
     }
+
+    @SneakyThrows
+    public static void isNoContent(MockHttpServletRequestBuilder endpoint, MockMvc mvc, Object request) {
+        mvc.perform(endpoint
+                .contentType(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .content(convertObjectToJsonBytes(request)))
+            .andExpect(status().isNoContent());
+    }
 }

@@ -2,14 +2,12 @@ package br.com.gymloadapi.autenticacao.service;
 
 import br.com.gymloadapi.autenticacao.dto.LoginRequest;
 import br.com.gymloadapi.autenticacao.dto.LoginResponse;
-import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,25 +35,5 @@ public class AutenticacaoService implements UserDetailsService {
         var token = tokenService.generateToken((Usuario) auth.getPrincipal());
 
         return new LoginResponse(token);
-    }
-
-    public Usuario getUsuarioAutenticado() {
-        var userDetails = this.getAuthentication();
-
-        if (!(userDetails instanceof Usuario)) {
-            throw new ValidacaoException("Usuário autenticado não é uma instância de Usuario");
-        }
-
-        return (Usuario) userDetails;
-    }
-
-    private UserDetails getAuthentication() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
-            throw new ValidacaoException("Usuário não autenticado");
-        }
-
-        return (UserDetails) authentication.getPrincipal();
     }
 }

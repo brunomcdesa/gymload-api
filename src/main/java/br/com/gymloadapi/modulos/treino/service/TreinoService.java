@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.treino.service;
 
-import br.com.gymloadapi.autenticacao.service.AutenticacaoService;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.treino.dto.TreinoRequest;
@@ -13,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,18 +21,14 @@ public class TreinoService {
     private final TreinoMapper treinoMapper;
     private final TreinoRepository repository;
     private final ExercicioService exercicioService;
-    private final AutenticacaoService autenticacaoService;
 
-    public void salvar(TreinoRequest request) {
-        var usuario = this.getUsuarioAutenticado();
+    public void salvar(TreinoRequest request, Usuario usuario) {
         var exercicios = exercicioService.findByIdIn(request.exerciciosIds());
-
         repository.save(treinoMapper.mapToModel(request, usuario, exercicios));
     }
 
-    public List<TreinoResponse> listarTodosDoUsuario() {
-        var usuario = this.getUsuarioAutenticado();
-        return repository.findByUsuarioId(usuario.getId()).stream()
+    public List<TreinoResponse> listarTodosDoUsuario(UUID usuarioId) {
+        return repository.findByUsuarioId(usuarioId).stream()
             .map(treinoMapper::mapToResponse)
             .toList();
     }
@@ -45,10 +41,6 @@ public class TreinoService {
 
             repository.save(treino);
         }
-    }
-
-    private Usuario getUsuarioAutenticado() {
-        return autenticacaoService.getUsuarioAutenticado();
     }
 
     private Treino findCompleteById(Integer id) {
