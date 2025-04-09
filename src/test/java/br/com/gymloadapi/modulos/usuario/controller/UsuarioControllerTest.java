@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.usuario.controller;
 
 import br.com.gymloadapi.autenticacao.service.TokenService;
+import br.com.gymloadapi.config.TestSecurityConfiguration;
 import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioRequest;
@@ -14,19 +15,18 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
-import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdminRequest;
-import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioRequest;
+import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(UsuarioController.class)
-@Import({SecurityConfiguration.class, TokenService.class, JwtAccessDeinedHandler.class})
+@Import({SecurityConfiguration.class, TokenService.class, JwtAccessDeinedHandler.class, TestSecurityConfiguration.class})
 class UsuarioControllerTest {
 
     private static final String URL = "/api/usuarios";
@@ -114,5 +114,34 @@ class UsuarioControllerTest {
         isCreated(post(URL + "/cadastro/admin"), mockMvc, request);
 
         verify(service).cadastrar(request, true);
+    }
+
+    @Test
+    @WithAnonymousUser
+    void editar_deveRetornarUnauthorized_quandoUsuarioNaoAutenticado() {
+        isUnauthorized(put(URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar"), mockMvc);
+        verifyNoInteractions(service);
+    }
+
+    @WithUserDetails
+    @ParameterizedTest
+    @CsvSource(value = {"NULL,NULL,'123'", "'','',''", "'  ','  ','  '"}, nullValues = "NULL")
+    void editar_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos(String nome, String username, String password) {
+        var request = new UsuarioRequest(nome, username, password);
+        isBadRequest(put(URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar"), mockMvc, request,
+            "O campo nome é obrigatório.",
+            "O campo username é obrigatório.",
+            "O campo password deve ser nulo");
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithUserDetails
+    void editar_deveRetornarNoContent_quandoCamposObrigatoriosValidos() {
+        var request = umUsuarioRequestSemSenha();
+        isNoContent(put(URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar"), mockMvc, request);
+
+        verify(service).editar(USUARIO_ADMIN_ID, request, umUsuarioAdmin());
     }
 }

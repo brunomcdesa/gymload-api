@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.comum.controller;
 
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
+import br.com.gymloadapi.modulos.comum.exception.PermissaoException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @ExtendWith(MockitoExtension.class)
 class ExceptionHandlerControllerTest {
@@ -82,6 +82,22 @@ class ExceptionHandlerControllerTest {
             () -> assertEquals("nome", resultado.getFirst().field()),
             () -> assertEquals("O campo email deve ser válido", resultado.getLast().message()),
             () -> assertEquals("email", resultado.getLast().field())
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void handlePermissaoException_deveRetornarStatusForbidden_quandoPermissaoExceptionForLancado() {
+        var exception = new PermissaoException("Sem permissão para a operação");
+
+        var annotation = ExceptionHandlerController.class.getMethod("handlePermissaoException", PermissaoException.class)
+            .getAnnotation(ResponseStatus.class);
+        var resultado = exceptionHandlerController.handlePermissaoException(exception);
+
+        assertAll(
+            () -> assertEquals(FORBIDDEN, annotation.value()),
+            () -> assertEquals("Acesso negado. Sem permissão para a operação", resultado.message()),
+            () -> assertNull(resultado.field())
         );
     }
 }

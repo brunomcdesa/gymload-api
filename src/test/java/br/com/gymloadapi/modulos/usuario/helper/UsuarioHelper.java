@@ -24,6 +24,10 @@ public class UsuarioHelper {
         return new UsuarioRequest("Usuario Admin", "usuarioAdmin", "654321");
     }
 
+    public static UsuarioRequest umUsuarioRequestSemSenha() {
+        return new UsuarioRequest("Usuario Edicao", "usernameEdicao", null);
+    }
+
     public static Usuario umUsuarioAdmin() {
         return Usuario.builder()
             .id(USUARIO_ADMIN_ID)
@@ -40,6 +44,16 @@ public class UsuarioHelper {
             .nome("Usuario")
             .roles(ROLES_USER)
             .username("usuarioUser")
+            .senha(new BCryptPasswordEncoder().encode("123456"))
+            .build();
+    }
+
+    public static Usuario outroUsuario() {
+        return Usuario.builder()
+            .id(UUID.fromString("802421c7-f8fd-454e-ab59-9ea346a2a444"))
+            .nome("Usuario 2")
+            .roles(ROLES_USER)
+            .username("usuarioUser2")
             .senha(new BCryptPasswordEncoder().encode("123456"))
             .build();
     }

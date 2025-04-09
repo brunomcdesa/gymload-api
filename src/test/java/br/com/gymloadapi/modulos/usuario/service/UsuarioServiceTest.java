@@ -1,5 +1,7 @@
 package br.com.gymloadapi.modulos.usuario.service;
 
+import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
+import br.com.gymloadapi.modulos.comum.exception.PermissaoException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapper;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapperImpl;
@@ -14,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.ADMIN;
 import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.USER;
@@ -116,5 +119,65 @@ class UsuarioServiceTest {
         );
 
         verify(repository).findAll();
+    }
+
+    @Test
+    void editar_deveLancarException_quandoNaoEncontrarUsuario() {
+        when(repository.findById(USUARIO_ADMIN_ID)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.editar(USUARIO_ADMIN_ID, umUsuarioRequestSemSenha(), umUsuarioAdmin())
+        );
+        assertEquals("Usuário não encontrado.", exception.getMessage());
+
+        verify(repository).findById(USUARIO_ADMIN_ID);
+        verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    void editar_deveLancarException_quandoUsuarioAutenticadoNaoForAdminNemOMesmoUsuarioQueEstaSendoEditado() {
+        when(repository.findById(USUARIO_ADMIN_ID)).thenReturn(Optional.of(umUsuario()));
+
+        var exception = assertThrowsExactly(
+            PermissaoException.class,
+            () -> service.editar(USUARIO_ADMIN_ID, umUsuarioRequestSemSenha(), outroUsuario())
+        );
+        assertEquals("Apenas usuários Admin ou o próprio usuário podem alterar suas informações.", exception.getMessage());
+
+        verify(repository).findById(USUARIO_ADMIN_ID);
+        verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    void editar_deveEditarUsuario_quandoUsuarioAutenticadoForAdmin() {
+        when(repository.findById(USUARIO_ADMIN_ID)).thenReturn(Optional.of(umUsuario()));
+
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_ID, umUsuarioRequestSemSenha(), umUsuarioAdmin()));
+
+        verify(repository).findById(USUARIO_ADMIN_ID);
+        verify(repository).save(captor.capture());
+
+        var usuario = captor.getValue();
+        assertAll(
+            () -> assertEquals("Usuario Edicao", usuario.getNome()),
+            () -> assertEquals("usernameEdicao", usuario.getUsername())
+        );
+    }
+
+    @Test
+    void editar_deveEditarUsuario_quandoUsuarioAutenticadoForOMesmoUsuarioQueEstaSendoEditado() {
+        when(repository.findById(USUARIO_ADMIN_ID)).thenReturn(Optional.of(umUsuario()));
+
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_ID, umUsuarioRequestSemSenha(), umUsuario()));
+
+        verify(repository).findById(USUARIO_ADMIN_ID);
+        verify(repository).save(captor.capture());
+
+        var usuario = captor.getValue();
+        assertAll(
+            () -> assertEquals("Usuario Edicao", usuario.getNome()),
+            () -> assertEquals("usernameEdicao", usuario.getUsername())
+        );
     }
 }

@@ -47,7 +47,6 @@ public class UsuarioService {
             .toList();
     }
 
-    //TODO Testes unitários
     public void editar(UUID id, UsuarioRequest usuarioRequest, Usuario usuarioAutenticado) {
         var usuario = this.findById(id);
         this.validarUsuarioAlteracao(usuario, usuarioAutenticado);
