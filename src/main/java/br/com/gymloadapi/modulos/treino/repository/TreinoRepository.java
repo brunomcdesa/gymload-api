@@ -6,11 +6,10 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.UUID;
 
 @Repository
 public interface TreinoRepository extends JpaRepository<Treino, Integer>, QuerydslPredicateExecutor<Treino>,
     TreinoRepositoryCustom {
 
-    List<Treino> findByUsuarioId(UUID usuarioId);
+    List<Treino> findByUsuarioId(Integer usuarioId);
 }

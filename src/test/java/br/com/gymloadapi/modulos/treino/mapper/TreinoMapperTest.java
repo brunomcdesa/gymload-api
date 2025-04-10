@@ -9,7 +9,6 @@ import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umaListaDeExercicios;
 import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.umTreino;
 import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.umTreinoRequest;
-import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.USUARIO_ADMIN_ID;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,12 +43,12 @@ class TreinoMapperTest {
 
     @Test
     void mapToHistorico_deveFazerMapeamentoCorreto_quandoSolicitado() {
-        var historico = mapper.mapToHistorico(umTreino(ATIVO), USUARIO_ADMIN_ID, CADASTRO);
+        var historico = mapper.mapToHistorico(umTreino(ATIVO), 1, CADASTRO);
 
         assertAll(
             () -> assertNull(historico.getId()),
             () -> assertEquals(CADASTRO, historico.getAcao()),
-            () -> assertEquals(USUARIO_ADMIN_ID, historico.getUsuarioCadastroId()),
+            () -> assertEquals(1, historico.getUsuarioCadastroId()),
             () -> assertEquals(1, historico.getTreino().getId())
         );
     }

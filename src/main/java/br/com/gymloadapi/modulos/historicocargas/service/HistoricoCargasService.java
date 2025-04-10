@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 import static java.util.Comparator.comparing;
 
@@ -30,7 +29,7 @@ public class HistoricoCargasService {
         repository.save(historicoCargasMapper.mapToModel(request, exercicio, usuario));
     }
 
-    public CargaResponse buscarUltimoHistoricoCargas(Integer exercicioId, UUID usuarioId) {
+    public CargaResponse buscarUltimoHistoricoCargas(Integer exercicioId, Integer usuarioId) {
         var historicoCargas = this.getAllByExercicioId(exercicioId, usuarioId);
 
         return new CargaResponse(
@@ -41,14 +40,14 @@ public class HistoricoCargasService {
         );
     }
 
-    public List<HistoricoCargasResponse> buscarHistoricoCargasCompleto(Integer exercicioId, UUID usuarioId) {
+    public List<HistoricoCargasResponse> buscarHistoricoCargasCompleto(Integer exercicioId, Integer usuarioId) {
         return this.getAllByExercicioId(exercicioId, usuarioId).stream()
             .sorted(comparing(HistoricoCargas::getDataCadastro).reversed())
             .map(historicoCargasMapper::mapToResponse)
             .toList();
     }
 
-    private List<HistoricoCargas> getAllByExercicioId(Integer exercicioId, UUID usuarioId) {
+    private List<HistoricoCargas> getAllByExercicioId(Integer exercicioId, Integer usuarioId) {
         return repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId);
     }
 

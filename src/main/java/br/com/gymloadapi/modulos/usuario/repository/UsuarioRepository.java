@@ -6,12 +6,15 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, UUID>, QuerydslPredicateExecutor<Usuario> {
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer>, QuerydslPredicateExecutor<Usuario> {
 
     UserDetails findByUsername(String username);
 
     boolean existsByUsername(String username);
+
+    Optional<Usuario> findByUuid(UUID uuid);
 }

@@ -21,7 +21,6 @@ import java.util.Map;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
 import static br.com.gymloadapi.modulos.historicocargas.helper.HistoricoCargasHelper.umHistoricoCargasRequest;
-import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.USUARIO_ADMIN_ID;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -71,8 +70,8 @@ class HistoricoCargasControllerTest {
         isOk(get(URL + endpoint), mockMvc);
 
         Map.<String, Runnable>of(
-            "/1", () -> verify(service).buscarUltimoHistoricoCargas(1, USUARIO_ADMIN_ID),
-            "/1/completo", () -> verify(service).buscarHistoricoCargasCompleto(1, USUARIO_ADMIN_ID)
+            "/1", () -> verify(service).buscarUltimoHistoricoCargas(1, 1),
+            "/1/completo", () -> verify(service).buscarHistoricoCargasCompleto(1, 1)
         ).get(endpoint).run();
     }
 }

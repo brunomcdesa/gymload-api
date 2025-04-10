@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.INATIVACAO;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.INATIVO;
 import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.umTreino;
-import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.USUARIO_ADMIN_ID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
@@ -37,7 +36,7 @@ class TreinoHistoricoServiceTest {
 
     @Test
     void salvar_deveSalvarHistorico_quandoSolicitado() {
-        service.salvar(umTreino(INATIVO), USUARIO_ADMIN_ID, INATIVACAO);
+        service.salvar(umTreino(INATIVO), 1, INATIVACAO);
 
         verify(repository).save(captor.capture());
 
@@ -45,7 +44,7 @@ class TreinoHistoricoServiceTest {
         assertAll(
             () -> assertNull(historico.getId()),
             () -> assertEquals(INATIVACAO, historico.getAcao()),
-            () -> assertEquals(USUARIO_ADMIN_ID, historico.getUsuarioCadastroId()),
+            () -> assertEquals(1, historico.getUsuarioCadastroId()),
             () -> assertEquals(1, historico.getTreino().getId())
         );
     }

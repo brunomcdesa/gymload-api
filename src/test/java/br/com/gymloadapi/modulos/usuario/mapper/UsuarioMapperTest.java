@@ -29,7 +29,7 @@ class UsuarioMapperTest {
     void mapModelToResponse_deveFazerMapeamentoCorreto_quandoSolicitar() {
         var response = mapper.mapModelToResponse(umUsuarioAdmin());
         assertAll(
-            () -> assertEquals("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9", response.id().toString()),
+            () -> assertEquals("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9", response.uuid().toString()),
             () -> assertEquals("Usuario Admin", response.nome()),
             () -> assertEquals("usuarioAdmin", response.username())
         );

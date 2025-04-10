@@ -5,7 +5,6 @@ import lombok.*;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
@@ -29,7 +28,7 @@ public class TreinoHistorico {
     private LocalDateTime dataCadastro;
 
     @Column(nullable = false)
-    private UUID usuarioCadastroId;
+    private Integer usuarioCadastroId;
 
     @Enumerated(STRING)
     @Column(nullable = false)

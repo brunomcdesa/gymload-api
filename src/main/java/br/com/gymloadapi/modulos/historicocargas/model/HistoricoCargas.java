@@ -46,7 +46,7 @@ public class HistoricoCargas {
     private Exercicio exercicio;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FK_USUARIO", referencedColumnName = "ID", columnDefinition = "UUID",
+    @JoinColumn(name = "FK_USUARIO", referencedColumnName = "ID",
         foreignKey = @ForeignKey(name = "FK_USUARIO"), nullable = false)
     private Usuario usuario;
 

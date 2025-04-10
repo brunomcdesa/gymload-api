@@ -42,9 +42,9 @@ public class UsuarioController {
     }
 
     @ResponseStatus(NO_CONTENT)
-    @PutMapping("{id}/editar")
-    public void editar(@PathVariable UUID id, @RequestBody @Validated(Alteracao.class) UsuarioRequest usuarioRequest,
+    @PutMapping("{uuid}/editar")
+    public void editar(@PathVariable UUID uuid, @RequestBody @Validated(Alteracao.class) UsuarioRequest usuarioRequest,
                        @AuthenticationPrincipal Usuario usuario) {
-        service.editar(id, usuarioRequest, usuario);
+        service.editar(uuid, usuarioRequest, usuario);
     }
 }

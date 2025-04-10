@@ -14,7 +14,6 @@ import org.mapstruct.Mapping;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Mapper(imports = {LocalDate.class, LocalDateTime.class, ESituacao.class})
 public interface TreinoMapper {
@@ -33,5 +32,5 @@ public interface TreinoMapper {
     @Mapping(target = "acao", source = "acao")
     @Mapping(target = "usuarioCadastroId", source = "usuarioId")
     @Mapping(target = "dataCadastro", expression = "java(LocalDateTime.now())")
-    TreinoHistorico mapToHistorico(Treino treino, UUID usuarioId, EAcao acao);
+    TreinoHistorico mapToHistorico(Treino treino, Integer usuarioId, EAcao acao);
 }

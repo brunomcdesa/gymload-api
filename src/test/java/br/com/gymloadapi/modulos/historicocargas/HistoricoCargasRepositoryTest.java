@@ -8,9 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.UUID;
-
-import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.USUARIO_ADMIN_ID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -22,7 +19,7 @@ class HistoricoCargasRepositoryTest {
 
     @Test
     void findAllByExercicioIdAndUsuarioId_deveRetornarCargas_quandoEncontrarCargasParaOExercicioEUsuario() {
-        var historicoCargas = repository.findAllByExercicioIdAndUsuarioId(1, USUARIO_ADMIN_ID);
+        var historicoCargas = repository.findAllByExercicioIdAndUsuarioId(1, 1);
 
         assertAll(
             () -> assertEquals(1, historicoCargas.getFirst().getId()),
@@ -30,14 +27,14 @@ class HistoricoCargasRepositoryTest {
             () -> assertEquals(12, historicoCargas.getFirst().getQtdRepeticoes()),
             () -> assertEquals(4, historicoCargas.getFirst().getQtdSeries()),
             () -> assertEquals(1, historicoCargas.getFirst().getExercicio().getId()),
-            () -> assertEquals("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9", historicoCargas.getFirst().getUsuario().getId().toString())
+            () -> assertEquals(1, historicoCargas.getFirst().getUsuario().getId())
         );
     }
 
     @ParameterizedTest
     @SuppressWarnings("LineLength")
-    @CsvSource(value = {"9999,c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9", "1,fba367b8-df4b-496b-ac23-0b3bed6ad3b4"})
-    void findAllByExercicioIdAndUsuarioId_deveRetornarListaVazia_quandoEncontrarCargasParaOExercicioOuParaOUsuario(Integer exercicioId, String usuarioId) {
-        assertTrue(repository.findAllByExercicioIdAndUsuarioId(exercicioId, UUID.fromString(usuarioId)).isEmpty());
+    @CsvSource(value = {"9999,1", "1,999999"})
+    void findAllByExercicioIdAndUsuarioId_deveRetornarListaVazia_quandoEncontrarCargasParaOExercicioOuParaOUsuario(Integer exercicioId, Integer usuarioId) {
+        assertTrue(repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId).isEmpty());
     }
 }

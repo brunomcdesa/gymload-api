@@ -14,7 +14,7 @@ import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_USER;
 @UtilityClass
 public class UsuarioHelper {
 
-    public static final UUID USUARIO_ADMIN_ID = UUID.fromString("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9");
+    public static final UUID USUARIO_ADMIN_UUID = UUID.fromString("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9");
 
     public static UsuarioRequest umUsuarioRequest() {
         return new UsuarioRequest("Usuario", "usuario", "123456");
@@ -30,7 +30,8 @@ public class UsuarioHelper {
 
     public static Usuario umUsuarioAdmin() {
         return Usuario.builder()
-            .id(USUARIO_ADMIN_ID)
+            .id(1)
+            .uuid(USUARIO_ADMIN_UUID)
             .nome("Usuario Admin")
             .roles(ROLES_ADMIN)
             .username("usuarioAdmin")
@@ -40,7 +41,8 @@ public class UsuarioHelper {
 
     public static Usuario umUsuario() {
         return Usuario.builder()
-            .id(UUID.fromString("8689ea4e-3a85-4b6b-80f2-fc04f3cdd712"))
+            .id(2)
+            .uuid(UUID.fromString("8689ea4e-3a85-4b6b-80f2-fc04f3cdd712"))
             .nome("Usuario")
             .roles(ROLES_USER)
             .username("usuarioUser")
@@ -50,7 +52,8 @@ public class UsuarioHelper {
 
     public static Usuario outroUsuario() {
         return Usuario.builder()
-            .id(UUID.fromString("802421c7-f8fd-454e-ab59-9ea346a2a444"))
+            .id(3)
+            .uuid(UUID.fromString("802421c7-f8fd-454e-ab59-9ea346a2a444"))
             .nome("Usuario 2")
             .roles(ROLES_USER)
             .username("usuarioUser2")

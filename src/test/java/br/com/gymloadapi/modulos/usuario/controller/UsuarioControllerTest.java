@@ -142,6 +142,6 @@ class UsuarioControllerTest {
         var request = umUsuarioRequestSemSenha();
         isNoContent(put(URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar"), mockMvc, request);
 
-        verify(service).editar(USUARIO_ADMIN_ID, request, umUsuarioAdmin());
+        verify(service).editar(USUARIO_ADMIN_UUID, request, umUsuarioAdmin());
     }
 }

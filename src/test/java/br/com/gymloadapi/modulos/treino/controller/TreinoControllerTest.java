@@ -25,7 +25,6 @@ import java.util.Map;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
 import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.umTreinoRequest;
-import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.USUARIO_ADMIN_ID;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.verify;
@@ -84,7 +83,7 @@ class TreinoControllerTest {
     @WithUserDetails
     void listarTodosDoUsuario_deveRetornarOk_quandoUsuarioAutenticado() {
         isOk(get(URL), mockMvc);
-        verify(service).listarTodosDoUsuario(USUARIO_ADMIN_ID);
+        verify(service).listarTodosDoUsuario(1);
     }
 
     @ParameterizedTest
@@ -112,7 +111,7 @@ class TreinoControllerTest {
         var request = umTreinoRequest();
         isNoContent(put(URL + "/1/editar"), mockMvc, request);
 
-        verify(service).editar(1, request, USUARIO_ADMIN_ID);
+        verify(service).editar(1, request, 1);
     }
 
     @WithUserDetails
@@ -122,8 +121,8 @@ class TreinoControllerTest {
         isNoContent(put(URL + endpoint), mockMvc);
 
         Map.<String, Runnable>of(
-            "/1/ativar", () -> verify(service).ativar(1, USUARIO_ADMIN_ID),
-            "/1/inativar", () -> verify(service).inativar(1, USUARIO_ADMIN_ID)
+            "/1/ativar", () -> verify(service).ativar(1, 1),
+            "/1/inativar", () -> verify(service).inativar(1, 1)
         ).get(endpoint).run();
     }
 }

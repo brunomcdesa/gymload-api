@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_ADMIN;
@@ -47,8 +48,8 @@ public class UsuarioService {
             .toList();
     }
 
-    public void editar(UUID id, UsuarioRequest usuarioRequest, Usuario usuarioAutenticado) {
-        var usuario = this.findById(id);
+    public void editar(UUID uuid, UsuarioRequest usuarioRequest, Usuario usuarioAutenticado) {
+        var usuario = this.findByUuid(uuid);
         this.validarUsuarioAlteracao(usuario, usuarioAutenticado);
 
         usuarioMapper.editar(usuarioRequest, usuario);
@@ -56,12 +57,12 @@ public class UsuarioService {
     }
 
     private void validarUsuarioAlteracao(Usuario usuarioAlterado, Usuario usuarioAutenticado) {
-        if (!usuarioAutenticado.isAdmin() && !usuarioAutenticado.getId().equals(usuarioAlterado.getId())) {
+        if (!usuarioAutenticado.isAdmin() && !Objects.equals(usuarioAutenticado.getId(), usuarioAlterado.getId())) {
             throw new PermissaoException("Apenas usuários Admin ou o próprio usuário podem alterar suas informações.");
         }
     }
 
-    private Usuario findById(UUID id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
+    private Usuario findByUuid(UUID uuid) {
+        return repository.findByUuid(uuid).orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
     }
 }

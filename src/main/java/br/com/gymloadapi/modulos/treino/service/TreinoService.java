@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.*;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
@@ -37,13 +36,13 @@ public class TreinoService {
         this.saveComHistorico(treino, usuario.getId(), CADASTRO);
     }
 
-    public List<TreinoResponse> listarTodosDoUsuario(UUID usuarioId) {
+    public List<TreinoResponse> listarTodosDoUsuario(Integer usuarioId) {
         return repository.findByUsuarioId(usuarioId).stream()
             .map(treinoMapper::mapToResponse)
             .toList();
     }
 
-    public void editar(Integer id, TreinoRequest request, UUID usuarioId) {
+    public void editar(Integer id, TreinoRequest request, Integer usuarioId) {
         var treino = this.findCompleteById(id);
         if (!treino.getExerciciosIds().equals(request.exerciciosIds())) {
             var exercicios = exercicioService.findByIdIn(request.exerciciosIds());
@@ -53,7 +52,7 @@ public class TreinoService {
         }
     }
 
-    public void ativar(Integer id, UUID usuarioId) {
+    public void ativar(Integer id, Integer usuarioId) {
         var treino = this.findCompleteById(id);
         this.validarSituacao(treino.getSituacao(), ATIVO);
         treino.alterarSituacao();
@@ -61,7 +60,7 @@ public class TreinoService {
         this.saveComHistorico(treino, usuarioId, ATIVACAO);
     }
 
-    public void inativar(Integer id, UUID usuarioId) {
+    public void inativar(Integer id, Integer usuarioId) {
         var treino = this.findCompleteById(id);
         this.validarSituacao(treino.getSituacao(), INATIVO);
         treino.alterarSituacao();
@@ -80,7 +79,7 @@ public class TreinoService {
         }
     }
 
-    private void saveComHistorico(Treino treino, UUID usuarioId, EAcao acao) {
+    private void saveComHistorico(Treino treino, Integer usuarioId, EAcao acao) {
         repository.save(treino);
         historicoService.salvar(treino, usuarioId, acao);
     }

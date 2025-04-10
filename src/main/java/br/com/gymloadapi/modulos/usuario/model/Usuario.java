@@ -14,6 +14,7 @@ import java.util.UUID;
 import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.ADMIN;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.EAGER;
+import static jakarta.persistence.GenerationType.SEQUENCE;
 
 @Table
 @Getter
@@ -26,8 +27,12 @@ import static jakarta.persistence.FetchType.EAGER;
 public class Usuario implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(generator = "SEQ_USUARIO", strategy = SEQUENCE)
+    @SequenceGenerator(name = "SEQ_USUARIO", sequenceName = "SEQ_USUARIO", allocationSize = 1)
+    private Integer id;
+
+    @Column(nullable = false)
+    private UUID uuid;
 
     @Column(nullable = false)
     private String nome;

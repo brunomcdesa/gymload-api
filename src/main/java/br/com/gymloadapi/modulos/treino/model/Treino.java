@@ -40,7 +40,7 @@ public class Treino {
     private ESituacao situacao;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "FK_USUARIO", referencedColumnName = "ID", columnDefinition = "UUID",
+    @JoinColumn(name = "FK_USUARIO", referencedColumnName = "ID",
         foreignKey = @ForeignKey(name = "FK_USUARIO"), nullable = false)
     private Usuario usuario;
 

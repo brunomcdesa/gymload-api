@@ -7,13 +7,15 @@ import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import org.mapstruct.*;
 
 import java.util.List;
+import java.util.UUID;
 
-@Mapper
+@Mapper(imports = UUID.class)
 public interface UsuarioMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "senha", source = "encryptedPassword")
     @Mapping(target = "roles", source = "roles")
+    @Mapping(target = "uuid", expression = "java(UUID.randomUUID())")
     Usuario mapToModel(UsuarioRequest usuarioRequest, String encryptedPassword, List<EUserRole> roles);
 
     UsuarioResponse mapModelToResponse(Usuario usuario);

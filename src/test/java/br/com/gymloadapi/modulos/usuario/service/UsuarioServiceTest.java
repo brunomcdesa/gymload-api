@@ -109,11 +109,11 @@ class UsuarioServiceTest {
 
         var response = service.buscarTodos();
         assertAll(
-            () -> assertEquals("8689ea4e-3a85-4b6b-80f2-fc04f3cdd712", response.getFirst().id().toString()),
+            () -> assertEquals("8689ea4e-3a85-4b6b-80f2-fc04f3cdd712", response.getFirst().uuid().toString()),
             () -> assertEquals("Usuario", response.getFirst().nome()),
             () -> assertEquals("usuarioUser", response.getFirst().username()),
 
-            () -> assertEquals("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9", response.getLast().id().toString()),
+            () -> assertEquals("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9", response.getLast().uuid().toString()),
             () -> assertEquals("Usuario Admin", response.getLast().nome()),
             () -> assertEquals("usuarioAdmin", response.getLast().username())
         );
@@ -123,39 +123,39 @@ class UsuarioServiceTest {
 
     @Test
     void editar_deveLancarException_quandoNaoEncontrarUsuario() {
-        when(repository.findById(USUARIO_ADMIN_ID)).thenReturn(Optional.empty());
+        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.empty());
 
         var exception = assertThrowsExactly(
             NotFoundException.class,
-            () -> service.editar(USUARIO_ADMIN_ID, umUsuarioRequestSemSenha(), umUsuarioAdmin())
+            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), umUsuarioAdmin())
         );
         assertEquals("Usuário não encontrado.", exception.getMessage());
 
-        verify(repository).findById(USUARIO_ADMIN_ID);
+        verify(repository).findByUuid(USUARIO_ADMIN_UUID);
         verifyNoMoreInteractions(repository);
     }
 
     @Test
     void editar_deveLancarException_quandoUsuarioAutenticadoNaoForAdminNemOMesmoUsuarioQueEstaSendoEditado() {
-        when(repository.findById(USUARIO_ADMIN_ID)).thenReturn(Optional.of(umUsuario()));
+        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(umUsuario()));
 
         var exception = assertThrowsExactly(
             PermissaoException.class,
-            () -> service.editar(USUARIO_ADMIN_ID, umUsuarioRequestSemSenha(), outroUsuario())
+            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), outroUsuario())
         );
         assertEquals("Apenas usuários Admin ou o próprio usuário podem alterar suas informações.", exception.getMessage());
 
-        verify(repository).findById(USUARIO_ADMIN_ID);
+        verify(repository).findByUuid(USUARIO_ADMIN_UUID);
         verifyNoMoreInteractions(repository);
     }
 
     @Test
     void editar_deveEditarUsuario_quandoUsuarioAutenticadoForAdmin() {
-        when(repository.findById(USUARIO_ADMIN_ID)).thenReturn(Optional.of(umUsuario()));
+        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(umUsuario()));
 
-        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_ID, umUsuarioRequestSemSenha(), umUsuarioAdmin()));
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), umUsuarioAdmin()));
 
-        verify(repository).findById(USUARIO_ADMIN_ID);
+        verify(repository).findByUuid(USUARIO_ADMIN_UUID);
         verify(repository).save(captor.capture());
 
         var usuario = captor.getValue();
@@ -167,11 +167,11 @@ class UsuarioServiceTest {
 
     @Test
     void editar_deveEditarUsuario_quandoUsuarioAutenticadoForOMesmoUsuarioQueEstaSendoEditado() {
-        when(repository.findById(USUARIO_ADMIN_ID)).thenReturn(Optional.of(umUsuario()));
+        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(umUsuario()));
 
-        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_ID, umUsuarioRequestSemSenha(), umUsuario()));
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), umUsuario()));
 
-        verify(repository).findById(USUARIO_ADMIN_ID);
+        verify(repository).findByUuid(USUARIO_ADMIN_UUID);
         verify(repository).save(captor.capture());
 
         var usuario = captor.getValue();

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 import jakarta.persistence.EntityManager;
 import java.util.List;
-import java.util.UUID;
 
 import static br.com.gymloadapi.modulos.exercicio.model.QExercicio.exercicio;
 import static br.com.gymloadapi.modulos.grupomuscular.model.QGrupoMuscular.grupoMuscular;
@@ -19,7 +18,7 @@ public class HistoricoCargasRepositoryImpl implements HistoricoCargasRepositoryC
     private final EntityManager entityManager;
 
     @Override
-    public List<HistoricoCargas> findAllByExercicioIdAndUsuarioId(Integer exercicioId, UUID usuarioId) {
+    public List<HistoricoCargas> findAllByExercicioIdAndUsuarioId(Integer exercicioId, Integer usuarioId) {
         return new JPAQueryFactory(entityManager)
             .selectFrom(historicoCargas)
             .innerJoin(historicoCargas.exercicio, exercicio).fetchJoin()
