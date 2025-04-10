@@ -10,13 +10,13 @@ import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import br.com.gymloadapi.modulos.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static br.com.gymloadapi.modulos.comum.utils.PasswordUtils.encodePassword;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_ADMIN;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_USER;
 
@@ -32,8 +32,8 @@ public class UsuarioService {
             throw new ValidacaoException("Já existe um usuário com este username.");
         }
 
-        var encryptedPassword = new BCryptPasswordEncoder().encode(usuarioRequest.password());
-        var novoUsuario = usuarioMapper.mapToModel(usuarioRequest, encryptedPassword, isCadastroAdmin ? ROLES_ADMIN : ROLES_USER);
+        var novoUsuario = usuarioMapper.mapToModel(usuarioRequest, encodePassword(usuarioRequest.password()),
+            isCadastroAdmin ? ROLES_ADMIN : ROLES_USER);
 
         repository.save(novoUsuario);
     }
@@ -54,6 +54,10 @@ public class UsuarioService {
 
         usuarioMapper.editar(usuarioRequest, usuario);
         repository.save(usuario);
+    }
+
+    public void atualizarSenha(String userName, String senha) {
+        repository.atualizarSenha(userName, senha);
     }
 
     private void validarUsuarioAlteracao(Usuario usuarioAlterado, Usuario usuarioAutenticado) {

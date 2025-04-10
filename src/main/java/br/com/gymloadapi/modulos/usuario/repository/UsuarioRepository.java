@@ -10,7 +10,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Integer>, QuerydslPredicateExecutor<Usuario> {
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer>, QuerydslPredicateExecutor<Usuario>,
+    UsuarioRepositoryCustom {
 
     UserDetails findByUsername(String username);
 

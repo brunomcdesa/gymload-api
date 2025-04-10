@@ -3,11 +3,11 @@ package br.com.gymloadapi.modulos.usuario.helper;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioRequest;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.experimental.UtilityClass;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 import java.util.UUID;
 
+import static br.com.gymloadapi.modulos.comum.utils.PasswordUtils.encodePassword;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_ADMIN;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_USER;
 
@@ -35,7 +35,7 @@ public class UsuarioHelper {
             .nome("Usuario Admin")
             .roles(ROLES_ADMIN)
             .username("usuarioAdmin")
-            .senha(new BCryptPasswordEncoder().encode("654321"))
+            .senha(encodePassword("654321"))
             .build();
     }
 
@@ -46,7 +46,7 @@ public class UsuarioHelper {
             .nome("Usuario")
             .roles(ROLES_USER)
             .username("usuarioUser")
-            .senha(new BCryptPasswordEncoder().encode("123456"))
+            .senha(encodePassword("123456"))
             .build();
     }
 
@@ -57,7 +57,7 @@ public class UsuarioHelper {
             .nome("Usuario 2")
             .roles(ROLES_USER)
             .username("usuarioUser2")
-            .senha(new BCryptPasswordEncoder().encode("123456"))
+            .senha(encodePassword("123456"))
             .build();
     }
 
