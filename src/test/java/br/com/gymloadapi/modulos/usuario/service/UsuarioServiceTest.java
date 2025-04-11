@@ -180,4 +180,10 @@ class UsuarioServiceTest {
             () -> assertEquals("usernameEdicao", usuario.getUsername())
         );
     }
+
+    @Test
+    void atualizarSenha_deveAtualizarSenha_quandoSolicitado() {
+        service.atualizarSenha("usuarioUser", "123456");
+        verify(repository).atualizarSenha("usuarioUser", "123456");
+    }
 }

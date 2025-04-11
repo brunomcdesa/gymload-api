@@ -1,6 +1,5 @@
-package br.com.gymloadapi.modulos.historicocargas;
+package br.com.gymloadapi.modulos.historicocargas.repository;
 
-import br.com.gymloadapi.modulos.historicocargas.repository.HistoricoCargasRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
