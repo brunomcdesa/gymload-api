@@ -6,7 +6,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface HistoricoCargasRepository extends JpaRepository<RegistroCarga, Integer>,
-    QuerydslPredicateExecutor<RegistroCarga>, HistoricoCargasRepositoryCustom {
+public interface RegistroCargaRepository extends JpaRepository<RegistroCarga, Integer>,
+    QuerydslPredicateExecutor<RegistroCarga>, RegistroCargaRepositoryCustom {
 
 }

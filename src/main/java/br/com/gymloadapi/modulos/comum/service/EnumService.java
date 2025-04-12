@@ -2,7 +2,6 @@ package br.com.gymloadapi.modulos.comum.service;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
 import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
-import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
 import br.com.gymloadapi.modulos.comum.enums.ETipoPegada;
 import br.com.gymloadapi.modulos.comum.enums.EUnidadePeso;
 import org.springframework.stereotype.Service;

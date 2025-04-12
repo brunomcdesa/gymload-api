@@ -4,7 +4,7 @@ import br.com.gymloadapi.modulos.registroatividade.registrocarga.model.RegistroC
 
 import java.util.List;
 
-public interface HistoricoCargasRepositoryCustom {
+public interface RegistroCargaRepositoryCustom {
 
     List<RegistroCarga> findAllByExercicioIdAndUsuarioId(Integer exercicioId, Integer usuarioId);
 }

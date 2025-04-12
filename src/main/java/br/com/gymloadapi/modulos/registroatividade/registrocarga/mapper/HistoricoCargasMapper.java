@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.registroatividade.registrocarga.mapper;
 
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
+import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.dto.HistoricoCargasRequest;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.dto.HistoricoCargasResponse;
@@ -32,4 +33,10 @@ public interface HistoricoCargasMapper {
     @Mapping(target = "grupoMuscularNome", source = "registroCarga.exercicio.grupoMuscular.nome")
     @Mapping(target = "carga", expression = "java(registroCarga.getCargaComUnidadePeso())")
     HistoricoCargasResponse mapToResponse(RegistroCarga registroCarga);
+
+    @Mapping(target = "exercicioNome", source = "registroCarga.exercicio.nome")
+    @Mapping(target = "tipoExercicio", source = "registroCarga.exercicio.tipoEquipamento")
+    @Mapping(target = "grupoMuscularNome", source = "registroCarga.exercicio.grupoMuscular.nome")
+    @Mapping(target = "carga", expression = "java(registroCarga.getCargaComUnidadePeso())")
+    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeResponse(RegistroCarga registroCarga);
 }

@@ -13,7 +13,7 @@ import static br.com.gymloadapi.modulos.registroatividade.registrocarga.model.QR
 import static br.com.gymloadapi.modulos.usuario.model.QUsuario.usuario;
 
 @RequiredArgsConstructor
-public class HistoricoCargasRepositoryImpl implements HistoricoCargasRepositoryCustom {
+public class RegistroCargaRepositoryImpl implements RegistroCargaRepositoryCustom {
 
     private final EntityManager entityManager;
 

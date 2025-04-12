@@ -4,7 +4,7 @@ import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.mapper.HistoricoCargasMapper;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.mapper.HistoricoCargasMapperImpl;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.model.RegistroCarga;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.repository.HistoricoCargasRepository;
+import br.com.gymloadapi.modulos.registroatividade.registrocarga.repository.RegistroCargaRepository;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.service.RegistroCargaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class RegistroCargaServiceTest {
     @Mock
     private ExercicioService exercicioService;
     @Mock
-    private HistoricoCargasRepository repository;
+    private RegistroCargaRepository repository;
     @Captor
     private ArgumentCaptor<RegistroCarga> historicoCargasCaptor;
 

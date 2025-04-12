@@ -1,11 +1,15 @@
 package br.com.gymloadapi.modulos.registroatividade.registrocardio.service;
 
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
+import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
+import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.factory.RegistroAtividadeFactory;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -14,5 +18,15 @@ public class RegistroCardioService implements RegistroAtividadeFactory {
     @Override
     public void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario) {
 
+    }
+
+    @Override
+    public RegistroAtividadeResponse buscarUltimoRegistro(Integer exercicioId, Integer usuarioId) {
+        return null;
+    }
+
+    @Override
+    public List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer usuarioId) {
+        return List.of();
     }
 }

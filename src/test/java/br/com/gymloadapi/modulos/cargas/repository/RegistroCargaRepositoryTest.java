@@ -1,6 +1,6 @@
 package br.com.gymloadapi.modulos.cargas.repository;
 
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.repository.HistoricoCargasRepository;
+import br.com.gymloadapi.modulos.registroatividade.registrocarga.repository.RegistroCargaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class RegistroCargaRepositoryTest {
 
     @Autowired
-    private HistoricoCargasRepository repository;
+    private RegistroCargaRepository repository;
 
     @Test
     void findAllByExercicioIdAndUsuarioId_deveRetornarCargas_quandoEncontrarCargasParaOExercicioEUsuario() {
