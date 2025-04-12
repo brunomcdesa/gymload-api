@@ -17,7 +17,7 @@ class EnumServiceTest {
 
     @Test
     void getTiposExerciciosSelect_deveRetornarTodosOsTiposDeExercicios_quandoSolicitado() {
-        assertThat(service.getTiposExerciciosSelect())
+        assertThat(service.getTiposEquipamentosSelect())
             .extracting(SelectResponse::value, SelectResponse::label)
             .containsExactly(tuple("HALTER", "Halter"), tuple("BARRA", "Barra"),
                 tuple("MAQUINA", "Maquina"), tuple("POLIA", "Polia"),

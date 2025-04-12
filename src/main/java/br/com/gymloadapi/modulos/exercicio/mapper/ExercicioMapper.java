@@ -16,11 +16,12 @@ public interface ExercicioMapper {
     @Mapping(target = "grupoMuscular", source = "grupoMuscular")
     Exercicio mapToModel(ExercicioRequest request, GrupoMuscular grupoMuscular);
 
+    @Mapping(target = "tipoExercicio", source = "exercicio.tipoEquipamento")
     @Mapping(target = "grupoMuscularNome", source = "exercicio.grupoMuscular.nome")
     ExercicioResponse mapModelToResponse(Exercicio exercicio);
 
     @Mapping(target = "value", source = "exercicio.id")
-    @Mapping(target = "label", expression = "java(exercicio.getNomeComTipoExercicio())")
+    @Mapping(target = "label", expression = "java(exercicio.getNomeComTipoEquipamento())")
     SelectResponse mapToSelectResponse(Exercicio exercicio);
 
 }

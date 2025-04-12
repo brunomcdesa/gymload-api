@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ExercicioTest {
 
     @Test
-    void getNomeComTipoExercicio_deveRetornarNomeComTipoExercicioCorreto_quandoSolicitado() {
-        assertEquals("SUPINO RETO (HALTER)", umExercicio(1).getNomeComTipoExercicio());
+    void getNomeComTipoEquipamento_deveRetornarNomeComTipoExercicioCorreto_quandoSolicitado() {
+        assertEquals("SUPINO RETO (HALTER)", umExercicio(1).getNomeComTipoEquipamento());
     }
 }

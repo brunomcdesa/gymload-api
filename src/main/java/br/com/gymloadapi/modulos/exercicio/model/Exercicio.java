@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.exercicio.model;
 
+import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
 import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
 import br.com.gymloadapi.modulos.comum.enums.ETipoPegada;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
@@ -35,6 +36,10 @@ public class Exercicio {
 
     @Column
     @Enumerated(STRING)
+    private ETipoEquipamento tipoEquipamento;
+
+    @Column
+    @Enumerated(STRING)
     private ETipoExercicio tipoExercicio;
 
     @Column
@@ -55,7 +60,7 @@ public class Exercicio {
             foreignKey = @ForeignKey(name = "FK_TREINO"))})
     private List<Treino> treinos;
 
-    public String getNomeComTipoExercicio() {
-        return this.nome + " (" + this.tipoExercicio.name() + ")";
+    public String getNomeComTipoEquipamento() {
+        return this.nome + " (" + this.tipoEquipamento.name() + ")";
     }
 }

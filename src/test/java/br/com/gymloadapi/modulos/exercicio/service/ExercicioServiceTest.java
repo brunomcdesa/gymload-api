@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.HALTER;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
@@ -59,7 +59,7 @@ class ExercicioServiceTest {
         assertAll(
             () -> assertEquals("SUPINO RETO", exercicio.getNome()),
             () -> assertEquals("Supino Reto", exercicio.getDescricao()),
-            () -> assertEquals(HALTER, exercicio.getTipoExercicio()),
+            () -> assertEquals(HALTER, exercicio.getTipoEquipamento()),
             () -> assertEquals(PRONADA, exercicio.getTipoPegada()),
             () -> assertEquals("Peitoral", exercicio.getGrupoMuscular().getNome())
         );

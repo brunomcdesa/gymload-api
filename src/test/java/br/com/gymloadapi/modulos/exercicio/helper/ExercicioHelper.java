@@ -6,8 +6,9 @@ import lombok.experimental.UtilityClass;
 
 import java.util.List;
 
-import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.HALTER;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MAQUINA;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.MAQUINA;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularCostas;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
@@ -17,7 +18,7 @@ import static java.util.Collections.emptyList;
 public class ExercicioHelper {
 
     public static ExercicioRequest umExercicioRequest() {
-        return new ExercicioRequest("SUPINO RETO", "Supino Reto", 1, HALTER, PRONADA);
+        return new ExercicioRequest("SUPINO RETO", "Supino Reto", 1, HALTER, MUSCULACAO, PRONADA);
     }
 
     public static Exercicio umExercicio(Integer id) {
@@ -25,7 +26,7 @@ public class ExercicioHelper {
             .id(id)
             .nome("SUPINO RETO")
             .descricao("Supino Reto")
-            .tipoExercicio(HALTER)
+            .tipoEquipamento(HALTER)
             .tipoPegada(PRONADA)
             .grupoMuscular(umGrupoMuscularPeitoral())
             .treinos(emptyList())
@@ -37,7 +38,7 @@ public class ExercicioHelper {
             .id(id)
             .nome("PUXADA ALTA")
             .descricao("Puxada Alta")
-            .tipoExercicio(MAQUINA)
+            .tipoEquipamento(MAQUINA)
             .tipoPegada(PRONADA)
             .grupoMuscular(umGrupoMuscularCostas())
             .treinos(emptyList())

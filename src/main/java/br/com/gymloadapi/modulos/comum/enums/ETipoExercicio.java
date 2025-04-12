@@ -1,5 +1,7 @@
 package br.com.gymloadapi.modulos.comum.enums;
 
+import br.com.gymloadapi.modulos.registroatividade.factory.RegistroAtividadeFactory;
+import br.com.gymloadapi.modulos.registroatividade.registrocarga.service.RegistroCargaService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -7,15 +9,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ETipoExercicio {
 
-    HALTER("Halter"),
-    BARRA("Barra"),
-    MAQUINA("Maquina"),
-    POLIA("Polia"),
-    ANILHA("Anilha"),
-    BOLA("Bola"),
-    KETLLEBEL("Kettlebel"),
-    BAG("Bag"),
-    CORPORAL("Corporal");
+    MUSCULACAO("Musculação", RegistroCargaService.class),
+    CARDIO("Cardio", RegistroCargaService.class);
 
     private final String descricao;
+    private final Class<? extends RegistroAtividadeFactory> serviceClass;
 }

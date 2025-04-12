@@ -51,7 +51,7 @@ class EnumControllerTest {
         isOk(get(URL + endpoint), mvc);
 
         Map.<String, Runnable>of(
-            "/tipos-exercicios/select", () -> verify(service).getTiposExerciciosSelect(),
+            "/tipos-exercicios/select", () -> verify(service).getTiposEquipamentosSelect(),
             "/tipos-pegadas/select", () -> verify(service).getTiposPegadasSelect(),
             "/unidades-pesos/select", () -> verify(service).getUnidadesPesosSelect()
         ).get(endpoint).run();
