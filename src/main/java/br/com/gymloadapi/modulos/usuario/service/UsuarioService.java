@@ -1,7 +1,6 @@
 package br.com.gymloadapi.modulos.usuario.service;
 
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
-import br.com.gymloadapi.modulos.comum.exception.PermissaoException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioRequest;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioResponse;
@@ -13,12 +12,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static br.com.gymloadapi.modulos.comum.utils.PasswordUtils.encodePassword;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_ADMIN;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_USER;
+import static br.com.gymloadapi.modulos.comum.utils.ValidacaoUtils.validarUsuarioAlteracao;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +49,7 @@ public class UsuarioService {
 
     public void editar(UUID uuid, UsuarioRequest usuarioRequest, Usuario usuarioAutenticado) {
         var usuario = this.findByUuid(uuid);
-        this.validarUsuarioAlteracao(usuario, usuarioAutenticado);
+        validarUsuarioAlteracao(usuario.getId(), usuarioAutenticado, "alterar suas informações");
 
         usuarioMapper.editar(usuarioRequest, usuario);
         repository.save(usuario);
@@ -58,12 +57,6 @@ public class UsuarioService {
 
     public void atualizarSenha(String userName, String senha) {
         repository.atualizarSenha(userName, senha);
-    }
-
-    private void validarUsuarioAlteracao(Usuario usuarioAlterado, Usuario usuarioAutenticado) {
-        if (!usuarioAutenticado.isAdmin() && !Objects.equals(usuarioAutenticado.getId(), usuarioAlterado.getId())) {
-            throw new PermissaoException("Apenas usuários Admin ou o próprio usuário podem alterar suas informações.");
-        }
     }
 
     private Usuario findByUuid(UUID uuid) {

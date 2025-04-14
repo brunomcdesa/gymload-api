@@ -1,8 +1,8 @@
-package br.com.gymloadapi.modulos.cargas.model;
+package br.com.gymloadapi.modulos.registroatividade.registrocarga.model;
 
 import org.junit.jupiter.api.Test;
 
-import static br.com.gymloadapi.modulos.cargas.helper.RegistroCargaHelper.umRegistroCarga;
+import static br.com.gymloadapi.modulos.registroatividade.registrocarga.helper.RegistroCargaHelper.umRegistroCarga;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RegistroCargaTest {

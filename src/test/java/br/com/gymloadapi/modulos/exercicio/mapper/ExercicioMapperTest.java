@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicio;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioRequest;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacao;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacaoRequest;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,7 +16,7 @@ class ExercicioMapperTest {
 
     @Test
     void mapToModel_deveFazerOMapeamentoCorreto_quandoSolicitado() {
-        var model = mapper.mapToModel(umExercicioRequest(), umGrupoMuscularPeitoral());
+        var model = mapper.mapToModel(umExercicioMusculacaoRequest(), umGrupoMuscularPeitoral());
 
         assertAll(
             () -> assertEquals("SUPINO RETO", model.getNome()),
@@ -30,7 +30,7 @@ class ExercicioMapperTest {
 
     @Test
     void mapModelToResponse_deveFazerOMapeamentoCorreto_quandoSolicitado() {
-        var response = mapper.mapModelToResponse(umExercicio(1));
+        var response = mapper.mapModelToResponse(umExercicioMusculacao(1));
 
         assertAll(
             () -> assertEquals(1, response.id()),
@@ -44,7 +44,7 @@ class ExercicioMapperTest {
 
     @Test
     void mapToSelectResponse_deveFazerOMapeamentoCorreto_quandoSolicitado() {
-        var selectResponse = mapper.mapToSelectResponse(umExercicio(1));
+        var selectResponse = mapper.mapToSelectResponse(umExercicioMusculacao(1));
 
         assertAll(
             () -> assertEquals(1, selectResponse.value()),

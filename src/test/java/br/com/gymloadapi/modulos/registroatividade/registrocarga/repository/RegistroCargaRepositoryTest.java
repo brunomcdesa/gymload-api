@@ -1,4 +1,4 @@
-package br.com.gymloadapi.modulos.cargas.repository;
+package br.com.gymloadapi.modulos.registroatividade.registrocarga.repository;
 
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.repository.RegistroCargaRepository;
 import org.junit.jupiter.api.Test;

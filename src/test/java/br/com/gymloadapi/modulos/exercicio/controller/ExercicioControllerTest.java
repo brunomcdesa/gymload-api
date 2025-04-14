@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Map;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioRequest;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacaoRequest;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -73,7 +73,7 @@ class ExercicioControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void salvar_deveRetornarCreated_quandoUsuarioAdminECamposObrigatoriosValidos() {
-        var request = umExercicioRequest();
+        var request = umExercicioMusculacaoRequest();
         isCreated(post(URL), mockMvc, request);
 
         verify(service).salvar(request);

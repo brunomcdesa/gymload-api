@@ -8,12 +8,16 @@ import java.time.LocalDate;
 public record HistoricoRegistroAtividadeResponse(
     Integer id,
     String exercicioNome,
+    @DatePatternResponse
+    LocalDate dataCadastro,
+
     String carga,
     ETipoEquipamento tipoExercicio,
     String grupoMuscularNome,
     Integer qtdRepeticoes,
     Integer qtdSeries,
-    @DatePatternResponse
-    LocalDate dataCadastro
+
+    Double distancia,
+    Double duracao
 ) {
 }

@@ -15,4 +15,6 @@ public interface RegistroAtividadeFactory {
     RegistroAtividadeResponse buscarUltimoRegistro(Integer exercicioId, Integer usuarioId);
 
     List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer usuarioId);
+
+    void editarRegistro(Integer registroAtividadeId, RegistroAtividadeRequest request, Usuario usuario);
 }

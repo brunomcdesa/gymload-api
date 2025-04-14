@@ -1,10 +1,9 @@
-package br.com.gymloadapi.modulos.cargas.controller;
+package br.com.gymloadapi.modulos.registroatividade.registrocarga.controller;
 
 import br.com.gymloadapi.autenticacao.service.TokenService;
 import br.com.gymloadapi.config.TestSecurityConfiguration;
 import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.controller.HistoricoCargasController;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.service.RegistroCargaService;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Map;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
-import static br.com.gymloadapi.modulos.cargas.helper.RegistroCargaHelper.umHistoricoCargasRequest;
+import static br.com.gymloadapi.modulos.registroatividade.registrocarga.helper.RegistroCargaHelper.umHistoricoCargasRequest;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;

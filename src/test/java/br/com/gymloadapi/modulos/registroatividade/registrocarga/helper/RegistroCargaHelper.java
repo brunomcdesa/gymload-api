@@ -1,4 +1,4 @@
-package br.com.gymloadapi.modulos.cargas.helper;
+package br.com.gymloadapi.modulos.registroatividade.registrocarga.helper;
 
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.dto.HistoricoCargasRequest;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.model.RegistroCarga;
@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicio;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacao;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 
 @UtilityClass
@@ -26,7 +26,7 @@ public class RegistroCargaHelper {
             .qtdRepeticoes(12)
             .dataCadastro(LocalDate.of(2025, 4, 4))
             .qtdSeries(4)
-            .exercicio(umExercicio(1))
+            .exercicio(umExercicioMusculacao(1))
             .usuario(umUsuarioAdmin())
             .build();
     }
@@ -39,7 +39,7 @@ public class RegistroCargaHelper {
             .qtdRepeticoes(8)
             .dataCadastro(LocalDate.of(2025, 4, 5))
             .qtdSeries(2)
-            .exercicio(umExercicio(1))
+            .exercicio(umExercicioMusculacao(1))
             .usuario(umUsuarioAdmin())
             .build();
     }
@@ -52,7 +52,7 @@ public class RegistroCargaHelper {
             .qtdRepeticoes(8)
             .dataCadastro(LocalDate.of(2025, 4, 6))
             .qtdSeries(3)
-            .exercicio(umExercicio(1))
+            .exercicio(umExercicioMusculacao(1))
             .usuario(umUsuarioAdmin())
             .build();
     }

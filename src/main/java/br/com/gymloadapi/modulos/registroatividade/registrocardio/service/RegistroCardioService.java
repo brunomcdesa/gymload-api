@@ -29,4 +29,9 @@ public class RegistroCardioService implements RegistroAtividadeFactory {
     public List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer usuarioId) {
         return List.of();
     }
+
+    @Override
+    public void editarRegistro(Integer registroAtividadeId, RegistroAtividadeRequest request, Usuario usuario) {
+
+    }
 }

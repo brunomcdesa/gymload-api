@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,12 +37,5 @@ public class HistoricoCargasController {
     public List<HistoricoCargasResponse> buscarHistoricoCargasCompleto(@PathVariable Integer exercicioId,
                                                                        @AuthenticationPrincipal Usuario usuario) {
         return service.buscarHistoricoCargasCompleto(exercicioId, usuario.getId());
-    }
-
-    @PutMapping("{id}/editar")
-    @ResponseStatus(NO_CONTENT)
-    public void editar(@PathVariable Integer id, @RequestBody @Valid HistoricoCargasRequest request,
-                       @AuthenticationPrincipal Usuario usuario) {
-        service.editar(id, request, usuario);
     }
 }

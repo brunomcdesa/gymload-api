@@ -45,7 +45,7 @@ class ExercicioServiceTest {
 
     @Test
     void salvar_deveSalvarExercicio_quandoSolicitado() {
-        var request = umExercicioRequest();
+        var request = umExercicioMusculacaoRequest();
         var grupoMuscular = umGrupoMuscularPeitoral();
 
         when(grupoMuscularService.findById(1)).thenReturn(grupoMuscular);
@@ -93,7 +93,7 @@ class ExercicioServiceTest {
 
     @Test
     void findById_deveRetornarExercicio_quandoEncontrarExercicio() {
-        when(repository.findById(1)).thenReturn(Optional.of(umExercicio(1)));
+        when(repository.findById(1)).thenReturn(Optional.of(umExercicioMusculacao(1)));
 
         var exercicio = assertDoesNotThrow(() -> service.findById(1));
         assertAll(

@@ -48,7 +48,7 @@ public class Exercicio {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "FK_GRUPO_MUSCULAR", referencedColumnName = "ID",
-        foreignKey = @ForeignKey(name = "FK_GRUPO_MUSCULAR"), nullable = false)
+        foreignKey = @ForeignKey(name = "FK_GRUPO_MUSCULAR"))
     private GrupoMuscular grupoMuscular;
 
     @ManyToMany

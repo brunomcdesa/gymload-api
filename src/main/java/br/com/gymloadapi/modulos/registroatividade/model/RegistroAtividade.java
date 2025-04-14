@@ -31,4 +31,8 @@ public abstract class RegistroAtividade {
     @JoinColumn(name = "FK_USUARIO", referencedColumnName = "ID",
         foreignKey = @ForeignKey(name = "FK_USUARIO"), nullable = false)
     protected Usuario usuario;
+
+    public Integer getUsuarioId() {
+        return usuario.getId();
+    }
 }

@@ -1,16 +1,14 @@
-package br.com.gymloadapi.modulos.cargas.mapper;
+package br.com.gymloadapi.modulos.registroatividade.registrocarga.mapper;
 
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.mapper.HistoricoCargasMapper;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.mapper.HistoricoCargasMapperImpl;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static br.com.gymloadapi.modulos.cargas.helper.RegistroCargaHelper.umRegistroCarga;
-import static br.com.gymloadapi.modulos.cargas.helper.RegistroCargaHelper.umHistoricoCargasRequest;
+import static br.com.gymloadapi.modulos.registroatividade.registrocarga.helper.RegistroCargaHelper.umRegistroCarga;
+import static br.com.gymloadapi.modulos.registroatividade.registrocarga.helper.RegistroCargaHelper.umHistoricoCargasRequest;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicio;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacao;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +19,7 @@ class RegistroCargaMapperTest {
 
     @Test
     void mapToModel_deveFazerOMapeamentoCorreto_quandoSolicitado() {
-        var model = mapper.mapToModel(umHistoricoCargasRequest(), umExercicio(1), umUsuarioAdmin());
+        var model = mapper.mapToModel(umHistoricoCargasRequest(), umExercicioMusculacao(1), umUsuarioAdmin());
 
         assertAll(
             () -> assertEquals(22.5, model.getPeso()),

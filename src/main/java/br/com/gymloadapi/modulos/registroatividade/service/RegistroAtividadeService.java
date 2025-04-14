@@ -39,6 +39,13 @@ public class RegistroAtividadeService {
             .buscarHistoricoRegistroCompleto(exercicioId, usuarioId);
     }
 
+    public void editar(Integer registroAtividadeId, RegistroAtividadeRequest request, Usuario usuario) {
+        var exercicio = this.findExercicioById(request.exercicioId());
+
+        locatorService.getRegistroAtividadeService(exercicio.getTipoExercicio())
+            .editarRegistro(registroAtividadeId, request, usuario);
+    }
+
     private Exercicio findExercicioById(Integer exercicioId) {
         return exercicioService.findById(exercicioId);
     }

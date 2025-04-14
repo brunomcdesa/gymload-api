@@ -1,13 +1,13 @@
 package br.com.gymloadapi.modulos.registroatividade.registrocarga.service;
 
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
-import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.factory.RegistroAtividadeFactory;
+import br.com.gymloadapi.modulos.registroatividade.mapper.RegistroAtividadeMapper;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.dto.CargaResponse;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.dto.HistoricoCargasRequest;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.dto.HistoricoCargasResponse;
@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
+import static br.com.gymloadapi.modulos.comum.utils.ValidacaoUtils.validarUsuarioAlteracao;
 import static java.util.Comparator.comparing;
 
 @Service
@@ -31,6 +31,7 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
     private final ExercicioService exercicioService;
     private final RegistroCargaRepository repository;
     private final HistoricoCargasMapper historicoCargasMapper;
+    private final RegistroAtividadeMapper registroAtividadeMapper;
 
     public void salvar(HistoricoCargasRequest request, Usuario usuario) {
         var exercicio = exercicioService.findById(request.exercicioId());
@@ -39,7 +40,7 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
 
     @Override
     public void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario) {
-        repository.save(historicoCargasMapper.mapToModel(request, exercicio, usuario));
+        repository.save(registroAtividadeMapper.mapToRegistroCarga(request, exercicio, usuario));
     }
 
     public CargaResponse buscarUltimoHistoricoCargas(Integer exercicioId, Integer usuarioId) {
@@ -60,7 +61,7 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
         return new RegistroAtividadeResponse(
             this.getDestaqueDoHistorico(registroCarga),
             this.getHistoricoUltimoDia(registroCarga).stream()
-                .map(historicoCargasMapper::mapToHistoricoRegistroAtividadeResponse)
+                .map(registroAtividadeMapper::mapToHistoricoRegistroAtividadeResponse)
                 .toList()
         );
     }
@@ -76,12 +77,16 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
     public List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer usuarioId) {
         return this.getAllByExercicioId(exercicioId, usuarioId).stream()
             .sorted(comparing(RegistroCarga::getDataCadastro).reversed())
-            .map(historicoCargasMapper::mapToHistoricoRegistroAtividadeResponse)
+            .map(registroAtividadeMapper::mapToHistoricoRegistroAtividadeResponse)
             .toList();
     }
 
-    public void editar(Integer id, HistoricoCargasRequest request, Usuario usuario) {
-        var historicoCargas = this.findById(id);
+    @Override
+    public void editarRegistro(Integer registroAtividadeId, RegistroAtividadeRequest request, Usuario usuario) {
+        var registroCarga = this.findById(registroAtividadeId);
+        validarUsuarioAlteracao(registroCarga.getUsuarioId(), usuario, "alterar as informações deste registro");
+        registroAtividadeMapper.editarRegistroCarga(request, registroCarga);
+        repository.save(registroCarga);
     }
 
     private List<RegistroCarga> getAllByExercicioId(Integer exercicioId, Integer usuarioId) {
@@ -127,12 +132,6 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
 
     private RegistroCarga findById(Integer id) {
         return repository.findById(id)
-            .orElseThrow(() -> new NotFoundException("Histórico de cargas não encontrado."));
-    }
-
-    private void validarUsuarioVinculado(RegistroCarga registroCarga, Usuario usuario) {
-        if (!Objects.equals(registroCarga.getUsuario().getId(), usuario.getId())) {
-            throw new ValidacaoException("Histórico de cargas ");
-        }
+            .orElseThrow(() -> new NotFoundException("Registro de carga não encontrado."));
     }
 }
