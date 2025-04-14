@@ -17,7 +17,7 @@ import static java.util.Collections.emptyList;
 public class ExercicioHelper {
 
     public static ExercicioRequest umExercicioMusculacaoRequest() {
-        return new ExercicioRequest("SUPINO RETO", "Supino Reto", 1, HALTER, MUSCULACAO, PRONADA);
+        return new ExercicioRequest("SUPINO RETO", MUSCULACAO, "Supino Reto", 1, HALTER, PRONADA);
     }
 
     public static Exercicio umExercicioMusculacao(Integer id) {

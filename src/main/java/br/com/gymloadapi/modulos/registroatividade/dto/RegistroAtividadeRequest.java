@@ -1,25 +1,43 @@
 package br.com.gymloadapi.modulos.registroatividade.dto;
 
 import br.com.gymloadapi.modulos.comum.enums.EUnidadePeso;
-import br.com.gymloadapi.modulos.registroatividade.registrocardio.enums.ETipoVelocidadeMedia;
+import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Aerobico;
+import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Musculacao;
+import br.com.gymloadapi.modulos.comum.utils.ValidacaoUtils;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 
 public record RegistroAtividadeRequest(
     @NotNull
     Integer exercicioId,
 
-    @NotNull
+    @Null(groups = Aerobico.class)
+    @NotNull(groups = Musculacao.class)
     Double peso,
-    @NotNull
+
+    @Null(groups = Aerobico.class)
+    @NotNull(groups = Musculacao.class)
     EUnidadePeso unidadePeso,
-    @NotNull
+
+    @Null(groups = Aerobico.class)
+    @NotNull(groups = Musculacao.class)
     Integer qtdRepeticoes,
-    @NotNull
+
+    @Null(groups = Aerobico.class)
+    @NotNull(groups = Musculacao.class)
     Integer qtdSeries,
 
+    @Null(groups = Musculacao.class)
+    @NotNull(groups = Aerobico.class)
     Double distancia,
-    Double duracao,
-    ETipoVelocidadeMedia tipoVelocidadeMedia
+
+    @Null(groups = Musculacao.class)
+    @NotNull(groups = Aerobico.class)
+    Double duracao
 ) {
+
+    public void aplicarGroupValidators(Class<?> groupValidator) {
+        ValidacaoUtils.aplicarValidacoes(this, groupValidator);
+    }
 }

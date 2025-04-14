@@ -21,6 +21,8 @@ public class RegistroAtividadeService {
 
     public void salvar(RegistroAtividadeRequest request, Usuario usuario) {
         var exercicio = this.findExercicioById(request.exercicioId());
+        request.aplicarGroupValidators(exercicio.getTipoExercicio().getGroupValidator());
+
         locatorService.getRegistroAtividadeService(exercicio.getTipoExercicio())
             .salvarRegistro(request, exercicio, usuario);
     }
@@ -41,6 +43,7 @@ public class RegistroAtividadeService {
 
     public void editar(Integer registroAtividadeId, RegistroAtividadeRequest request, Usuario usuario) {
         var exercicio = this.findExercicioById(request.exercicioId());
+        request.aplicarGroupValidators(exercicio.getTipoExercicio().getGroupValidator());
 
         locatorService.getRegistroAtividadeService(exercicio.getTipoExercicio())
             .editarRegistro(registroAtividadeId, request, usuario);

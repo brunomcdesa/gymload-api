@@ -10,23 +10,22 @@ import java.util.List;
 
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
-import static br.com.gymloadapi.modulos.registroatividade.registrocardio.enums.ETipoVelocidadeMedia.KM_H;
 
 @UtilityClass
 public class RegistroAtividadeHelper {
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestComCamposNull() {
-        return new RegistroAtividadeRequest(null, null, null, null, null, null, null, null);
+        return new RegistroAtividadeRequest(null, null, null, null, null, null, null);
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaMusculacao() {
         return new RegistroAtividadeRequest(1, 22.5, KG, 12, 4,
-            null, null, null);
+            null, null);
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaAerobico() {
         return new RegistroAtividadeRequest(3, null, null, null, null,
-            20.0, 1.5, KM_H);
+            20.0, 1.5);
     }
 
     public static RegistroAtividadeResponse umRegistroAtividadeResponseComDadosDeMusculacao() {

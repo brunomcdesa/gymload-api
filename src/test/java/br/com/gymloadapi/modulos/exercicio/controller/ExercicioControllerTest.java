@@ -62,10 +62,7 @@ class ExercicioControllerTest {
         var request = new ExercicioRequest(exercicioNome, null, null, null, null, null);
         isBadRequest(post(URL), mockMvc, request,
             "O campo nome é obrigatório.",
-            "O campo grupoMuscularId é obrigatório.",
-            "O campo tipoEquipamento é obrigatório.",
-            "O campo tipoExercicio é obrigatório.",
-            "O campo tipoPegada é obrigatório.");
+            "O campo tipoExercicio é obrigatório.");
 
         verifyNoInteractions(service);
     }

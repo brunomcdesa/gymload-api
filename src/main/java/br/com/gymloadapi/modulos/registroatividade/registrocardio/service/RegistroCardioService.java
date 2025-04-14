@@ -5,6 +5,8 @@ import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividad
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.factory.RegistroAtividadeFactory;
+import br.com.gymloadapi.modulos.registroatividade.mapper.RegistroAtividadeMapper;
+import br.com.gymloadapi.modulos.registroatividade.registrocardio.repository.RegistroCardioRepository;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,9 +17,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RegistroCardioService implements RegistroAtividadeFactory {
 
+    private final RegistroCardioRepository repository;
+    private final RegistroAtividadeMapper registroAtividadeMapper;
+
     @Override
     public void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario) {
-
+        var registroCardio = registroAtividadeMapper.mapToRegistroCardio(request, exercicio, usuario);
+        repository.save(registroCardio);
     }
 
     @Override

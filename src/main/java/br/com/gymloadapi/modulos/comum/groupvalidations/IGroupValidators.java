@@ -5,4 +5,8 @@ public interface IGroupValidators {
     interface Cadastro {}
 
     interface Alteracao {}
+
+    interface Musculacao {}
+
+    interface Aerobico {}
 }

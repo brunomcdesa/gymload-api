@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 
+import static br.com.gymloadapi.modulos.comum.dto.ExceptionErrorMessage.createErrorMessage;
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.*;
 
@@ -33,18 +35,21 @@ public class ExceptionHandlerController {
     @ExceptionHandler(BindException.class)
     public List<ExceptionErrorMessage> handleBindException(BindException exception) {
         return exception.getBindingResult().getFieldErrors().stream()
-            .map(error -> {
-                var field = error.getField();
-                return new ExceptionErrorMessage(
-                    format("O campo %s %s", field,  error.getDefaultMessage()),
-                    field
-                );
-            }).toList();
+            .map(error -> createErrorMessage(error.getDefaultMessage(), error.getField()))
+            .toList();
+    }
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public List<ExceptionErrorMessage> handleConstraintViolationException(ConstraintViolationException exception) {
+        return exception.getConstraintViolations().stream()
+            .map(violation -> createErrorMessage(violation.getMessage(), violation.getPropertyPath().toString()))
+            .toList();
     }
 
     @ResponseStatus(FORBIDDEN)
     @ExceptionHandler(PermissaoException.class)
     public ExceptionErrorMessage handlePermissaoException(PermissaoException exception) {
-        return new ExceptionErrorMessage(String.format("Acesso negado. %s", exception.getMessage()), null);
+        return new ExceptionErrorMessage(format("Acesso negado. %s", exception.getMessage()), null);
     }
 }

@@ -50,12 +50,7 @@ class RegistroAtividadeControllerTest {
     @Test
     @WithMockUser
     void salvar_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos() {
-        isBadRequest(post(URL), mockMvc, umRegistroAtividadeRequestComCamposNull(),
-            "O campo exercicioId é obrigatório.",
-            "O campo peso é obrigatório.",
-            "O campo qtdSeries é obrigatório.",
-            "O campo unidadePeso é obrigatório.",
-            "O campo qtdRepeticoes é obrigatório.");
+        isBadRequest(post(URL), mockMvc, umRegistroAtividadeRequestComCamposNull(), "O campo exercicioId é obrigatório.");
 
         verifyNoInteractions(service);
     }
@@ -100,11 +95,7 @@ class RegistroAtividadeControllerTest {
     @WithMockUser
     void editar_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos() {
         isBadRequest(put(URL + "/1/editar"), mockMvc, umRegistroAtividadeRequestComCamposNull(),
-            "O campo exercicioId é obrigatório.",
-            "O campo peso é obrigatório.",
-            "O campo qtdSeries é obrigatório.",
-            "O campo unidadePeso é obrigatório.",
-            "O campo qtdRepeticoes é obrigatório.");
+            "O campo exercicioId é obrigatório.");
 
         verifyNoInteractions(service);
     }

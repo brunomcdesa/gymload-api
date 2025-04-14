@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static br.com.gymloadapi.modulos.comum.utils.MapUtils.mapNullBoolean;
+
 @Service
 @RequiredArgsConstructor
 public class ExercicioService {
@@ -22,8 +24,13 @@ public class ExercicioService {
     private final GrupoMuscularService grupoMuscularService;
 
     public void salvar(ExercicioRequest request) {
-        var grupoMuscular = grupoMuscularService.findById(request.grupoMuscularId());
-        repository.save(exercicioMapper.mapToModel(request, grupoMuscular));
+        request.aplicarGroupValidators();
+        var exercicio = exercicioMapper.mapToModel(
+            request,
+            mapNullBoolean(request.isExercicioMusculacao(), () -> grupoMuscularService.findById(request.grupoMuscularId()))
+        );
+
+        repository.save(exercicio);
     }
 
     public List<ExercicioResponse> buscarTodos() {
