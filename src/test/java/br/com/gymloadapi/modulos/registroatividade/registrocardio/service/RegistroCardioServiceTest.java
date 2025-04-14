@@ -76,13 +76,13 @@ class RegistroCardioServiceTest {
 
         var response = service.buscarUltimoRegistro(1, 1);
         assertAll(
-            () -> assertEquals("26,60 km", response.destaque()),
+            () -> assertEquals("26.6 km", response.destaque()),
             () -> assertEquals(1, response.historicoRegistroAtividade().getFirst().id()),
             () -> assertEquals("Esteira", response.historicoRegistroAtividade().getFirst().exercicioNome()),
             () -> assertEquals(LocalDate.of(2025, 4, 14), response.historicoRegistroAtividade().getFirst().dataCadastro()),
             () -> assertEquals(22.6, response.historicoRegistroAtividade().getFirst().distancia()),
             () -> assertEquals(1.33, response.historicoRegistroAtividade().getFirst().duracao()),
-            () -> assertEquals("16,99 km/h", response.historicoRegistroAtividade().getFirst().velocidadeMedia())
+            () -> assertEquals("16.99 km/h", response.historicoRegistroAtividade().getFirst().velocidadeMedia())
         );
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, 1);
@@ -108,13 +108,13 @@ class RegistroCardioServiceTest {
             () -> assertEquals(LocalDate.of(2025, 4, 14), response.getFirst().dataCadastro()),
             () -> assertEquals(22.6, response.getFirst().distancia()),
             () -> assertEquals(1.33, response.getFirst().duracao()),
-            () -> assertEquals("16,99 km/h", response.getFirst().velocidadeMedia()),
+            () -> assertEquals("16.99 km/h", response.getFirst().velocidadeMedia()),
             () -> assertEquals(2, response.getLast().id()),
             () -> assertEquals("Esteira", response.getLast().exercicioNome()),
             () -> assertEquals(LocalDate.of(2025, 4, 13), response.getLast().dataCadastro()),
             () -> assertEquals(26.6, response.getLast().distancia()),
             () -> assertEquals(1.92, response.getLast().duracao()),
-            () -> assertEquals("13,85 km/h", response.getLast().velocidadeMedia())
+            () -> assertEquals("13.85 km/h", response.getLast().velocidadeMedia())
         );
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, 1);

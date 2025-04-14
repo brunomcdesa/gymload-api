@@ -9,11 +9,11 @@ class RegistroCardioTest {
 
     @Test
     void getDistanciaFormatada_deveRetornarDistanciaFormatada_quandoSolicitado() {
-        assertEquals("22,60 km", umRegistroCardio().getDistanciaFormatada());
+        assertEquals("22.6 km", umRegistroCardio().getDistanciaFormatada());
     }
 
     @Test
     void getVelocidadeMedia_deveRetornarVelocidadeMedia_quandoSolicitado() {
-        assertEquals("16,99 km/h", umRegistroCardio().getVelocidadeMedia());
+        assertEquals("16.99 km/h", umRegistroCardio().getVelocidadeMedia());
     }
 }

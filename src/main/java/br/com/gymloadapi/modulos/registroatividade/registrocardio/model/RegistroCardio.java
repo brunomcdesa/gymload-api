@@ -9,6 +9,9 @@ import lombok.experimental.SuperBuilder;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import static jakarta.persistence.GenerationType.SEQUENCE;
 import static java.lang.String.format;
@@ -36,11 +39,13 @@ public class RegistroCardio extends RegistroAtividade {
     private Double duracao;
 
     public String getDistanciaFormatada() {
-        return format("%.2f km", this.distancia);
+        return format("%s km", this.distancia);
     }
 
     public String getVelocidadeMedia() {
-        var velocidadeMedia = this.distancia / this.duracao;
-        return format("%.2f km/h", velocidadeMedia);
+        var velocidadeMedia = (double) this.distancia / this.duracao;
+
+        var df = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.US));
+        return format("%s km/h", df.format(velocidadeMedia));
     }
 }
