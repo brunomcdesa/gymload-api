@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RegistroCardioRepository extends JpaRepository<RegistroCardio, Integer>,
-    QuerydslPredicateExecutor<RegistroCardio> {
+    QuerydslPredicateExecutor<RegistroCardio>, RegistroCardioRepositoryCustom {
 }

@@ -34,7 +34,7 @@ class RegistroCargaRepositoryTest {
     @ParameterizedTest
     @SuppressWarnings("LineLength")
     @CsvSource(value = {"9999,1", "1,999999"})
-    void findAllByExercicioIdAndUsuarioId_deveRetornarListaVazia_quandoEncontrarCargasParaOExercicioOuParaOUsuario(Integer exercicioId, Integer usuarioId) {
+    void findAllByExercicioIdAndUsuarioId_deveRetornarListaVazia_quandoNaoEncontrarCargasParaOExercicioOuParaOUsuario(Integer exercicioId, Integer usuarioId) {
         assertTrue(repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId).isEmpty());
     }
 }

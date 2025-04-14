@@ -27,10 +27,19 @@ public interface RegistroAtividadeMapper {
     @Mapping(target = "tipoExercicio", source = "registroCarga.exercicio.tipoEquipamento")
     @Mapping(target = "grupoMuscularNome", source = "registroCarga.exercicio.grupoMuscular.nome")
     @Mapping(target = "carga", expression = "java(registroCarga.getCargaComUnidadePeso())")
-    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeResponse(RegistroCarga registroCarga);
+    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeMusculacaoResponse(RegistroCarga registroCarga);
+
+    @Mapping(target = "exercicioNome", source = "registroCardio.exercicio.nome")
+    @Mapping(target = "velocidadeMedia", expression = "java(registroCardio.getVelocidadeMedia())")
+    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeAerobicoResponse(RegistroCardio registroCardio);
 
     @BeanMapping(
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
     void editarRegistroCarga(RegistroAtividadeRequest request, @MappingTarget RegistroCarga registroCarga);
+
+    @BeanMapping(
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
+    void editarRegistroCarga(RegistroAtividadeRequest request, @MappingTarget RegistroCardio registroCardio);
 }

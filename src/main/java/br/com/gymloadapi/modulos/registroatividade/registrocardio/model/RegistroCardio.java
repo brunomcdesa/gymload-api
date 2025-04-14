@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 
 import static jakarta.persistence.GenerationType.SEQUENCE;
+import static java.lang.String.format;
 
 @Table
 @Getter
@@ -33,4 +34,13 @@ public class RegistroCardio extends RegistroAtividade {
     @Positive
     @Column(nullable = false)
     private Double duracao;
+
+    public String getDistanciaFormatada() {
+        return format("%.2f km", this.distancia);
+    }
+
+    public String getVelocidadeMedia() {
+        var velocidadeMedia = this.distancia / this.duracao;
+        return format("%.2f km/h", velocidadeMedia);
+    }
 }

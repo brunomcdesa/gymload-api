@@ -61,7 +61,7 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
         return new RegistroAtividadeResponse(
             this.getDestaqueDoHistorico(registroCarga),
             this.getHistoricoUltimoDia(registroCarga).stream()
-                .map(registroAtividadeMapper::mapToHistoricoRegistroAtividadeResponse)
+                .map(registroAtividadeMapper::mapToHistoricoRegistroAtividadeMusculacaoResponse)
                 .toList()
         );
     }
@@ -77,14 +77,14 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
     public List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer usuarioId) {
         return this.getAllByExercicioId(exercicioId, usuarioId).stream()
             .sorted(comparing(RegistroCarga::getDataCadastro).reversed())
-            .map(registroAtividadeMapper::mapToHistoricoRegistroAtividadeResponse)
+            .map(registroAtividadeMapper::mapToHistoricoRegistroAtividadeMusculacaoResponse)
             .toList();
     }
 
     @Override
     public void editarRegistro(Integer registroAtividadeId, RegistroAtividadeRequest request, Usuario usuario) {
         var registroCarga = this.findById(registroAtividadeId);
-        validarUsuarioAlteracao(registroCarga.getUsuarioId(), usuario, "alterar as informações deste registro");
+        validarUsuarioAlteracao(registroCarga.getUsuarioId(), usuario, "alterar as informações deste registro de carga");
         registroAtividadeMapper.editarRegistroCarga(request, registroCarga);
         repository.save(registroCarga);
     }
@@ -119,13 +119,13 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
             : null;
     }
 
-    private List<RegistroCarga> getHistoricoUltimoDia(List<RegistroCarga> cargases) {
-        var ultimoDia = cargases.stream()
+    private List<RegistroCarga> getHistoricoUltimoDia(List<RegistroCarga> cargas) {
+        var ultimoDia = cargas.stream()
             .map(RegistroCarga::getDataCadastro)
             .max(LocalDate::compareTo)
             .orElse(LocalDate.now());
 
-        return cargases.stream()
+        return cargas.stream()
             .filter(historico -> historico.getDataCadastro().equals(ultimoDia))
             .toList();
     }

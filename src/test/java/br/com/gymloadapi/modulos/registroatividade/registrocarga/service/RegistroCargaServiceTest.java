@@ -259,7 +259,7 @@ class RegistroCargaServiceTest {
             () -> service.editarRegistro(1, umRegistroAtividadeRequestParaMusculacao(), umUsuario())
         );
         assertEquals(
-            "Apenas usuários Admin ou o próprio usuário podem alterar as informações deste registro.",
+            "Apenas usuários Admin ou o próprio usuário podem alterar as informações deste registro de carga.",
             exception.getMessage()
         );
 
