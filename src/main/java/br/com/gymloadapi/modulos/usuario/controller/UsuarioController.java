@@ -7,9 +7,11 @@ import br.com.gymloadapi.modulos.usuario.dto.UsuarioResponse;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -43,8 +45,13 @@ public class UsuarioController {
 
     @ResponseStatus(NO_CONTENT)
     @PutMapping("{uuid}/editar")
-    public void editar(@PathVariable UUID uuid, @RequestBody @Validated(Alteracao.class) UsuarioRequest usuarioRequest,
-                       @AuthenticationPrincipal Usuario usuario) {
-        service.editar(uuid, usuarioRequest, usuario);
+    public void editar(@PathVariable UUID uuid, @RequestPart @Validated(Alteracao.class) UsuarioRequest usuarioRequest,
+                       @RequestPart(required = false) MultipartFile imagem, @AuthenticationPrincipal Usuario usuario) {
+        service.editar(uuid, usuarioRequest, imagem, usuario);
+    }
+
+    @GetMapping(value = "imagem-perfil", produces = {"image/jpeg"})
+    public Resource buscarImagemPerfil(@AuthenticationPrincipal Usuario usuario) {
+        return service.buscarImagemPerfil(usuario);
     }
 }

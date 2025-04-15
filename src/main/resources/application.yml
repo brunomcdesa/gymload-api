@@ -21,3 +21,11 @@ api:
   security:
     token:
       secret: ${JWT_SECRET:my-secret-key}
+
+  aws:
+    accessKeyId: 0053827d213c74a0000000001
+    secretKey: K005fxgktfYLGYGLLOkHDtEkP/N1vo4
+    region: us-east-005
+    bucket:
+      name: gymload
+    endpoint: https://s3.us-east-005.backblazeb2.com

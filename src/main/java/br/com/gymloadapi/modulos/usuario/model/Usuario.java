@@ -43,6 +43,9 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String senha;
 
+    @Column(length = 75)
+    private String imagemPerfil;
+
     @Column(name = "ROLE")
     @Enumerated(STRING)
     @ElementCollection(fetch = EAGER)

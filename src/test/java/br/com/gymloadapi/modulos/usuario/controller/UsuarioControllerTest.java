@@ -18,9 +18,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -142,6 +144,6 @@ class UsuarioControllerTest {
         var request = umUsuarioRequestSemSenha();
         isNoContent(put(URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar"), mockMvc, request);
 
-        verify(service).editar(USUARIO_ADMIN_UUID, request, umUsuarioAdmin());
+        verify(service).editar(USUARIO_ADMIN_UUID, request, any(MultipartFile.class), umUsuarioAdmin());
     }
 }

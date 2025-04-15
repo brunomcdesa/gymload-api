@@ -3,6 +3,7 @@ package br.com.gymloadapi.modulos.usuario.service;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.PermissaoException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
+import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapper;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapperImpl;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
@@ -14,6 +15,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,12 +34,14 @@ class UsuarioServiceTest {
 
     @Mock
     private UsuarioRepository repository;
+    @Mock
+    private BackBlazeService backBlazeService;
     @Captor
     private ArgumentCaptor<Usuario> captor;
 
     @BeforeEach
     void setUp() {
-        service = new UsuarioService(mapper, repository);
+        service = new UsuarioService(mapper, repository, backBlazeService);
     }
 
     @Test
@@ -127,7 +131,7 @@ class UsuarioServiceTest {
 
         var exception = assertThrowsExactly(
             NotFoundException.class,
-            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), umUsuarioAdmin())
+            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), any(MultipartFile.class), umUsuarioAdmin())
         );
         assertEquals("Usuário não encontrado.", exception.getMessage());
 
@@ -141,7 +145,7 @@ class UsuarioServiceTest {
 
         var exception = assertThrowsExactly(
             PermissaoException.class,
-            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), outroUsuario())
+            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), any(MultipartFile.class), outroUsuario())
         );
         assertEquals("Apenas usuários Admin ou o próprio usuário podem alterar suas informações.", exception.getMessage());
 
@@ -153,7 +157,8 @@ class UsuarioServiceTest {
     void editar_deveEditarUsuario_quandoUsuarioAutenticadoForAdmin() {
         when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(umUsuario()));
 
-        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), umUsuarioAdmin()));
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(),
+            any(MultipartFile.class), umUsuarioAdmin()));
 
         verify(repository).findByUuid(USUARIO_ADMIN_UUID);
         verify(repository).save(captor.capture());
@@ -169,7 +174,8 @@ class UsuarioServiceTest {
     void editar_deveEditarUsuario_quandoUsuarioAutenticadoForOMesmoUsuarioQueEstaSendoEditado() {
         when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(umUsuario()));
 
-        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), umUsuario()));
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(),
+            any(MultipartFile.class), umUsuario()));
 
         verify(repository).findByUuid(USUARIO_ADMIN_UUID);
         verify(repository).save(captor.capture());
