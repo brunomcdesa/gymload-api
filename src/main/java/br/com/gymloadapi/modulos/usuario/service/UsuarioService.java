@@ -40,7 +40,6 @@ public class UsuarioService {
     private final UsuarioRepository repository;
     private final BackBlazeService backBlazeService;
 
-
     public void cadastrar(UsuarioRequest usuarioRequest, boolean isCadastroAdmin, MultipartFile imagem) {
         if (repository.existsByUsername(usuarioRequest.username())) {
             throw new ValidacaoException("Já existe um usuário com este username.");

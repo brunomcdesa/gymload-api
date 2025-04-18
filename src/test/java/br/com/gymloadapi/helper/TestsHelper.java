@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @UtilityClass
+@SuppressWarnings("ParameterNumber")
 public class TestsHelper {
 
     private static ObjectMapper getMapper() {
