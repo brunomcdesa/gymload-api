@@ -5,10 +5,6 @@ import java.util.logging.Logger;
 
 public class IntegracaoException extends RuntimeException {
 
-    public IntegracaoException(String message) {
-        super(message);
-    }
-
     public IntegracaoException(final Throwable cause, final String className, final String erro) {
         super(erro);
 

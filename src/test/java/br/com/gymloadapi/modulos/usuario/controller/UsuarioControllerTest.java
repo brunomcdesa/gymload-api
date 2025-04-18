@@ -18,13 +18,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.multipart.MultipartFile;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(UsuarioController.class)
@@ -38,10 +38,11 @@ class UsuarioControllerTest {
     @MockitoBean
     private UsuarioService service;
 
-    @Test
     @WithAnonymousUser
-    void buscarTodos_deveRetorarUnauthorized_quandoUsuarioNaoAutenticado() {
-        isUnauthorized(get(URL), mockMvc);
+    @ParameterizedTest
+    @ValueSource(strings = {"", "/imagem-perfil"})
+    void gets_devemRetorarUnauthorized_quandoUsuarioNaoAutenticado(String endpoint) {
+        isUnauthorized(get(URL + endpoint), mockMvc);
         verifyNoInteractions(service);
     }
 
@@ -72,7 +73,7 @@ class UsuarioControllerTest {
     @CsvSource(value = {"NULL,NULL,NULL", "'','',''", "'  ','  ','  '"}, nullValues = {"NULL"})
     void cadastrar_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos(String nome, String username, String password) {
         var request = new UsuarioRequest(nome, username, password);
-        isBadRequest(post(URL + "/cadastro"), mockMvc, request,
+        isBadRequestMultipart(POST, URL + "/cadastro", mockMvc, umMockMultipartFile(), "usuarioRequest", request,
             "O campo nome é obrigatório.",
             "O campo username é obrigatório.",
             "O campo password é obrigatório."
@@ -84,9 +85,10 @@ class UsuarioControllerTest {
     @WithMockUser
     void cadastrar_deveRetornarCreated_quandoCamposObrigatoriosValidos() {
         var request = umUsuarioRequest();
-        isCreated(post(URL + "/cadastro"), mockMvc, request);
+        var file = umMockMultipartFile();
+        isCreatedMultipart(POST, URL + "/cadastro", mockMvc, file, "usuarioRequest", request);
 
-        verify(service).cadastrar(request, false);
+        verify(service).cadastrar(request, false, file);
     }
 
     @Test
@@ -115,7 +117,7 @@ class UsuarioControllerTest {
         var request = umUsuarioAdminRequest();
         isCreated(post(URL + "/cadastro/admin"), mockMvc, request);
 
-        verify(service).cadastrar(request, true);
+        verify(service).cadastrar(request, true, null);
     }
 
     @Test
@@ -130,7 +132,8 @@ class UsuarioControllerTest {
     @CsvSource(value = {"NULL,NULL,'123'", "'','',''", "'  ','  ','  '"}, nullValues = "NULL")
     void editar_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos(String nome, String username, String password) {
         var request = new UsuarioRequest(nome, username, password);
-        isBadRequest(put(URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar"), mockMvc, request,
+        isBadRequestMultipart(PUT, URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar",
+            mockMvc, umMockMultipartFile(), "usuarioRequest", request,
             "O campo nome é obrigatório.",
             "O campo username é obrigatório.",
             "O campo password deve ser nulo");
@@ -142,8 +145,18 @@ class UsuarioControllerTest {
     @WithUserDetails
     void editar_deveRetornarNoContent_quandoCamposObrigatoriosValidos() {
         var request = umUsuarioRequestSemSenha();
-        isNoContent(put(URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar"), mockMvc, request);
+        var file = umMockMultipartFile();
+        isNoContentMultipart(PUT, URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar", mockMvc,
+            file, "usuarioRequest", request);
 
-        verify(service).editar(USUARIO_ADMIN_UUID, request, any(MultipartFile.class), umUsuarioAdmin());
+        verify(service).editar(USUARIO_ADMIN_UUID, request, file, umUsuarioAdmin());
+    }
+
+    @Test
+    @WithUserDetails
+    void buscarImagemPerfil_deveRetornarOk_quandoUsuarioAutenticado() {
+        isOk(get(URL + "/imagem-perfil"), mockMvc);
+
+        verify(service).buscarImagemPerfil(umUsuarioAdmin());
     }
 }

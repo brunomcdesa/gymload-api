@@ -46,6 +46,7 @@ public class UsuarioHelper {
             .nome("Usuario")
             .roles(ROLES_USER)
             .username("usuarioUser")
+            .imagemPerfil("802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png")
             .senha(encodePassword("123456"))
             .build();
     }
@@ -57,6 +58,7 @@ public class UsuarioHelper {
             .nome("Usuario 2")
             .roles(ROLES_USER)
             .username("usuarioUser2")
+            .imagemPerfil("802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario 2.png")
             .senha(encodePassword("123456"))
             .build();
     }
