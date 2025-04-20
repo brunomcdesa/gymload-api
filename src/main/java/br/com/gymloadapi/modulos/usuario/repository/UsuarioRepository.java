@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer>, QuerydslPredicateExecutor<Usuario>,
     UsuarioRepositoryCustom {
 
-    UserDetails findByUsername(String username);
+    Optional<UserDetails> findByUsername(String username);
 
     boolean existsByUsername(String username);
 

@@ -112,13 +112,26 @@ class UsuarioServiceTest {
 
     @Test
     void findByUsername_deveRetornarUsuario_quandoEncontrarUsuarioComMesmoUsername() {
-        when(repository.findByUsername("usuario")).thenReturn(umUsuarioAdmin());
+        when(repository.findByUsername("usuario")).thenReturn(Optional.of(umUsuarioAdmin()));
 
         var userDetails = service.findByUsername("usuario");
         assertAll(
             () -> assertEquals("usuarioAdmin", userDetails.getUsername()),
             () -> assertTrue(userDetails.getPassword().startsWith("$2a$"))
         );
+
+        verify(repository).findByUsername("usuario");
+    }
+
+    @Test
+    void findByUsername_deveLancarException_quandoNaoEncontrarUsuarioComMesmoUsername() {
+        when(repository.findByUsername("usuario")).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.findByUsername("usuario")
+        );
+        assertEquals("Usuário não encontrado.", exception.getMessage());
 
         verify(repository).findByUsername("usuario");
     }

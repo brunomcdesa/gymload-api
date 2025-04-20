@@ -33,6 +33,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @RequiredArgsConstructor
 public class UsuarioService {
 
+    private static final String MSG_USUARIO_NAO_ENCONTRADO = "Usuário não encontrado.";
+
     @Value("${api.aws.default-user-image}")
     private String defaultUserImage;
 
@@ -56,7 +58,8 @@ public class UsuarioService {
     }
 
     public UserDetails findByUsername(String username) {
-        return repository.findByUsername(username);
+        return repository.findByUsername(username)
+            .orElseThrow(() -> new NotFoundException(MSG_USUARIO_NAO_ENCONTRADO));
     }
 
     public List<UsuarioResponse> buscarTodos() {
@@ -91,7 +94,8 @@ public class UsuarioService {
     }
 
     private Usuario findByUuid(UUID uuid) {
-        return repository.findByUuid(uuid).orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
+        return repository.findByUuid(uuid)
+            .orElseThrow(() -> new NotFoundException(MSG_USUARIO_NAO_ENCONTRADO));
     }
 
     private void realizarUploadImagemPerfil(Usuario usuario, MultipartFile imagem) {
