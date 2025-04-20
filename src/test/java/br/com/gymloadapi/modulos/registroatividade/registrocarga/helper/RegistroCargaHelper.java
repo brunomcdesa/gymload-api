@@ -26,6 +26,7 @@ public class RegistroCargaHelper {
             .qtdRepeticoes(12)
             .dataCadastro(LocalDate.of(2025, 4, 4))
             .qtdSeries(4)
+            .observacao("Observacao")
             .exercicio(umExercicioMusculacao(1))
             .usuario(umUsuarioAdmin())
             .build();
@@ -39,27 +40,27 @@ public class RegistroCargaHelper {
             .qtdRepeticoes(8)
             .dataCadastro(LocalDate.of(2025, 4, 5))
             .qtdSeries(2)
+            .observacao("Observacao")
             .exercicio(umExercicioMusculacao(1))
             .usuario(umUsuarioAdmin())
             .build();
     }
 
-    public static RegistroCarga maisUmHistoricoCargas() {
+    public static RegistroCarga maisUmRegistroCarga() {
         return RegistroCarga.builder()
             .id(3)
             .peso(27.2)
             .unidadePeso(KG)
             .qtdRepeticoes(8)
             .dataCadastro(LocalDate.of(2025, 4, 6))
+            .observacao("Observacao")
             .qtdSeries(3)
             .exercicio(umExercicioMusculacao(1))
             .usuario(umUsuarioAdmin())
             .build();
     }
 
-    public static List<RegistroCarga> umaListaHistoricoCargas() {
-        return List.of(
-            umRegistroCarga(), outroRegistroCarga(), maisUmHistoricoCargas()
-        );
+    public static List<RegistroCarga> umaListaRegistroCarga() {
+        return List.of(umRegistroCarga(), outroRegistroCarga(), maisUmRegistroCarga());
     }
 }

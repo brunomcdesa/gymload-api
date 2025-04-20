@@ -22,6 +22,9 @@ public abstract class RegistroAtividade {
     @Column(nullable = false)
     protected LocalDate dataCadastro;
 
+    @Column(length = 150)
+    protected String observacao;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_EXERCICIO", referencedColumnName = "ID",
         foreignKey = @ForeignKey(name = "FK_EXERCICIO"), nullable = false)

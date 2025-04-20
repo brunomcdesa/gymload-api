@@ -15,6 +15,7 @@ public class RegistroCardioHelper {
     public static RegistroCardio umRegistroCardio() {
         return RegistroCardio.builder()
             .id(1)
+            .observacao("Observacao")
             .dataCadastro(LocalDate.of(2025, 4, 14))
             .exercicio(umExercicioAerobico(1))
             .usuario(umUsuario())
@@ -26,6 +27,7 @@ public class RegistroCardioHelper {
     public static RegistroCardio outroRegistroCardio() {
         return RegistroCardio.builder()
             .id(2)
+            .observacao("Observacao")
             .dataCadastro(LocalDate.of(2025, 4, 13))
             .exercicio(umExercicioAerobico(1))
             .usuario(umUsuario())

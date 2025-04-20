@@ -12,6 +12,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 public record HistoricoRegistroAtividadeResponse(
     Integer id,
     String exercicioNome,
+    String observacao,
     @DatePatternResponse
     LocalDate dataCadastro,
     String carga,

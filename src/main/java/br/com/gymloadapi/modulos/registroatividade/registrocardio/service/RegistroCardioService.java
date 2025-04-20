@@ -56,7 +56,7 @@ public class RegistroCardioService implements RegistroAtividadeFactory {
     public void editarRegistro(Integer registroAtividadeId, RegistroAtividadeRequest request, Usuario usuario) {
         var registroCardio = this.findById(registroAtividadeId);
         validarUsuarioAlteracao(registroCardio.getUsuarioId(), usuario, "alterar as informações deste registro de cardio");
-        registroAtividadeMapper.editarRegistroCarga(request, registroCardio);
+        registroAtividadeMapper.editarRegistroCardio(request, registroCardio);
         repository.save(registroCardio);
     }
 

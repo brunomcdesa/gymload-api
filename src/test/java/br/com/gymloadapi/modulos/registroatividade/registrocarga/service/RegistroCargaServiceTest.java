@@ -108,7 +108,7 @@ class RegistroCargaServiceTest {
     void buscarUltimoHistoricoCargas_deveRetornarMaiorCargaECargasDoUltimoDiaRegistrado_quandoSolicitado() {
         var usuario = umUsuarioAdmin();
 
-        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaHistoricoCargas());
+        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaRegistroCarga());
 
         var response = service.buscarUltimoHistoricoCargas(1, usuario.getId());
 
@@ -143,7 +143,7 @@ class RegistroCargaServiceTest {
     void buscarUltimoRegistro_deveRetornarMaiorCargaECargasDoUltimoDiaRegistrado_quandoSolicitado() {
         var usuario = umUsuarioAdmin();
 
-        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaHistoricoCargas());
+        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaRegistroCarga());
 
         var response = service.buscarUltimoRegistro(1, usuario.getId());
 
@@ -173,7 +173,7 @@ class RegistroCargaServiceTest {
     void buscarHistoricoCargasCompleto_deveRetornarHistoricoCompleto_quandoExercicioPossuirHistoricoCargas() {
         var usuario = umUsuarioAdmin();
 
-        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaHistoricoCargas());
+        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaRegistroCarga());
 
         var responses = service.buscarHistoricoCargasCompleto(1, usuario.getId());
 
@@ -212,7 +212,7 @@ class RegistroCargaServiceTest {
     void buscarHistoricoRegistroCompleto_deveRetornarHistoricoCompleto_quandoExercicioPossuirHistoricoCargas() {
         var usuario = umUsuarioAdmin();
 
-        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaHistoricoCargas());
+        when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaRegistroCarga());
 
         var responses = service.buscarHistoricoRegistroCompleto(1, usuario.getId());
 

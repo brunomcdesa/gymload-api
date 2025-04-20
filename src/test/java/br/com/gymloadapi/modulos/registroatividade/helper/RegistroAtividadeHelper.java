@@ -15,16 +15,16 @@ import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
 public class RegistroAtividadeHelper {
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestComCamposNull() {
-        return new RegistroAtividadeRequest(null, null, null, null, null, null, null);
+        return new RegistroAtividadeRequest(null, null, null, null, null, null, null, null);
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaMusculacao() {
-        return new RegistroAtividadeRequest(1, 22.5, KG, 12, 4,
+        return new RegistroAtividadeRequest(1, "Observacao", 22.5, KG, 12, 4,
             null, null);
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaAerobico() {
-        return new RegistroAtividadeRequest(3, null, null, null, null,
+        return new RegistroAtividadeRequest(3, "Observacao", null, null, null, null,
             20.0, 1.5);
     }
 
@@ -43,14 +43,15 @@ public class RegistroAtividadeHelper {
     }
 
     public static HistoricoRegistroAtividadeResponse umHistoricoRegistroAtividadeResponseDeMusculacao() {
-        return new HistoricoRegistroAtividadeResponse(1, "SUPINO RETO", LocalDate.of(2025, 4, 4), "22.5 (KG)", HALTER,
-            "Peitoral", 12, 4, null, null, null
+        return new HistoricoRegistroAtividadeResponse(1, "SUPINO RETO", "Observacao",
+            LocalDate.of(2025, 4, 4), "22.5 (KG)", HALTER, "Peitoral", 12,
+            4, null, null, null
         );
     }
 
     public static HistoricoRegistroAtividadeResponse umHistoricoRegistroAtividadeResponseDeAerobico() {
-        return new HistoricoRegistroAtividadeResponse(2, "ESTEIRA", LocalDate.of(2025, 4, 4),
-            null, null, null, null, null, 22.5, 2.0,
-            "11,25 km/h");
+        return new HistoricoRegistroAtividadeResponse(2, "ESTEIRA", "Observacao",
+            LocalDate.of(2025, 4, 4), null, null, null, null, null,
+            22.5, 2.0, "11,25 km/h");
     }
 }

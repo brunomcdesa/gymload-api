@@ -41,5 +41,5 @@ public interface RegistroAtividadeMapper {
     @BeanMapping(
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
-    void editarRegistroCarga(RegistroAtividadeRequest request, @MappingTarget RegistroCardio registroCardio);
+    void editarRegistroCardio(RegistroAtividadeRequest request, @MappingTarget RegistroCardio registroCardio);
 }

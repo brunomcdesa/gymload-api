@@ -12,6 +12,8 @@ public record RegistroAtividadeRequest(
     @NotNull
     Integer exercicioId,
 
+    String observacao,
+
     @Null(groups = Aerobico.class)
     @NotNull(groups = Musculacao.class)
     Double peso,
