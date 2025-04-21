@@ -19,7 +19,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import static br.com.gymloadapi.modulos.comum.utils.ValidacaoUtils.validarUsuarioAlteracao;
 import static java.util.Comparator.comparing;
@@ -55,14 +57,11 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
     }
 
     @Override
-    public RegistroAtividadeResponse buscarUltimoRegistro(Integer exercicioId, Integer usuarioId) {
-        var registroCarga = this.getAllByExercicioId(exercicioId, usuarioId);
+    public RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId) {
+        var registrosCargas = this.getAllByExercicioId(exercicioId, usuarioId);
 
-        return new RegistroAtividadeResponse(
-            this.getDestaqueDoHistorico(registroCarga),
-            this.getHistoricoUltimoDia(registroCarga).stream()
-                .map(registroAtividadeMapper::mapToHistoricoRegistroAtividadeMusculacaoResponse)
-                .toList()
+        return new RegistroAtividadeResponse(exercicioId, this.getDestaqueDoRegistro(registrosCargas),
+            this.getUltimoRegistro(registrosCargas), null
         );
     }
 
@@ -104,7 +103,7 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
             : null;
     }
 
-    private String getDestaqueDoHistorico(List<RegistroCarga> cargas) {
+    private String getDestaqueDoRegistro(List<RegistroCarga> cargas) {
         var optionalMaiorCarga = cargas.stream()
             .map(RegistroCarga::getPeso)
             .mapToDouble(Double::doubleValue)
@@ -116,7 +115,7 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
             .map(RegistroCarga::getCargaComUnidadePeso)
             .findFirst()
             .orElse(null)
-            : null;
+            : "-";
     }
 
     private List<RegistroCarga> getHistoricoUltimoDia(List<RegistroCarga> cargas) {
@@ -128,6 +127,19 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
         return cargas.stream()
             .filter(historico -> historico.getDataCadastro().equals(ultimoDia))
             .toList();
+    }
+
+    private String getUltimoRegistro(List<RegistroCarga> cargas) {
+        var utimoRegistroId = cargas.stream()
+            .map(RegistroCarga::getId)
+            .max(Comparator.naturalOrder())
+            .orElse(null);
+
+        return cargas.stream()
+            .filter(registro -> Objects.equals(registro.getId(), utimoRegistroId))
+            .findFirst()
+            .map(RegistroCarga::getCargaComUnidadePeso)
+            .orElse("-");
     }
 
     private RegistroCarga findById(Integer id) {

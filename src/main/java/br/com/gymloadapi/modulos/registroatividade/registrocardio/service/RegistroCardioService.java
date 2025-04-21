@@ -13,8 +13,9 @@ import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import static br.com.gymloadapi.modulos.comum.utils.ValidacaoUtils.validarUsuarioAlteracao;
 import static java.util.Comparator.comparing;
@@ -33,14 +34,11 @@ public class RegistroCardioService implements RegistroAtividadeFactory {
     }
 
     @Override
-    public RegistroAtividadeResponse buscarUltimoRegistro(Integer exercicioId, Integer usuarioId) {
+    public RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId) {
         var registroCardio = this.getAllByExercicioId(exercicioId, usuarioId);
 
-        return new RegistroAtividadeResponse(
-            this.getDestaqueDoHistorico(registroCardio),
-            this.getHistoricoUltimoDia(registroCardio).stream()
-                .map(registroAtividadeMapper::mapToHistoricoRegistroAtividadeAerobicoResponse)
-                .toList()
+        return new RegistroAtividadeResponse(exercicioId, this.getDestaqueDoHistorico(registroCardio),
+            null, this.getUltimoResgistro(registroCardio)
         );
     }
 
@@ -80,18 +78,20 @@ public class RegistroCardioService implements RegistroAtividadeFactory {
             .filter(carga -> carga.getDistancia() == optionalMaiorDistancia.getAsDouble())
             .map(RegistroCardio::getDistanciaFormatada)
             .findFirst()
-            .orElse(null)
-            : null;
+            .orElse("-")
+            : "-";
     }
 
-    private List<RegistroCardio> getHistoricoUltimoDia(List<RegistroCardio> registros) {
-        var ultimoDia = registros.stream()
-            .map(RegistroCardio::getDataCadastro)
-            .max(LocalDate::compareTo)
-            .orElse(LocalDate.now());
+    private String getUltimoResgistro(List<RegistroCardio> registros) {
+        var ultimoRegistro = registros.stream()
+            .map(RegistroCardio::getId)
+            .max(Comparator.naturalOrder())
+            .orElse(null);
 
         return registros.stream()
-            .filter(historico -> historico.getDataCadastro().equals(ultimoDia))
-            .toList();
+            .filter(registro -> Objects.equals(registro.getId(), ultimoRegistro))
+            .map(RegistroCardio::getDistanciaFormatada)
+            .findFirst()
+            .orElse("-");
     }
 }

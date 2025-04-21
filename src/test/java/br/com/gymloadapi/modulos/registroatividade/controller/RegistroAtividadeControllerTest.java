@@ -21,8 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Map;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
-import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.umRegistroAtividadeRequestComCamposNull;
-import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.umRegistroAtividadeRequestParaMusculacao;
+import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.*;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -66,7 +65,7 @@ class RegistroAtividadeControllerTest {
 
     @ParameterizedTest
     @WithAnonymousUser
-    @ValueSource(strings = {"/1", "/1/completo"})
+    @ValueSource(strings = {"/destaques?exerciciosIds=1,2,3", "/1/completo"})
     void gets_devemRetornarUnauthorized_quandoUsuarioNaoAutenticado(String endpoint) {
         isUnauthorized(get(URL + endpoint), mockMvc);
         verifyNoInteractions(service);
@@ -74,14 +73,22 @@ class RegistroAtividadeControllerTest {
 
     @WithUserDetails
     @ParameterizedTest
-    @ValueSource(strings = {"/1", "/1/completo"})
+    @ValueSource(strings = {"/destaques?exerciciosIds=1,2", "/1/completo"})
     void gets_devemRetornarOk_quandoUsuarioAutenticado(String endpoint) {
         isOk(get(URL + endpoint), mockMvc);
 
         Map.<String, Runnable>of(
-            "/1", () -> verify(service).buscarUltimoRegistroAtividade(1, 1),
+            "/destaques?exerciciosIds=1,2", () -> verify(service).buscarDestaques(umRegistroAtividadeFiltros(), 1),
             "/1/completo", () -> verify(service).buscarRegistroAtividadeCompleto(1, 1)
         ).get(endpoint).run();
+    }
+
+    @Test
+    @WithMockUser
+    void buscarDestaques_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos() {
+        isBadRequest(get(URL + "/destaques"), mockMvc, "O campo exerciciosIds é obrigatório.");
+
+        verifyNoInteractions(service);
     }
 
     @Test

@@ -19,7 +19,7 @@ public class ExercicioRepositoryImpl implements ExercicioRepositoryCustom {
     public List<Exercicio> findAllComplete() {
         return new JPAQueryFactory(entityManager)
             .selectFrom(exercicio)
-            .innerJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
+            .leftJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
             .leftJoin(exercicio.treinos).fetchJoin()
             .fetch();
     }

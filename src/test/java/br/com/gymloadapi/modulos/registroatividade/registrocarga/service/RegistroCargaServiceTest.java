@@ -124,35 +124,36 @@ class RegistroCargaServiceTest {
     }
 
     @Test
-    void buscarUltimoRegistro_deveRetornarResponseComDadosNull_quandoExercicioNaoPossuirNenhumRegistroDeCargas() {
+    void buscarDestaque_deveRetornarResponseComDadosNull_quandoExercicioNaoPossuirNenhumRegistroDeCargas() {
         var usuario = umUsuarioAdmin();
 
         when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(emptyList());
 
-        var response = service.buscarUltimoRegistro(1, usuario.getId());
+        var response = service.buscarDestaque(1, usuario.getId());
 
         assertAll(
-            () -> assertNull(response.destaque()),
-            () -> assertTrue(response.historicoRegistroAtividade().isEmpty())
+            () -> assertEquals(1, response.exercicioId()),
+            () -> assertEquals("-", response.destaque()),
+            () -> assertEquals("-", response.ultimaCarga()),
+            () -> assertNull(response.ultimaDistancia())
         );
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, usuario.getId());
     }
 
     @Test
-    void buscarUltimoRegistro_deveRetornarMaiorCargaECargasDoUltimoDiaRegistrado_quandoSolicitado() {
+    void buscarDestaque_deveRetornarMaiorCargaECargasDoUltimoDiaRegistrado_quandoSolicitado() {
         var usuario = umUsuarioAdmin();
 
         when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaRegistroCarga());
 
-        var response = service.buscarUltimoRegistro(1, usuario.getId());
+        var response = service.buscarDestaque(1, usuario.getId());
 
         assertAll(
+            () -> assertEquals(1, response.exercicioId()),
             () -> assertEquals("27.2 (KG)", response.destaque()),
-            () -> assertEquals("27.2 (KG)", response.historicoRegistroAtividade().getFirst().carga()),
-            () -> assertEquals(LocalDate.of(2025, 4, 6), response.historicoRegistroAtividade().getFirst().dataCadastro()),
-            () -> assertEquals(8, response.historicoRegistroAtividade().getFirst().qtdRepeticoes()),
-            () -> assertEquals(3, response.historicoRegistroAtividade().getFirst().qtdSeries())
+            () -> assertEquals("27.2 (KG)", response.ultimaCarga()),
+            () -> assertNull(response.ultimaDistancia())
         );
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, usuario.getId());

@@ -11,17 +11,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.AEROBICO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioAerobico;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacao;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.*;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuario;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,58 +72,40 @@ class RegistroAtividadeServiceTest {
     }
 
     @Test
-    @SuppressWarnings("LineLength")
-    void buscarUltimoRegistroAtividade_deveChamarMetodoBuscarUltimoRegistroAtividadeDoRegistroCargaService_quandoSolicitadoComExercicioDeMusculacao() {
-        var exercicio = umExercicioMusculacao(1);
+    void buscarDestaques_deveRetornarListaVazia_quandoNaoEncontrarNenhumExercicio() {
+        when(exercicioService.findByIdIn(List.of(1, 2))).thenReturn(Collections.emptyList());
 
-        when(exercicioService.findById(1)).thenReturn(exercicio);
-        when(locatorService.getRegistroAtividadeService(MUSCULACAO)).thenReturn(registroCargaService);
-        when(registroCargaService.buscarUltimoRegistro(1, 2))
-            .thenReturn(umRegistroAtividadeResponseComDadosDeMusculacao());
+        assertTrue(service.buscarDestaques(umRegistroAtividadeFiltros(), 1).isEmpty());
 
-        var response = service.buscarUltimoRegistroAtividade(1, 2);
-        assertAll(
-            () -> assertEquals("22.5 (KG)", response.destaque()),
-            () -> assertEquals(1, response.historicoRegistroAtividade().getFirst().id()),
-            () -> assertEquals("SUPINO RETO", response.historicoRegistroAtividade().getFirst().exercicioNome()),
-            () -> assertEquals("22.5 (KG)", response.historicoRegistroAtividade().getFirst().carga()),
-            () -> assertEquals(HALTER, response.historicoRegistroAtividade().getFirst().tipoExercicio()),
-            () -> assertEquals("Peitoral", response.historicoRegistroAtividade().getFirst().grupoMuscularNome()),
-            () -> assertEquals(12, response.historicoRegistroAtividade().getFirst().qtdRepeticoes()),
-            () -> assertEquals(4, response.historicoRegistroAtividade().getFirst().qtdSeries()),
-            () -> assertEquals(LocalDate.of(2025, 4, 4), response.historicoRegistroAtividade().getFirst().dataCadastro())
-        );
-
-        verify(exercicioService).findById(1);
-        verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
-        verify(registroCargaService).buscarUltimoRegistro(1, 2);
-        verifyNoInteractions(registroCardioService);
+        verify(exercicioService).findByIdIn(List.of(1, 2));
+        verifyNoInteractions(locatorService, registroCargaService, registroCardioService);
     }
 
     @Test
-    @SuppressWarnings("LineLength")
-    void buscarUltimoRegistroAtividade_deveChamarMetodoBuscarUltimoRegistroAtividadeDoRegistroCardioService_quandoSolicitadoComRequestDeAerobico() {
-        var exercicio = umExercicioAerobico(3);
-
-        when(exercicioService.findById(3)).thenReturn(exercicio);
+    void buscarDestaques_deveRetornarDestaquesDosExercicios_quandoEncontrarExercicios() {
+        when(exercicioService.findByIdIn(List.of(1, 2))).thenReturn(maisUmaListaDeExercicios());
+        when(locatorService.getRegistroAtividadeService(MUSCULACAO)).thenReturn(registroCargaService);
         when(locatorService.getRegistroAtividadeService(AEROBICO)).thenReturn(registroCardioService);
-        when(registroCardioService.buscarUltimoRegistro(3, 2))
-            .thenReturn(umRegistroAtividadeResponseComDadosDeAerobico());
+        when(registroCargaService.buscarDestaque(1, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeMusculacao());
+        when(registroCardioService.buscarDestaque(2, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeAerobico());
 
-        var response = service.buscarUltimoRegistroAtividade(3, 2);
+        var responses = service.buscarDestaques(umRegistroAtividadeFiltros(), 1);
         assertAll(
-            () -> assertEquals("22.5 KM", response.destaque()),
-            () -> assertEquals(2, response.historicoRegistroAtividade().getFirst().id()),
-            () -> assertEquals("ESTEIRA", response.historicoRegistroAtividade().getFirst().exercicioNome()),
-            () -> assertEquals(LocalDate.of(2025, 4, 4), response.historicoRegistroAtividade().getFirst().dataCadastro()),
-            () -> assertEquals(22.5, response.historicoRegistroAtividade().getFirst().distancia()),
-            () -> assertEquals(2.0, response.historicoRegistroAtividade().getFirst().duracao())
+            () -> assertEquals(1, responses.getFirst().exercicioId()),
+            () -> assertEquals("22.5 (KG)", responses.getFirst().destaque()),
+            () -> assertEquals("20.0 (KG)", responses.getFirst().ultimaCarga()),
+            () -> assertNull(responses.getFirst().ultimaDistancia()),
+            () -> assertEquals(2, responses.getLast().exercicioId()),
+            () -> assertEquals("22.5 KM", responses.getLast().destaque()),
+            () -> assertNull(responses.getLast().ultimaCarga()),
+            () -> assertEquals("11,25 KM", responses.getLast().ultimaDistancia())
         );
 
-        verify(exercicioService).findById(3);
+        verify(exercicioService).findByIdIn(List.of(1, 2));
+        verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
         verify(locatorService).getRegistroAtividadeService(AEROBICO);
-        verify(registroCardioService).buscarUltimoRegistro(3, 2);
-        verifyNoInteractions(registroCargaService);
+        verify(registroCargaService).buscarDestaque(1, 1);
+        verify(registroCardioService).buscarDestaque(2, 1);
     }
 
     @Test

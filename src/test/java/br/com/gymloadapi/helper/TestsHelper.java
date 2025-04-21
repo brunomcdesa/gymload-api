@@ -66,6 +66,16 @@ public class TestsHelper {
     }
 
     @SneakyThrows
+    public static void isBadRequest(MockHttpServletRequestBuilder endpoint, MockMvc mvc,
+                                    String... erros) {
+        mvc.perform(endpoint
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$[*].message",
+                containsInAnyOrder(erros)));
+    }
+
+    @SneakyThrows
     public static void isBadRequestMultipart(HttpMethod method, String endpoint, MockMvc mvc, MockMultipartFile file,
                                              String requestName, Object request, String... erros) {
         performMultipart(mvc, method, endpoint, file, requestName, request)

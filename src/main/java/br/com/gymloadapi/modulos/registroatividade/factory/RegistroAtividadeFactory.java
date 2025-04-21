@@ -12,7 +12,7 @@ public interface RegistroAtividadeFactory {
 
     void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
 
-    RegistroAtividadeResponse buscarUltimoRegistro(Integer exercicioId, Integer usuarioId);
+    RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId);
 
     List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer usuarioId);
 

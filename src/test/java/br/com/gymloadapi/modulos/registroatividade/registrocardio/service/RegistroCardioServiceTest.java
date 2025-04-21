@@ -58,31 +58,30 @@ class RegistroCardioServiceTest {
     }
 
     @Test
-    void buscarUltimoRegistro_deveRetornarDadosNull_quandoNaoEcontrarRegistrosParaOExercicio() {
+    void buscarDestaque_deveRetornarDadosNull_quandoNaoEcontrarRegistrosParaOExercicio() {
         when(repository.findAllByExercicioIdAndUsuarioId(1, 1)).thenReturn(emptyList());
 
-        var response = service.buscarUltimoRegistro(1, 1);
+        var response = service.buscarDestaque(1, 1);
         assertAll(
-            () -> assertNull(response.destaque()),
-            () -> assertTrue(response.historicoRegistroAtividade().isEmpty())
+            () -> assertEquals(1, response.exercicioId()),
+            () -> assertEquals("-", response.destaque()),
+            () -> assertNull(response.ultimaCarga()),
+            () -> assertEquals("-", response.ultimaDistancia())
         );
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, 1);
     }
 
     @Test
-    void buscarUltimoRegistro_deveRetornarDadosPreenchidos_quandoEcontrarRegistrosParaOExercicio() {
+    void buscarDestaque_deveRetornarDadosPreenchidos_quandoEcontrarRegistrosParaOExercicio() {
         when(repository.findAllByExercicioIdAndUsuarioId(1, 1)).thenReturn(umaListaDeRegistrosCardio());
 
-        var response = service.buscarUltimoRegistro(1, 1);
+        var response = service.buscarDestaque(1, 1);
         assertAll(
+            () -> assertEquals(1, response.exercicioId()),
             () -> assertEquals("26.6 km", response.destaque()),
-            () -> assertEquals(1, response.historicoRegistroAtividade().getFirst().id()),
-            () -> assertEquals("Esteira", response.historicoRegistroAtividade().getFirst().exercicioNome()),
-            () -> assertEquals(LocalDate.of(2025, 4, 14), response.historicoRegistroAtividade().getFirst().dataCadastro()),
-            () -> assertEquals(22.6, response.historicoRegistroAtividade().getFirst().distancia()),
-            () -> assertEquals(1.33, response.historicoRegistroAtividade().getFirst().duracao()),
-            () -> assertEquals("16.99 km/h", response.historicoRegistroAtividade().getFirst().velocidadeMedia())
+            () -> assertNull(response.ultimaCarga()),
+            () -> assertEquals("26.6 km", response.ultimaDistancia())
         );
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, 1);

@@ -63,4 +63,8 @@ public class ExercicioHelper {
     public static List<Exercicio> outraListaDeExercicios() {
         return List.of(umExercicioMusculacao(3), outroExercicioMusculacao(4));
     }
+
+    public static List<Exercicio> maisUmaListaDeExercicios() {
+        return List.of(umExercicioMusculacao(1), umExercicioAerobico(2));
+    }
 }

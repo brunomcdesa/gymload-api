@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.registroatividade.controller;
 
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
+import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeFiltros;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.service.RegistroAtividadeService;
@@ -28,10 +29,10 @@ public class RegistroAtividadeController {
         service.salvar(request, usuario);
     }
 
-    @GetMapping("{exercicioId}")
-    public RegistroAtividadeResponse buscarUltimoRegistroAtividade(@PathVariable Integer exercicioId,
-                                                                   @AuthenticationPrincipal Usuario usuario) {
-        return service.buscarUltimoRegistroAtividade(exercicioId, usuario.getId());
+    @GetMapping("destaques")
+    public List<RegistroAtividadeResponse> buscarDestaques(@Valid RegistroAtividadeFiltros filtros,
+                                                           @AuthenticationPrincipal Usuario usuario) {
+        return service.buscarDestaques(filtros, usuario.getId());
     }
 
     @GetMapping("{exercicioId}/completo")

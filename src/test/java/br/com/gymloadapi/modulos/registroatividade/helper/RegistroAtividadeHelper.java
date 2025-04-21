@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.registroatividade.helper;
 
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
+import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeFiltros;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
 import lombok.experimental.UtilityClass;
@@ -23,23 +24,21 @@ public class RegistroAtividadeHelper {
             null, null);
     }
 
+    public static RegistroAtividadeFiltros umRegistroAtividadeFiltros() {
+        return new RegistroAtividadeFiltros(List.of(1, 2));
+    }
+
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaAerobico() {
         return new RegistroAtividadeRequest(3, "Observacao", null, null, null, null,
             20.0, 1.5);
     }
 
     public static RegistroAtividadeResponse umRegistroAtividadeResponseComDadosDeMusculacao() {
-        return new RegistroAtividadeResponse(
-            "22.5 (KG)",
-            List.of(umHistoricoRegistroAtividadeResponseDeMusculacao())
-        );
+        return new RegistroAtividadeResponse(1, "22.5 (KG)", "20.0 (KG)", null);
     }
 
     public static RegistroAtividadeResponse umRegistroAtividadeResponseComDadosDeAerobico() {
-        return new RegistroAtividadeResponse(
-            "22.5 KM",
-            List.of(umHistoricoRegistroAtividadeResponseDeAerobico())
-        );
+        return new RegistroAtividadeResponse(2, "22.5 KM", null, "11,25 KM");
     }
 
     public static HistoricoRegistroAtividadeResponse umHistoricoRegistroAtividadeResponseDeMusculacao() {
