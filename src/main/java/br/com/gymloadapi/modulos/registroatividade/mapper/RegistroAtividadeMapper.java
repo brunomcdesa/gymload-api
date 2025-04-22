@@ -8,7 +8,7 @@ import br.com.gymloadapi.modulos.registroatividade.registrocarga.model.RegistroC
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import org.mapstruct.*;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface RegistroAtividadeMapper {
 
     @Mapping(target = "id", ignore = true)

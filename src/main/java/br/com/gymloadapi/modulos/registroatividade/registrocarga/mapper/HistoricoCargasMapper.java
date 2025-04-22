@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 
 import java.time.LocalDate;
 
-@Mapper(imports = LocalDate.class)
+@Mapper(componentModel = "spring", imports = LocalDate.class)
 public interface HistoricoCargasMapper {
 
     @Mapping(target = "id", ignore = true)

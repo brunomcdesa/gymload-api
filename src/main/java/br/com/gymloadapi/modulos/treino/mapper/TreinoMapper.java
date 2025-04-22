@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Mapper(imports = {LocalDate.class, LocalDateTime.class, ESituacao.class})
+@Mapper(componentModel = "spring", imports = {LocalDate.class, LocalDateTime.class, ESituacao.class})
 public interface TreinoMapper {
 
     @Mapping(target = "id", ignore = true)

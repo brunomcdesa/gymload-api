@@ -3,6 +3,7 @@ package br.com.gymloadapi.modulos.exercicio.mapper;
 import org.junit.jupiter.api.Test;
 
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacao;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacaoRequest;
@@ -38,7 +39,8 @@ class ExercicioMapperTest {
             () -> assertEquals("Supino Reto", response.descricao()),
             () -> assertEquals("Peitoral", response.grupoMuscularNome()),
             () -> assertEquals(HALTER, response.tipoExercicio()),
-            () -> assertEquals(PRONADA, response.tipoPegada())
+            () -> assertEquals(PRONADA, response.tipoPegada()),
+            () -> assertEquals(MUSCULACAO, response.tipoExercicioo())
         );
     }
 

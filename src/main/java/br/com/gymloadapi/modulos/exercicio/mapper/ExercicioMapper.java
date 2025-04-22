@@ -8,7 +8,7 @@ import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ExercicioMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -17,6 +17,7 @@ public interface ExercicioMapper {
     Exercicio mapToModel(ExercicioRequest request, GrupoMuscular grupoMuscular);
 
     @Mapping(target = "tipoExercicio", source = "exercicio.tipoEquipamento")
+    @Mapping(target = "tipoExercicioo", source = "exercicio.tipoExercicio")
     @Mapping(target = "grupoMuscularNome", source = "exercicio.grupoMuscular.nome")
     ExercicioResponse mapModelToResponse(Exercicio exercicio);
 
