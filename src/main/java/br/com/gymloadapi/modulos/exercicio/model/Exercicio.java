@@ -61,6 +61,6 @@ public class Exercicio {
     private List<Treino> treinos;
 
     public String getNomeComTipoEquipamento() {
-        return this.nome + " (" + this.tipoEquipamento.name() + ")";
+        return this.nome + (this.tipoEquipamento != null ? " (" + this.tipoEquipamento.name() + ")" : "");
     }
 }
