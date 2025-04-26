@@ -16,7 +16,7 @@ class EnumServiceTest {
     private EnumService service;
 
     @Test
-    void getTiposExerciciosSelect_deveRetornarTodosOsTiposDeExercicios_quandoSolicitado() {
+    void getTiposEquipamentosSelect_deveRetornarTodosOsTiposDeEquipamentos_quandoSolicitado() {
         assertThat(service.getTiposEquipamentosSelect())
             .extracting(SelectResponse::value, SelectResponse::label)
             .containsExactly(tuple("HALTER", "Halter"), tuple("BARRA", "Barra"),
@@ -39,5 +39,12 @@ class EnumServiceTest {
         assertThat(service.getUnidadesPesosSelect())
             .extracting(SelectResponse::value, SelectResponse::label)
             .containsExactly(tuple("KG", "Quilogramas"), tuple("LBS", "Libras"));
+    }
+
+    @Test
+    void getTiposExerciciosSelect_deveRetornarTodosOsTiposDeExercicios_quandoSolicitado() {
+        assertThat(service.getTiposExerciciosSelect())
+            .extracting(SelectResponse::value, SelectResponse::label)
+            .containsExactly(tuple("MUSCULACAO", "Musculação"), tuple("AEROBICO", "Aeróbico"));
     }
 }

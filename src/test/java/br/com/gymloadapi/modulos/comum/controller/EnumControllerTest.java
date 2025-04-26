@@ -37,7 +37,8 @@ class EnumControllerTest {
 
     @WithAnonymousUser
     @ParameterizedTest
-    @ValueSource(strings = {"/tipos-exercicios/select", "/tipos-pegadas/select", "/unidades-pesos/select"})
+    @ValueSource(strings = {"/tipos-exercicios/select", "/tipos-pegadas/select", "/unidades-pesos/select",
+        "/tipos-equipamentos/select"})
     void gets_devemRetornarUnauthorized_quandoUsuarioNaoAutenticado(String endpoint) {
         isUnauthorized(get(URL + endpoint), mvc);
 
@@ -46,14 +47,16 @@ class EnumControllerTest {
 
     @WithMockUser
     @ParameterizedTest
-    @ValueSource(strings = {"/tipos-exercicios/select", "/tipos-pegadas/select", "/unidades-pesos/select"})
+    @ValueSource(strings = {"/tipos-exercicios/select", "/tipos-pegadas/select", "/unidades-pesos/select",
+        "/tipos-equipamentos/select"})
     void gets_devemRetornarOk_quandoUsuarioAutenticado(String endpoint) {
         isOk(get(URL + endpoint), mvc);
 
         Map.<String, Runnable>of(
-            "/tipos-exercicios/select", () -> verify(service).getTiposEquipamentosSelect(),
+            "/tipos-exercicios/select", () -> verify(service).getTiposExerciciosSelect(),
             "/tipos-pegadas/select", () -> verify(service).getTiposPegadasSelect(),
-            "/unidades-pesos/select", () -> verify(service).getUnidadesPesosSelect()
+            "/unidades-pesos/select", () -> verify(service).getUnidadesPesosSelect(),
+            "/tipos-equipamentos/select", () -> verify(service).getTiposEquipamentosSelect()
         ).get(endpoint).run();
     }
 }

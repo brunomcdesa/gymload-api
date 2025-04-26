@@ -18,7 +18,7 @@ public class EnumController {
 
     @GetMapping("tipos-exercicios/select")
     public List<SelectResponse> getTiposExerciciosSelect() {
-        return enumService.getTiposEquipamentosSelect();
+        return enumService.getTiposExerciciosSelect();
     }
 
     @GetMapping("tipos-pegadas/select")
@@ -29,5 +29,10 @@ public class EnumController {
     @GetMapping("unidades-pesos/select")
     public List<SelectResponse> getUnidadesPesosSelect() {
         return enumService.getUnidadesPesosSelect();
+    }
+
+    @GetMapping("tipos-equipamentos/select")
+    public List<SelectResponse> getTiposEquipamentosSelect() {
+        return enumService.getTiposEquipamentosSelect();
     }
 }

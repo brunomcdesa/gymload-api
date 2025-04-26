@@ -13,7 +13,7 @@ import lombok.Getter;
 public enum ETipoExercicio {
 
     MUSCULACAO("Musculação", Musculacao.class, RegistroCargaService.class),
-    AEROBICO("Aerobico", Aerobico.class, RegistroCardioService.class);
+    AEROBICO("Aeróbico", Aerobico.class, RegistroCardioService.class);
 
     private final String descricao;
     private final Class<?> groupValidator;

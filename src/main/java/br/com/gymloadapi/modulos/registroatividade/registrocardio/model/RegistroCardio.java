@@ -34,7 +34,6 @@ public class RegistroCardio extends RegistroAtividade {
     @Column(nullable = false)
     private Double distancia;
 
-    @Positive
     @Column(nullable = false)
     private Double duracao;
 
