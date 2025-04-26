@@ -46,7 +46,7 @@ public class TreinoService {
         var treino = this.findCompleteById(id);
         if (!treino.getExerciciosIds().equals(request.exerciciosIds())) {
             var exercicios = exercicioService.findByIdIn(request.exerciciosIds());
-            treino.setExercicios(exercicios);
+            treino.alterarDados(request.nome(), exercicios);
 
             this.saveComHistorico(treino, usuarioId, EDICAO);
         }

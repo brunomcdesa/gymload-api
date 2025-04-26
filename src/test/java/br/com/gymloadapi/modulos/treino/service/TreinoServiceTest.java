@@ -95,6 +95,7 @@ class TreinoServiceTest {
 
         var treino = captor.getValue();
         assertAll(
+            () -> assertEquals("Outro Treino", treino.getNome()),
             () -> assertEquals(3, treino.getExercicios().getFirst().getId()),
             () -> assertEquals(4, treino.getExercicios().getLast().getId())
         );

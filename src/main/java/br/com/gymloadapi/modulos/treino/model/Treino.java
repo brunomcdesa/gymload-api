@@ -63,4 +63,9 @@ public class Treino {
     public void alterarSituacao() {
         this.setSituacao(this.situacao == ATIVO ? INATIVO : ATIVO);
     }
+
+    public void alterarDados(String nome, List<Exercicio> exercicios) {
+        this.setNome(nome);
+        this.setExercicios(exercicios);
+    }
 }

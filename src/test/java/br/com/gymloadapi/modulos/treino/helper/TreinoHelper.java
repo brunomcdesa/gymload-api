@@ -19,7 +19,7 @@ public class TreinoHelper {
     }
 
     public static TreinoRequest outroTreinoRequest() {
-        return new TreinoRequest("Um Treino", List.of(3, 4));
+        return new TreinoRequest("Outro Treino", List.of(3, 4));
     }
 
     public static Treino umTreino(ESituacao situacao) {
