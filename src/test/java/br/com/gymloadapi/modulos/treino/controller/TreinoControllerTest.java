@@ -100,6 +100,7 @@ class TreinoControllerTest {
     void editar_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos(List<Integer> exerciciosIds) {
         var request = new TreinoRequest(" ", exerciciosIds);
         isBadRequest(put(URL + "/1/editar"), mockMvc, request,
+            "O campo nome é obrigatório.",
             "O campo exerciciosIds é obrigatório.");
 
         verifyNoInteractions(service);
