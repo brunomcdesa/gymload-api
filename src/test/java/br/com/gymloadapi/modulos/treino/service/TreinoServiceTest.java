@@ -83,7 +83,7 @@ class TreinoServiceTest {
     }
 
     @Test
-    void editar_deveEditarExerciciosDoTreino_quandoForListaDiferenteDaAnterior() {
+    void editar_deveEditarExerciciosDoTreino_quandoNomeEListaForDiferenteDaAnterior() {
         when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
         when(exercicioService.findByIdIn(List.of(3, 4))).thenReturn(outraListaDeExercicios());
 
@@ -102,7 +102,26 @@ class TreinoServiceTest {
     }
 
     @Test
-    void editar_naoDeveEditarExerciciosDoTreino_quandoForListaIgualDaAnterior() {
+    void editar_deveEditarExerciciosDoTreino_quandoNomeDiferenteDoAnterios() {
+        when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
+        when(exercicioService.findByIdIn(List.of(1, 2))).thenReturn(umaListaDeExercicios());
+
+        service.editar(1, maisUmTreinoRequest(), 1);
+
+        verify(repository).findCompleteById(1);
+        verify(exercicioService).findByIdIn(List.of(1, 2));
+        verify(repository).save(captor.capture());
+
+        var treino = captor.getValue();
+        assertAll(
+            () -> assertEquals("Outro Treino", treino.getNome()),
+            () -> assertEquals(1, treino.getExercicios().getFirst().getId()),
+            () -> assertEquals(2, treino.getExercicios().getLast().getId())
+        );
+    }
+
+    @Test
+    void editar_naoDeveEditarExerciciosDoTreino_quandoNomeEListaForIgualDaAnterior() {
         when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
 
         service.editar(1, umTreinoRequest(), 1);

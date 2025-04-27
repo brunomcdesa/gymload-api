@@ -44,7 +44,7 @@ public class TreinoService {
 
     public void editar(Integer id, TreinoRequest request, Integer usuarioId) {
         var treino = this.findCompleteById(id);
-        if (!treino.getExerciciosIds().equals(request.exerciciosIds())) {
+        if (!treino.getExerciciosIds().equals(request.exerciciosIds()) || !treino.getNome().equals(request.nome())) {
             var exercicios = exercicioService.findByIdIn(request.exerciciosIds());
             treino.alterarDados(request.nome(), exercicios);
 

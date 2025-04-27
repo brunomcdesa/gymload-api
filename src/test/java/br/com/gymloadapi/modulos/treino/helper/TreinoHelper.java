@@ -22,6 +22,10 @@ public class TreinoHelper {
         return new TreinoRequest("Outro Treino", List.of(3, 4));
     }
 
+    public static TreinoRequest maisUmTreinoRequest() {
+        return new TreinoRequest("Outro Treino", List.of(1, 2));
+    }
+
     public static Treino umTreino(ESituacao situacao) {
         return Treino.builder()
             .id(1)
