@@ -36,8 +36,9 @@ public class TreinoService {
         this.saveComHistorico(treino, usuario.getId(), CADASTRO);
     }
 
-    public List<TreinoResponse> listarTodosDoUsuario(Integer usuarioId) {
-        return repository.findByUsuarioId(usuarioId).stream()
+    public List<TreinoResponse> listarTodosDoUsuario(Integer usuarioId, boolean buscarInativos) {
+        var situacoes = buscarInativos ? List.of(ATIVO, INATIVO) : List.of(ATIVO);
+        return repository.findByUsuarioIdAndSituacaoIn(usuarioId, situacoes).stream()
             .map(treinoMapper::mapToResponse)
             .toList();
     }

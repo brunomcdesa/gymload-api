@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.treino.repository;
 
+import br.com.gymloadapi.modulos.comum.enums.ESituacao;
 import br.com.gymloadapi.modulos.treino.model.Treino;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -11,5 +12,5 @@ import java.util.List;
 public interface TreinoRepository extends JpaRepository<Treino, Integer>, QuerydslPredicateExecutor<Treino>,
     TreinoRepositoryCustom {
 
-    List<Treino> findByUsuarioId(Integer usuarioId);
+    List<Treino> findByUsuarioIdAndSituacaoIn(Integer usuarioId, List<ESituacao> situacoes);
 }

@@ -29,8 +29,9 @@ public class TreinoController {
     }
 
     @GetMapping
-    public List<TreinoResponse> listarTodosDoUsuario(@AuthenticationPrincipal Usuario usuario) {
-        return service.listarTodosDoUsuario(usuario.getId());
+    public List<TreinoResponse> listarTodosDoUsuario(@AuthenticationPrincipal Usuario usuario,
+                                                     @RequestParam(defaultValue = "false") boolean buscarInativos) {
+        return service.listarTodosDoUsuario(usuario.getId(), buscarInativos);
     }
 
     @PutMapping("{id}/editar")

@@ -68,18 +68,38 @@ class TreinoServiceTest {
     }
 
     @Test
-    void listarTodosDoUsuario_deveRetornarTreinosDoUsuario_quandoSolicitado() {
+    void listarTodosDoUsuario_deveRetornarTreinosAtivosDoUsuario_quandoSolicitadoComBuscarInativosFalse() {
         var usuario = umUsuarioAdmin();
-        when(repository.findByUsuarioId(usuario.getId())).thenReturn(List.of(umTreino(ATIVO)));
+        when(repository.findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO)))
+            .thenReturn(List.of(umTreino(ATIVO)));
 
-        var response = service.listarTodosDoUsuario(usuario.getId());
+        var response = service.listarTodosDoUsuario(usuario.getId(), false);
         assertAll(
             () -> assertEquals(1, response.getFirst().id()),
             () -> assertEquals("Um Treino", response.getFirst().nome()),
-            () -> assertEquals(LocalDate.of(2025, 4, 6), response.getFirst().dataCadastro())
+            () -> assertEquals(LocalDate.of(2025, 4, 6), response.getFirst().dataCadastro()),
+            () -> assertEquals(ATIVO, response.getFirst().situacao())
         );
 
-        verify(repository).findByUsuarioId(usuario.getId());
+        verify(repository).findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO));
+    }
+
+    @Test
+    void listarTodosDoUsuario_deveRetornarTodosOsTreinosDoUsuario_quandoSolicitadoComBuscarInativosTrue() {
+        var usuario = umUsuarioAdmin();
+        when(repository.findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO, INATIVO)))
+            .thenReturn(List.of(umTreino(ATIVO), umTreino(INATIVO)));
+
+        var response = service.listarTodosDoUsuario(usuario.getId(), true);
+        assertAll(
+            () -> assertEquals(1, response.getFirst().id()),
+            () -> assertEquals("Um Treino", response.getFirst().nome()),
+            () -> assertEquals(LocalDate.of(2025, 4, 6), response.getFirst().dataCadastro()),
+            () -> assertEquals(ATIVO, response.getFirst().situacao()),
+            () -> assertEquals(INATIVO, response.getLast().situacao())
+        );
+
+        verify(repository).findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO, INATIVO));
     }
 
     @Test
