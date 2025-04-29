@@ -292,4 +292,31 @@ class UsuarioServiceTest {
 
         verify(backBlazeService).downloadFile(anyString());
     }
+
+    @Test
+    void buscarPorUuid_deveLancarException_quandoNaoEncontrarUsuarioComMesmoUuid() {
+        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.buscarPorUuid(USUARIO_ADMIN_UUID)
+        );
+        assertEquals("Usuário não encontrado.", exception.getMessage());
+
+        verify(repository).findByUuid(USUARIO_ADMIN_UUID);
+    }
+
+    @Test
+    void buscarPorUuid_deveRetornarResponse_quandoEncontrarUsuarioComMesmoUuid() {
+        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(umUsuario()));
+
+        var response = assertDoesNotThrow(() -> service.buscarPorUuid(USUARIO_ADMIN_UUID));
+        assertAll(
+            () -> assertEquals("8689ea4e-3a85-4b6b-80f2-fc04f3cdd712", response.uuid().toString()),
+            () -> assertEquals("Usuario", response.nome()),
+            () -> assertEquals("usuarioUser", response.username())
+        );
+
+        verify(repository).findByUuid(USUARIO_ADMIN_UUID);
+    }
 }

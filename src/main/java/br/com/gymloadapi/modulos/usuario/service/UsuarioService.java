@@ -93,6 +93,10 @@ public class UsuarioService {
         }
     }
 
+    public UsuarioResponse buscarPorUuid(UUID uuid) {
+        return usuarioMapper.mapModelToResponse(this.findByUuid(uuid));
+    }
+
     private Usuario findByUuid(UUID uuid) {
         return repository.findByUuid(uuid)
             .orElseThrow(() -> new NotFoundException(MSG_USUARIO_NAO_ENCONTRADO));

@@ -19,6 +19,9 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Map;
+import java.util.UUID;
+
 import static br.com.gymloadapi.helper.TestsHelper.*;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.*;
 import static org.mockito.Mockito.verify;
@@ -40,7 +43,7 @@ class UsuarioControllerTest {
 
     @WithAnonymousUser
     @ParameterizedTest
-    @ValueSource(strings = {"", "/imagem-perfil"})
+    @ValueSource(strings = {"", "/imagem-perfil", "/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar"})
     void gets_devemRetorarUnauthorized_quandoUsuarioNaoAutenticado(String endpoint) {
         isUnauthorized(get(URL + endpoint), mockMvc);
         verifyNoInteractions(service);
@@ -152,11 +155,17 @@ class UsuarioControllerTest {
         verify(service).editar(USUARIO_ADMIN_UUID, request, file, umUsuarioAdmin());
     }
 
-    @Test
     @WithUserDetails
-    void buscarImagemPerfil_deveRetornarOk_quandoUsuarioAutenticado() {
-        isOk(get(URL + "/imagem-perfil"), mockMvc);
+    @ParameterizedTest
+    @ValueSource(strings = {"/imagem-perfil", "/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar"})
+    void gets_deveRetornarOk_quandoUsuarioAutenticado(String endpoint) {
+        isOk(get(URL + endpoint), mockMvc);
 
-        verify(service).buscarImagemPerfil(umUsuarioAdmin());
+        ;
+        Map.<String, Runnable>of(
+            "/imagem-perfil", () -> verify(service).buscarImagemPerfil(umUsuarioAdmin()),
+            "/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar", () -> verify(service)
+                .buscarPorUuid(UUID.fromString("8689ea4e-3a85-4b6b-80f2-fc04f3cdd712"))
+        ).get(endpoint).run();
     }
 }
