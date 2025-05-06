@@ -65,6 +65,8 @@ class RegistroAtividadeMapperTest {
             () -> assertEquals("Observacao", historicoRegistroAtividadeResponse.observacao()),
             () -> assertEquals(LocalDate.of(2025, 4, 4), historicoRegistroAtividadeResponse.dataCadastro()),
             () -> assertEquals("22.5 (KG)", historicoRegistroAtividadeResponse.carga()),
+            () -> assertEquals(22.5, historicoRegistroAtividadeResponse.peso()),
+            () -> assertEquals(KG, historicoRegistroAtividadeResponse.unidadePeso()),
             () -> assertEquals(HALTER, historicoRegistroAtividadeResponse.tipoExercicio()),
             () -> assertEquals("Peitoral", historicoRegistroAtividadeResponse.grupoMuscularNome()),
             () -> assertEquals(12, historicoRegistroAtividadeResponse.qtdRepeticoes()),

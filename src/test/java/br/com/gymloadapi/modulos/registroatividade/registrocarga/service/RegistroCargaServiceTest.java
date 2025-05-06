@@ -210,7 +210,7 @@ class RegistroCargaServiceTest {
     }
 
     @Test
-    void buscarHistoricoRegistroCompleto_deveRetornarHistoricoCompleto_quandoExercicioPossuirHistoricoCargas() {
+    void buscarHistoricoRegistroCompleto_deveRetornarHistoricoCompleto_quandoExercicioPossuirRegistrosCargas() {
         var usuario = umUsuarioAdmin();
 
         when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(umaListaRegistroCarga());
@@ -219,16 +219,22 @@ class RegistroCargaServiceTest {
 
         assertAll(
             () -> assertEquals("27.2 (KG)", responses.getFirst().carga()),
+            () -> assertEquals(27.2, responses.getFirst().peso()),
+            () -> assertEquals(KG, responses.getFirst().unidadePeso()),
             () -> assertEquals(LocalDate.of(2025, 4, 6), responses.getFirst().dataCadastro()),
             () -> assertEquals(8, responses.getFirst().qtdRepeticoes()),
             () -> assertEquals(3, responses.getFirst().qtdSeries()),
 
             () -> assertEquals("25.0 (KG)", responses.get(1).carga()),
+            () -> assertEquals(25.0, responses.get(1).peso()),
+            () -> assertEquals(KG, responses.get(1).unidadePeso()),
             () -> assertEquals(LocalDate.of(2025, 4, 5), responses.get(1).dataCadastro()),
             () -> assertEquals(8, responses.get(1).qtdRepeticoes()),
             () -> assertEquals(2, responses.get(1).qtdSeries()),
 
             () -> assertEquals("22.5 (KG)", responses.getLast().carga()),
+            () -> assertEquals(22.5, responses.getLast().peso()),
+            () -> assertEquals(KG, responses.getLast().unidadePeso()),
             () -> assertEquals(LocalDate.of(2025, 4, 4), responses.getLast().dataCadastro()),
             () -> assertEquals(12, responses.getLast().qtdRepeticoes()),
             () -> assertEquals(4, responses.getLast().qtdSeries())

@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.registroatividade.dto;
 
 import br.com.gymloadapi.modulos.comum.anotations.DatePatternResponse;
 import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
+import br.com.gymloadapi.modulos.comum.enums.EUnidadePeso;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDate;
@@ -16,6 +17,8 @@ public record HistoricoRegistroAtividadeResponse(
     @DatePatternResponse
     LocalDate dataCadastro,
     String carga,
+    Double peso,
+    EUnidadePeso unidadePeso,
     ETipoEquipamento tipoExercicio,
     String grupoMuscularNome,
     Integer qtdRepeticoes,

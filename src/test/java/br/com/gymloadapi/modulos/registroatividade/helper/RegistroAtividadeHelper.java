@@ -43,14 +43,14 @@ public class RegistroAtividadeHelper {
 
     public static HistoricoRegistroAtividadeResponse umHistoricoRegistroAtividadeResponseDeMusculacao() {
         return new HistoricoRegistroAtividadeResponse(1, "SUPINO RETO", "Observacao",
-            LocalDate.of(2025, 4, 4), "22.5 (KG)", HALTER, "Peitoral", 12,
+            LocalDate.of(2025, 4, 4), "22.5 (KG)", 22.5, KG, HALTER, "Peitoral", 12,
             4, null, null, null
         );
     }
 
     public static HistoricoRegistroAtividadeResponse umHistoricoRegistroAtividadeResponseDeAerobico() {
         return new HistoricoRegistroAtividadeResponse(2, "ESTEIRA", "Observacao",
-            LocalDate.of(2025, 4, 4), null, null, null, null, null,
-            22.5, 2.0, "11,25 km/h");
+            LocalDate.of(2025, 4, 4), null,  null, null, null, null,
+            null, null, 22.5, 2.0, "11,25 km/h");
     }
 }
