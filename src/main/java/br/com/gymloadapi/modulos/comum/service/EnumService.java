@@ -27,7 +27,7 @@ public class EnumService {
 
     public List<SelectResponse> getUnidadesPesosSelect() {
         return Arrays.stream(EUnidadePeso.values())
-            .map(unidadePeso -> new SelectResponse(unidadePeso.name(), unidadePeso.getDescricao()))
+            .map(unidadePeso -> new SelectResponse(unidadePeso.name(), unidadePeso.name()))
             .toList();
     }
 

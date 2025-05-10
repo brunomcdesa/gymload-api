@@ -38,7 +38,7 @@ class EnumServiceTest {
     void getUnidadesPesosSelect_deveRetornarTodasAsUnidadesDePesos_quandoSolicitado() {
         assertThat(service.getUnidadesPesosSelect())
             .extracting(SelectResponse::value, SelectResponse::label)
-            .containsExactly(tuple("KG", "Quilogramas"), tuple("LBS", "Libras"));
+            .containsExactly(tuple("KG", "KG"), tuple("LBS", "LBS"));
     }
 
     @Test
