@@ -18,6 +18,7 @@ import java.time.ZoneOffset;
 public class TokenService {
 
     private static final String API_ISSUER = "gymload-api";
+    private static final int DURACAO_TOKEN = 10;
 
     @Value("${api.security.token.secret}")
     private String secret;
@@ -56,7 +57,7 @@ public class TokenService {
 
     private Instant getExpirationDate() {
         return LocalDateTime.now()
-            .plusSeconds(10)
+            .plusSeconds(DURACAO_TOKEN)
             .toInstant(ZoneOffset.of("-03:00"));
     }
 }
