@@ -57,7 +57,7 @@ public class TokenService {
 
     private Instant getExpirationDate() {
         return LocalDateTime.now()
-            .plusDays(DURACAO_TOKEN)
+            .plusSeconds(DURACAO_TOKEN)
             .toInstant(ZoneOffset.of("-03:00"));
     }
 }
