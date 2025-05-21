@@ -3,6 +3,7 @@ package br.com.gymloadapi.modulos.grupomuscular.controller;
 import br.com.gymloadapi.autenticacao.service.TokenService;
 import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
+import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import br.com.gymloadapi.modulos.grupomuscular.dto.GrupoMuscularRequest;
 import br.com.gymloadapi.modulos.grupomuscular.service.GrupoMuscularService;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(GrupoMuscularController.class)
-@MockitoBean(types = UsuarioService.class)
+@MockitoBean(types = {UsuarioService.class, BackBlazeService.class})
 @Import({SecurityConfiguration.class, TokenService.class, JwtAccessDeinedHandler.class})
 class GrupoMuscularControllerTest {
 

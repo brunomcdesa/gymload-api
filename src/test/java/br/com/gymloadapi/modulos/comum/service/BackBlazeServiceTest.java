@@ -10,14 +10,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.IOException;
+import java.net.URL;
 
 import static br.com.gymloadapi.helper.TestsHelper.umMockMultipartFile;
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,6 +33,8 @@ class BackBlazeServiceTest {
     private BackBlazeService service;
     @Mock
     private S3Client s3Client;
+    @Mock
+    private S3Presigner s3Presigner;
 
     @BeforeEach
     void setUp() {
@@ -62,25 +66,29 @@ class BackBlazeServiceTest {
 
     @Test
     @SneakyThrows
-    void downloadFile_deveRetorarResourceDoArquivo_quandoNaoOcorrerErroDuranteFluxo() {
-        var mockResponseStream = mock(ResponseInputStream.class);
-        when(s3Client.getObject(any(GetObjectRequest.class))).thenReturn(mockResponseStream);
+    void generatePresignedUrl_deveRetorarUrlDeImagem_quandoNaoOcorrerErroDuranteFluxo() {
+        var presignedGetObjectRequest = mock(PresignedGetObjectRequest.class);
+        var mockedUrl = mock(URL.class);
 
-        assertNotNull(service.downloadFile("file.jpeg"));
+        when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).thenReturn(presignedGetObjectRequest);
+        when(presignedGetObjectRequest.url()).thenReturn(mockedUrl);
+        when(mockedUrl.toString()).thenReturn("http://teste/file.jpeg");
 
-        verify(s3Client).getObject(any(GetObjectRequest.class));
+        assertNotNull(service.generatePresignedUrl("file.jpeg"));
+
+        verify(s3Presigner).presignGetObject(any(GetObjectPresignRequest.class));
     }
 
     @Test
-    void downloadFile_QuandoOcorreExcecao_DeveLancarIntegracaoException() {
-        when(s3Client.getObject(any(GetObjectRequest.class))).thenThrow(S3Exception.class);
+    void generatePresignedUrl_deveLancarIntegracaoException_quandoOcorrerErroDuranteFluxo() {
+        when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).thenThrow(S3Exception.class);
 
         var exception = assertThrowsExactly(
             IntegracaoException.class,
-            () -> service.downloadFile("file.jpeg")
+            () -> service.generatePresignedUrl("file.jpeg")
         );
-        assertEquals("Erro ao buscar arquivo no BackBlaze.", exception.getMessage());
+        assertEquals("Erro ao gerar URL assinada para o arquivo.", exception.getMessage());
 
-        verify(s3Client).getObject(any(GetObjectRequest.class));
+        verify(s3Presigner).presignGetObject(any(GetObjectPresignRequest.class));
     }
 }

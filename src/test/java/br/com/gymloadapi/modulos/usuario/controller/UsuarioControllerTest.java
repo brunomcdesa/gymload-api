@@ -4,6 +4,7 @@ import br.com.gymloadapi.autenticacao.service.TokenService;
 import br.com.gymloadapi.config.TestSecurityConfiguration;
 import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
+import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioRequest;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,6 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Map;
 import java.util.UUID;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
@@ -31,6 +31,7 @@ import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(UsuarioController.class)
+@MockitoBean(types = BackBlazeService.class)
 @Import({SecurityConfiguration.class, TokenService.class, JwtAccessDeinedHandler.class, TestSecurityConfiguration.class})
 class UsuarioControllerTest {
 
@@ -43,7 +44,7 @@ class UsuarioControllerTest {
 
     @WithAnonymousUser
     @ParameterizedTest
-    @ValueSource(strings = {"", "/imagem-perfil", "/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar"})
+    @ValueSource(strings = {"", "/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar"})
     void gets_devemRetorarUnauthorized_quandoUsuarioNaoAutenticado(String endpoint) {
         isUnauthorized(get(URL + endpoint), mockMvc);
         verifyNoInteractions(service);
@@ -155,17 +156,11 @@ class UsuarioControllerTest {
         verify(service).editar(USUARIO_ADMIN_UUID, request, file, umUsuarioAdmin());
     }
 
+    @Test
     @WithUserDetails
-    @ParameterizedTest
-    @ValueSource(strings = {"/imagem-perfil", "/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar"})
-    void gets_deveRetornarOk_quandoUsuarioAutenticado(String endpoint) {
-        isOk(get(URL + endpoint), mockMvc);
+    void detalharByUuid_deveRetornarOk_quandoUsuarioAutenticado() {
+        isOk(get(URL + "/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar"), mockMvc);
 
-        ;
-        Map.<String, Runnable>of(
-            "/imagem-perfil", () -> verify(service).buscarImagemPerfil(umUsuarioAdmin()),
-            "/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar", () -> verify(service)
-                .buscarPorUuid(UUID.fromString("8689ea4e-3a85-4b6b-80f2-fc04f3cdd712"))
-        ).get(endpoint).run();
+        verify(service).buscarPorUuid(UUID.fromString("8689ea4e-3a85-4b6b-80f2-fc04f3cdd712"));
     }
 }

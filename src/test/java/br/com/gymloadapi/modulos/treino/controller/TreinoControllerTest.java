@@ -4,6 +4,7 @@ import br.com.gymloadapi.autenticacao.service.TokenService;
 import br.com.gymloadapi.config.TestSecurityConfiguration;
 import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
+import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import br.com.gymloadapi.modulos.treino.dto.TreinoRequest;
 import br.com.gymloadapi.modulos.treino.service.TreinoService;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(TreinoController.class)
-@MockitoBean(types = UsuarioService.class)
+@MockitoBean(types = {UsuarioService.class, BackBlazeService.class})
 @Import({SecurityConfiguration.class, TokenService.class, JwtAccessDeinedHandler.class, TestSecurityConfiguration.class})
 class TreinoControllerTest {
 

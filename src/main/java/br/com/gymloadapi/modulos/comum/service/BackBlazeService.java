@@ -9,18 +9,22 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
 public class BackBlazeService {
 
+    private static final int QTD_MAX_DIAS_IMAGEM = 7;
     @Value("${api.aws.bucket.name}")
     private String bucketName;
 
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
 
     public void uploadFile(String fileName, MultipartFile file) {
         try {
@@ -37,17 +41,22 @@ public class BackBlazeService {
         }
     }
 
-    public InputStream downloadFile(String fileName) {
+    public String generatePresignedUrl(String fileName) {
         try {
-            return s3Client.getObject(
-                GetObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileName)
-                    .build()
-            );
+            var getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .build();
+
+            return s3Presigner.presignGetObject(GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofDays(QTD_MAX_DIAS_IMAGEM))
+                    .getObjectRequest(getObjectRequest)
+                    .build())
+                .url()
+                .toString();
         } catch (Exception exception) {
             throw new IntegracaoException(exception, BackBlazeService.class.getName(),
-                "Erro ao buscar arquivo no BackBlaze.");
+                "Erro ao gerar URL assinada para o arquivo.");
         }
     }
 }

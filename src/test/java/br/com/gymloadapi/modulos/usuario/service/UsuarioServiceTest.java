@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.usuario.service;
 
-import br.com.gymloadapi.modulos.comum.exception.IntegracaoException;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.PermissaoException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
@@ -9,22 +8,15 @@ import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapper;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapperImpl;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import br.com.gymloadapi.modulos.usuario.repository.UsuarioRepository;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +43,6 @@ class UsuarioServiceTest {
     @BeforeEach
     void setUp() {
         service = new UsuarioService(mapper, repository, backBlazeService);
-        ReflectionTestUtils.setField(service, "defaultUserImage", "defaultImage.jpeg");
     }
 
     @Test
@@ -224,19 +215,21 @@ class UsuarioServiceTest {
 
     @Test
     void editar_deveEditarUsuarioENaoDeveSalvarImagem_quandoNaoReceberImagem() {
-        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(umUsuario()));
+        var usuario = umUsuario();
 
-        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), null, umUsuario()));
+        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(usuario));
+
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), null, usuario));
 
         verify(repository).findByUuid(USUARIO_ADMIN_UUID);
         verify(repository).save(captor.capture());
         verifyNoInteractions(backBlazeService);
 
-        var usuario = captor.getValue();
+        var usuarioSalvo = captor.getValue();
         assertAll(
-            () -> assertEquals("Usuario Edicao", usuario.getNome()),
-            () -> assertEquals("usernameEdicao", usuario.getUsername()),
-            () -> assertEquals("802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png", usuario.getImagemPerfil())
+            () -> assertEquals("Usuario Edicao", usuarioSalvo.getNome()),
+            () -> assertEquals("usernameEdicao", usuarioSalvo.getUsername()),
+            () -> assertEquals("802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png", usuarioSalvo.getImagemPerfil())
         );
     }
 
@@ -244,53 +237,6 @@ class UsuarioServiceTest {
     void atualizarSenha_deveAtualizarSenha_quandoSolicitado() {
         service.atualizarSenha("usuarioUser", "123456");
         verify(repository).atualizarSenha("usuarioUser", "123456");
-    }
-
-    @Test
-    @SneakyThrows
-    void buscarImagemPerfil_deveBuscarImagemPerfil_quandoUsuarioPossuirImagemDePerfil() {
-        var usuario = umUsuario();
-
-        when(backBlazeService.downloadFile("usuarios-images/802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png"))
-            .thenReturn(umMockMultipartFile().getInputStream());
-
-        assertNotNull(service.buscarImagemPerfil(usuario).getContentAsByteArray());
-
-        verify(backBlazeService).downloadFile("usuarios-images/802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png");
-    }
-
-    @SneakyThrows
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {"   "})
-    void buscarImagemPerfil_deveBuscarImagemPerfilDefault_quandoUsuarioNaoPossuirImagemDePerfil(String imagemPerfil) {
-        var usuario = umUsuario();
-        usuario.setImagemPerfil(imagemPerfil);
-
-        when(backBlazeService.downloadFile("usuarios-images/defaultImage.jpeg"))
-            .thenReturn(umMockMultipartFile().getInputStream());
-
-        assertNotNull(service.buscarImagemPerfil(usuario).getContentAsByteArray());
-
-        verify(backBlazeService).downloadFile("usuarios-images/defaultImage.jpeg");
-    }
-
-    @Test
-    @SneakyThrows
-    public void testBuscarImagemPerfil_QuandoOcorreIOException_DeveRetornarIntegracaoException() {
-        var usuario = umUsuario();
-
-        var mockInputStream = mock(InputStream.class);
-        when(mockInputStream.readAllBytes()).thenThrow(new IOException("Erro na leitura do arquivo"));
-        when(backBlazeService.downloadFile(anyString())).thenReturn(mockInputStream);
-
-        var exception = assertThrowsExactly(
-            IntegracaoException.class,
-            () -> service.buscarImagemPerfil(usuario)
-        );
-        assertEquals("Erro ao buscar imagem de perfil.", exception.getMessage());
-
-        verify(backBlazeService).downloadFile(anyString());
     }
 
     @Test

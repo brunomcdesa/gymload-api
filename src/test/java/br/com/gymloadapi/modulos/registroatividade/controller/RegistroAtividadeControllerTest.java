@@ -4,6 +4,7 @@ import br.com.gymloadapi.autenticacao.service.TokenService;
 import br.com.gymloadapi.config.TestSecurityConfiguration;
 import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
+import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import br.com.gymloadapi.modulos.registroatividade.service.RegistroAtividadeService;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import org.junit.jupiter.api.Test;
@@ -27,8 +28,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-@MockitoBean(types = UsuarioService.class)
 @WebMvcTest(RegistroAtividadeController.class)
+@MockitoBean(types = {UsuarioService.class, BackBlazeService.class})
 @Import({SecurityConfiguration.class, TokenService.class, JwtAccessDeinedHandler.class, TestSecurityConfiguration.class})
 class RegistroAtividadeControllerTest {
 

@@ -1,13 +1,18 @@
 package br.com.gymloadapi.autenticacao.service;
 
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
+import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -24,15 +29,21 @@ class TokenServiceTest {
 
     @InjectMocks
     private TokenService service;
+    @Mock
+    private BackBlazeService backBlazeService;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(service, "secret", "teste-secret-key-para-jwt");
+        ReflectionTestUtils.setField(service, "defaultUserImage", "default-user-image.png");
     }
 
     @Test
     void generateToken_deveRetornarToken_quandoUsuarioValido() {
         var usuario = umUsuario();
+
+        when(backBlazeService.generatePresignedUrl("802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png"))
+            .thenReturn("http://teste.s3/123-Usuario.png");
 
         var token = service.generateToken(usuario);
         var decodedJWT = JWT.decode(token);
@@ -43,8 +54,26 @@ class TokenServiceTest {
             () -> assertEquals("usuarioUser", decodedJWT.getSubject()),
             () -> assertEquals("Usuario", decodedJWT.getClaim("usuarioNome").asString()),
             () -> assertArrayEquals(new String[]{"ROLE_USER"}, decodedJWT.getClaim("usuarioRoles").asArray(String.class)),
+            () -> assertEquals("http://teste.s3/123-Usuario.png", decodedJWT.getClaim("imagemPerfilUrl").asString()),
             () -> assertNotNull(decodedJWT.getExpiresAt())
         );
+    }
+
+    @SuppressWarnings("LineLength")
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"  "})
+    void generateToken_deveRetornarTokenComImagemPerfilDefault_quandoUsuarioValidoNaoPossuirImagemNoCadastro(String imagemPerfil) {
+        var usuario = umUsuario();
+        usuario.setImagemPerfil(imagemPerfil);
+
+        when(backBlazeService.generatePresignedUrl("default-user-image.png"))
+            .thenReturn("http://teste.s3/default-user-image.png");
+
+        var token = service.generateToken(usuario);
+        var decodedJWT = JWT.decode(token);
+
+        assertEquals("http://teste.s3/default-user-image.png", decodedJWT.getClaim("imagemPerfilUrl").asString());
     }
 
     @Test
@@ -53,6 +82,7 @@ class TokenServiceTest {
 
         try (var jwtMockedStatic = mockStatic(JWT.class)) {
             var jwtBuilder = mock(Builder.class);
+            when(backBlazeService.generatePresignedUrl(anyString())).thenReturn("");
 
             jwtMockedStatic.when(JWT::create).thenReturn(jwtBuilder);
             when(jwtBuilder.withIssuer(anyString())).thenReturn(jwtBuilder);

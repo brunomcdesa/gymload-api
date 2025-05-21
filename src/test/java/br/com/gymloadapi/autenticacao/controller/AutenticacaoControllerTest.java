@@ -5,6 +5,7 @@ import br.com.gymloadapi.autenticacao.service.AutenticacaoService;
 import br.com.gymloadapi.autenticacao.service.TokenService;
 import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
+import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,9 +25,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @WithAnonymousUser
-@MockitoBean(types = UsuarioService.class)
+@MockitoBean(types = {UsuarioService.class, BackBlazeService.class})
 @WebMvcTest(AutenticacaoController.class)
-@Import({SecurityConfiguration.class, TokenService.class, JwtAccessDeinedHandler.class})
+@Import({SecurityConfiguration.class, TokenService.class, BackBlazeService.class, JwtAccessDeinedHandler.class})
 class AutenticacaoControllerTest {
 
     private static final String URL = "/auth";
