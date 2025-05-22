@@ -16,9 +16,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 @Service
 @RequiredArgsConstructor
 public class TokenService {
@@ -28,14 +25,12 @@ public class TokenService {
 
     @Value("${api.security.token.secret}")
     private String secret;
-    @Value("${api.aws.default-user-image}")
-    private String defaultUserImage;
 
     private final BackBlazeService backBlazeService;
 
     public String generateToken(Usuario usuario) {
         try {
-            var imagemPerfilUrl = backBlazeService.generatePresignedUrl(this.getNomeImagem(usuario));
+            var imagemPerfilUrl = backBlazeService.generatePresignedUrl(usuario.getImagemPerfil());
 
             return JWT.create()
                 .withIssuer(API_ISSUER)
@@ -72,13 +67,5 @@ public class TokenService {
         return LocalDateTime.now()
             .plusDays(DURACAO_TOKEN)
             .toInstant(ZoneOffset.of("-03:00"));
-    }
-
-    private String getNomeImagem(Usuario usuario) {
-        var imagemPerfilName = isNotBlank(usuario.getImagemPerfil())
-            ? usuario.getImagemPerfil()
-            : defaultUserImage;
-
-        return format("usuarios-images/%s", imagemPerfilName);
     }
 }

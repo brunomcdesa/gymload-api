@@ -265,4 +265,14 @@ class UsuarioServiceTest {
 
         verify(repository).findByUuid(USUARIO_ADMIN_UUID);
     }
+
+    @Test
+    void buscarUrlImagemPerfil_deveRetornarUrlImagemPerfil_quandoSolicitado() {
+        when(backBlazeService.generatePresignedUrl("802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png"))
+            .thenReturn("http://teste/usuarios-images/123-Usuario.png");
+
+        assertEquals("http://teste/usuarios-images/123-Usuario.png", service.buscarUrlImagemPerfil(umUsuario()));
+
+        verify(backBlazeService).generatePresignedUrl("802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png");
+    }
 }

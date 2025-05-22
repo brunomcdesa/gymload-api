@@ -49,7 +49,7 @@ public class SecurityConfiguration {
                 .hasRole(ADMIN.name())
                 .requestMatchers(PUT, "/api/usuarios/{id}/editar")
                 .hasAnyRole(ADMIN.name(), USER.name())
-                .requestMatchers(GET, "/api/usuarios/imagem-perfil")
+                .requestMatchers(GET, "/api/usuarios/url-imagem-perfil")
                 .hasAnyRole(ADMIN.name(), USER.name())
                 .requestMatchers("/api/usuarios/**")
                 .hasRole(ADMIN.name())

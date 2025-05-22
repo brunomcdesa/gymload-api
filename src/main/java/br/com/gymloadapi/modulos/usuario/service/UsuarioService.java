@@ -79,6 +79,10 @@ public class UsuarioService {
         return usuarioMapper.mapModelToResponse(this.findByUuid(uuid));
     }
 
+    public String buscarUrlImagemPerfil(Usuario usuario) {
+        return backBlazeService.generatePresignedUrl(usuario.getImagemPerfil());
+    }
+
     private Usuario findByUuid(UUID uuid) {
         return repository.findByUuid(uuid)
             .orElseThrow(() -> new NotFoundException(MSG_USUARIO_NAO_ENCONTRADO));
@@ -90,11 +94,7 @@ public class UsuarioService {
         var nomeComUnderLine = StringUtils.replace(usuario.getNome(), " ", "_");
         var imagemPerfilName = format("%s-%s%s", usuario.getUuid(), nomeComUnderLine, extensao);
 
-        backBlazeService.uploadFile(this.montarNomeArquivo(imagemPerfilName), imagem);
+        backBlazeService.uploadFile(imagemPerfilName, imagem);
         usuario.setImagemPerfil(imagemPerfilName);
-    }
-
-    private String montarNomeArquivo(String imagemPerfilName) {
-        return format("usuarios-images/%s", imagemPerfilName);
     }
 }

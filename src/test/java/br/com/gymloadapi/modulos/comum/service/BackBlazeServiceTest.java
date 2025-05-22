@@ -5,6 +5,9 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -75,6 +78,23 @@ class BackBlazeServiceTest {
         when(mockedUrl.toString()).thenReturn("http://teste/file.jpeg");
 
         assertNotNull(service.generatePresignedUrl("file.jpeg"));
+
+        verify(s3Presigner).presignGetObject(any(GetObjectPresignRequest.class));
+    }
+
+    @SneakyThrows
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"  "})
+    void generatePresignedUrl_deveRetorarUrlDeImagem_quandoImagemUsuarioForInvalido(String imagemUsuario) {
+        var presignedGetObjectRequest = mock(PresignedGetObjectRequest.class);
+        var mockedUrl = mock(URL.class);
+
+        when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).thenReturn(presignedGetObjectRequest);
+        when(presignedGetObjectRequest.url()).thenReturn(mockedUrl);
+        when(mockedUrl.toString()).thenReturn("http://teste/file.jpeg");
+
+        assertNotNull(service.generatePresignedUrl(imagemUsuario));
 
         verify(s3Presigner).presignGetObject(any(GetObjectPresignRequest.class));
     }

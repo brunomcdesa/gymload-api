@@ -54,4 +54,9 @@ public class UsuarioController {
     public UsuarioResponse detalharByUuid(@PathVariable UUID uuid) {
         return service.buscarPorUuid(uuid);
     }
+
+    @GetMapping("url-imagem-perfil")
+    public String buscarUrlImagemPerfil(@AuthenticationPrincipal Usuario usuario) {
+        return service.buscarUrlImagemPerfil(usuario);
+    }
 }

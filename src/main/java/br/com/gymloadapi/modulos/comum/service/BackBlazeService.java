@@ -15,6 +15,9 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import java.io.IOException;
 import java.time.Duration;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 @Service
 @RequiredArgsConstructor
 public class BackBlazeService {
@@ -22,12 +25,15 @@ public class BackBlazeService {
     private static final int QTD_MAX_DIAS_IMAGEM = 7;
     @Value("${api.aws.bucket.name}")
     private String bucketName;
+    @Value("${api.aws.default-user-image}")
+    private String defaultUserImage;
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
-    public void uploadFile(String fileName, MultipartFile file) {
+    public void uploadFile(String imagemPerfil, MultipartFile file) {
         try {
+            var fileName = this.montarCaminhoImagem(imagemPerfil);
             s3Client.putObject(
                 PutObjectRequest.builder()
                     .bucket(bucketName)
@@ -41,8 +47,9 @@ public class BackBlazeService {
         }
     }
 
-    public String generatePresignedUrl(String fileName) {
+    public String generatePresignedUrl(String imagemPerfil) {
         try {
+            var fileName = this.getNomeImagem(imagemPerfil);
             var getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileName)
@@ -58,5 +65,17 @@ public class BackBlazeService {
             throw new IntegracaoException(exception, BackBlazeService.class.getName(),
                 "Erro ao gerar URL assinada para o arquivo.");
         }
+    }
+
+    private String getNomeImagem(String imagemPerfil) {
+        var imagemPerfilName = isNotBlank(imagemPerfil)
+            ? imagemPerfil
+            : defaultUserImage;
+
+        return this.montarCaminhoImagem(imagemPerfilName);
+    }
+
+    private String montarCaminhoImagem(String imagemPerfil) {
+        return format("usuarios-images/%s", imagemPerfil);
     }
 }
