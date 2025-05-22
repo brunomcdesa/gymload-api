@@ -42,8 +42,8 @@ class TokenServiceTest {
     void generateToken_deveRetornarToken_quandoUsuarioValido() {
         var usuario = umUsuario();
 
-        when(backBlazeService.generatePresignedUrl("802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png"))
-            .thenReturn("http://teste.s3/123-Usuario.png");
+        when(backBlazeService.generatePresignedUrl("usuarios-images/802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png"))
+            .thenReturn("http://teste.s3/usuarios-images/123-Usuario.png");
 
         var token = service.generateToken(usuario);
         var decodedJWT = JWT.decode(token);
@@ -54,7 +54,7 @@ class TokenServiceTest {
             () -> assertEquals("usuarioUser", decodedJWT.getSubject()),
             () -> assertEquals("Usuario", decodedJWT.getClaim("usuarioNome").asString()),
             () -> assertArrayEquals(new String[]{"ROLE_USER"}, decodedJWT.getClaim("usuarioRoles").asArray(String.class)),
-            () -> assertEquals("http://teste.s3/123-Usuario.png", decodedJWT.getClaim("imagemPerfilUrl").asString()),
+            () -> assertEquals("http://teste.s3/usuarios-images/123-Usuario.png", decodedJWT.getClaim("imagemPerfilUrl").asString()),
             () -> assertNotNull(decodedJWT.getExpiresAt())
         );
     }
@@ -67,13 +67,13 @@ class TokenServiceTest {
         var usuario = umUsuario();
         usuario.setImagemPerfil(imagemPerfil);
 
-        when(backBlazeService.generatePresignedUrl("default-user-image.png"))
-            .thenReturn("http://teste.s3/default-user-image.png");
+        when(backBlazeService.generatePresignedUrl("usuarios-images/default-user-image.png"))
+            .thenReturn("http://teste.s3/usuarios-images/default-user-image.png");
 
         var token = service.generateToken(usuario);
         var decodedJWT = JWT.decode(token);
 
-        assertEquals("http://teste.s3/default-user-image.png", decodedJWT.getClaim("imagemPerfilUrl").asString());
+        assertEquals("http://teste.s3/usuarios-images/default-user-image.png", decodedJWT.getClaim("imagemPerfilUrl").asString());
     }
 
     @Test

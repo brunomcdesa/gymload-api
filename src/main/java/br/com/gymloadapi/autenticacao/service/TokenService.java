@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Service
@@ -74,8 +75,10 @@ public class TokenService {
     }
 
     private String getNomeImagem(Usuario usuario) {
-        return isNotBlank(usuario.getImagemPerfil())
+        var imagemPerfilName = isNotBlank(usuario.getImagemPerfil())
             ? usuario.getImagemPerfil()
             : defaultUserImage;
+
+        return format("usuarios-images/%s", imagemPerfilName);
     }
 }
