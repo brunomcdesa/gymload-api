@@ -1,13 +1,16 @@
 package br.com.gymloadapi.modulos.exercicio.helper;
 
+import br.com.gymloadapi.modulos.exercicio.dto.ExercicioFiltro;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import lombok.experimental.UtilityClass;
 
 import java.util.List;
 
-import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.*;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.*;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.MAQUINA;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.AEROBICO;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularCostas;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
@@ -66,5 +69,13 @@ public class ExercicioHelper {
 
     public static List<Exercicio> maisUmaListaDeExercicios() {
         return List.of(umExercicioMusculacao(1), umExercicioAerobico(2));
+    }
+
+    public static ExercicioFiltro umExercicioFiltroVazio() {
+        return new ExercicioFiltro(null);
+    }
+
+    public static ExercicioFiltro umExercicioFiltro() {
+        return new ExercicioFiltro(2);
     }
 }

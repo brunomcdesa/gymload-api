@@ -38,7 +38,7 @@ class ExercicioMapperTest {
             () -> assertEquals("SUPINO RETO", response.nome()),
             () -> assertEquals("Supino Reto", response.descricao()),
             () -> assertEquals("Peitoral", response.grupoMuscularNome()),
-            () -> assertEquals(HALTER, response.tipoExercicio()),
+            () -> assertEquals(MUSCULACAO, response.tipoExercicio()),
             () -> assertEquals(PRONADA, response.tipoPegada()),
             () -> assertEquals(MUSCULACAO, response.tipoExercicioo())
         );

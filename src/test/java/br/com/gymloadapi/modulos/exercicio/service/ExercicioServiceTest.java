@@ -6,6 +6,7 @@ import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapperImpl;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.exercicio.repository.ExercicioRepository;
 import br.com.gymloadapi.modulos.grupomuscular.service.GrupoMuscularService;
+import com.querydsl.core.types.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +23,7 @@ import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,9 +69,9 @@ class ExercicioServiceTest {
 
     @Test
     void buscarTodos_deveRetornarTodosOsExercicios_quandoSolicitado() {
-        when(repository.findAllComplete()).thenReturn(umaListaDeExercicios());
+        when(repository.findAllCompleteByPredicate(any(Predicate.class))).thenReturn(umaListaDeExercicios());
 
-        var responses = service.buscarTodos();
+        var responses = service.buscarTodos(umExercicioFiltroVazio());
 
         assertAll(
             () -> assertEquals(1, responses.getFirst().id()),
@@ -78,7 +80,7 @@ class ExercicioServiceTest {
             () -> assertEquals("PUXADA ALTA", responses.getLast().nome())
         );
 
-        verify(repository).findAllComplete();
+        verify(repository).findAllCompleteByPredicate(any(Predicate.class));
     }
 
     @Test

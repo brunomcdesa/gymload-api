@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.exercicio.service;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
+import br.com.gymloadapi.modulos.exercicio.dto.ExercicioFiltro;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioResponse;
 import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapper;
@@ -33,8 +34,8 @@ public class ExercicioService {
         repository.save(exercicio);
     }
 
-    public List<ExercicioResponse> buscarTodos() {
-        return this.findAll().stream()
+    public List<ExercicioResponse> buscarTodos(ExercicioFiltro filtro) {
+        return repository.findAllCompleteByPredicate(filtro.toPredicate()).stream()
             .map(exercicioMapper::mapModelToResponse)
             .toList();
     }
@@ -45,7 +46,7 @@ public class ExercicioService {
     }
 
     public List<SelectResponse> buscarTodosSelect() {
-        return this.findAll().stream()
+        return repository.findAllComplete().stream()
             .map(exercicioMapper::mapToSelectResponse)
             .toList();
     }
@@ -58,9 +59,5 @@ public class ExercicioService {
         return repository.buscarExerciciosPorTreino(treinoId).stream()
             .map(exercicioMapper::mapModelToResponse)
             .toList();
-    }
-
-    private List<Exercicio> findAll() {
-        return repository.findAllComplete();
     }
 }

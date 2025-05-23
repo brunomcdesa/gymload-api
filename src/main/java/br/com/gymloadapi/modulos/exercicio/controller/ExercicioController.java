@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.exercicio.controller;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
+import br.com.gymloadapi.modulos.exercicio.dto.ExercicioFiltro;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioResponse;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
@@ -26,8 +27,8 @@ public class ExercicioController {
     }
 
     @GetMapping
-    public List<ExercicioResponse> buscarTodos() {
-        return service.buscarTodos();
+    public List<ExercicioResponse> buscarTodos(ExercicioFiltro filtros) {
+        return service.buscarTodos(filtros);
     }
 
     @GetMapping("select")

@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.exercicio.repository;
 
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +22,16 @@ public class ExercicioRepositoryImpl implements ExercicioRepositoryCustom {
             .selectFrom(exercicio)
             .leftJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
             .leftJoin(exercicio.treinos).fetchJoin()
+            .fetch();
+    }
+
+    @Override
+    public List<Exercicio> findAllCompleteByPredicate(Predicate predicate) {
+        return new JPAQueryFactory(entityManager)
+            .selectFrom(exercicio)
+            .leftJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
+            .leftJoin(exercicio.treinos).fetchJoin()
+            .where(predicate)
             .fetch();
     }
 

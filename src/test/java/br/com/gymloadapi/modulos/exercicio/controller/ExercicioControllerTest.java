@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Map;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioFiltroVazio;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacaoRequest;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -94,7 +95,7 @@ class ExercicioControllerTest {
         isOk(get(URL + endpoint), mockMvc);
 
         Map.<String, Runnable>of(
-            "", () -> verify(service).buscarTodos(),
+            "", () -> verify(service).buscarTodos(umExercicioFiltroVazio()),
             "/select", () -> verify(service).buscarTodosSelect(),
             "/treino/1", () -> verify(service).buscarExerciciosPorTreino(1)
         ).get(endpoint).run();

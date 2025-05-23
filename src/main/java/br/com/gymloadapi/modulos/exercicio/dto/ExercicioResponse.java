@@ -13,8 +13,8 @@ public record ExercicioResponse(
     String nome,
     String descricao,
     String grupoMuscularNome,
-    //TODO: remover este atributo apos sub ir a proxima versao
-    ETipoEquipamento tipoExercicio,
+    ETipoExercicio tipoExercicio,
+    //TODO: remover este atributo apos subir a proxima versao
     ETipoExercicio tipoExercicioo,
     ETipoEquipamento tipoEquipamento,
     ETipoPegada tipoPegada
