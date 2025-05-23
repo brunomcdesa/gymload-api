@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.registroatividade.registrocarga.helper;
 
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.dto.HistoricoCargasRequest;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.model.RegistroCarga;
 import lombok.experimental.UtilityClass;
 
@@ -13,10 +12,6 @@ import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAd
 
 @UtilityClass
 public class RegistroCargaHelper {
-
-    public static HistoricoCargasRequest umHistoricoCargasRequest() {
-        return new HistoricoCargasRequest(22.5, KG, 1, 12, 4);
-    }
 
     public static RegistroCarga umRegistroCarga() {
         return RegistroCarga.builder()

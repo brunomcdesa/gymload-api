@@ -4,7 +4,6 @@ import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.registroatividade.mapper.RegistroAtividadeMapper;
 import br.com.gymloadapi.modulos.registroatividade.registrocardio.repository.RegistroCardioRepository;
 import br.com.gymloadapi.modulos.registroatividade.registrocardio.service.RegistroCardioService;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.mapper.HistoricoCargasMapper;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.repository.RegistroCargaRepository;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.service.RegistroCargaService;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 })
 @MockitoBeans({
     @MockitoBean(types = ExercicioService.class),
-    @MockitoBean(types = HistoricoCargasMapper.class),
     @MockitoBean(types = RegistroCargaRepository.class),
     @MockitoBean(types = RegistroAtividadeMapper.class),
     @MockitoBean(types = RegistroCardioRepository.class),

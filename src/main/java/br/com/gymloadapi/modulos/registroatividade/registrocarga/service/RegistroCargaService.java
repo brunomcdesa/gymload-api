@@ -2,23 +2,17 @@ package br.com.gymloadapi.modulos.registroatividade.registrocarga.service;
 
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
-import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.factory.RegistroAtividadeFactory;
 import br.com.gymloadapi.modulos.registroatividade.mapper.RegistroAtividadeMapper;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.dto.CargaResponse;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.dto.HistoricoCargasRequest;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.dto.HistoricoCargasResponse;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.mapper.HistoricoCargasMapper;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.model.RegistroCarga;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.repository.RegistroCargaRepository;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -30,30 +24,12 @@ import static java.util.Comparator.comparing;
 @RequiredArgsConstructor
 public class RegistroCargaService implements RegistroAtividadeFactory {
 
-    private final ExercicioService exercicioService;
     private final RegistroCargaRepository repository;
-    private final HistoricoCargasMapper historicoCargasMapper;
     private final RegistroAtividadeMapper registroAtividadeMapper;
-
-    public void salvar(HistoricoCargasRequest request, Usuario usuario) {
-        var exercicio = exercicioService.findById(request.exercicioId());
-        repository.save(historicoCargasMapper.mapToModel(request, exercicio, usuario));
-    }
 
     @Override
     public void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario) {
         repository.save(registroAtividadeMapper.mapToRegistroCarga(request, exercicio, usuario));
-    }
-
-    public CargaResponse buscarUltimoHistoricoCargas(Integer exercicioId, Integer usuarioId) {
-        var historicoCargas = this.getAllByExercicioId(exercicioId, usuarioId);
-
-        return new CargaResponse(
-            this.getMaiorCargaDoHistorico(historicoCargas),
-            this.getHistoricoUltimoDia(historicoCargas).stream()
-                .map(historicoCargasMapper::mapToResponse)
-                .toList()
-        );
     }
 
     @Override
@@ -63,13 +39,6 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
         return new RegistroAtividadeResponse(exercicioId, this.getDestaqueDoRegistro(registrosCargas),
             this.getUltimoRegistro(registrosCargas), null
         );
-    }
-
-    public List<HistoricoCargasResponse> buscarHistoricoCargasCompleto(Integer exercicioId, Integer usuarioId) {
-        return this.getAllByExercicioId(exercicioId, usuarioId).stream()
-            .sorted(comparing(RegistroCarga::getDataCadastro).reversed())
-            .map(historicoCargasMapper::mapToResponse)
-            .toList();
     }
 
     @Override
@@ -92,17 +61,6 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
         return repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId);
     }
 
-    private Double getMaiorCargaDoHistorico(List<RegistroCarga> cargases) {
-        var optionalMaiorCarga = cargases.stream()
-            .map(RegistroCarga::getPeso)
-            .mapToDouble(Double::doubleValue)
-            .max();
-
-        return optionalMaiorCarga.isPresent()
-            ? optionalMaiorCarga.getAsDouble()
-            : null;
-    }
-
     private String getDestaqueDoRegistro(List<RegistroCarga> cargas) {
         var optionalMaiorCarga = cargas.stream()
             .map(RegistroCarga::getPeso)
@@ -116,17 +74,6 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
             .findFirst()
             .orElse(null)
             : "-";
-    }
-
-    private List<RegistroCarga> getHistoricoUltimoDia(List<RegistroCarga> cargas) {
-        var ultimoDia = cargas.stream()
-            .map(RegistroCarga::getDataCadastro)
-            .max(LocalDate::compareTo)
-            .orElse(LocalDate.now());
-
-        return cargas.stream()
-            .filter(historico -> historico.getDataCadastro().equals(ultimoDia))
-            .toList();
     }
 
     private String getUltimoRegistro(List<RegistroCarga> cargas) {
