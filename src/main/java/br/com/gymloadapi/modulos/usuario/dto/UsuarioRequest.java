@@ -9,9 +9,12 @@ import jakarta.validation.constraints.Null;
 public record UsuarioRequest(
     @NotBlank(groups = {Cadastro.class, Alteracao.class})
     String nome,
+    @Null(groups = Alteracao.class)
+    @NotBlank(groups = Cadastro.class)
+    String email,
     @NotBlank(groups = {Cadastro.class, Alteracao.class})
     String username,
-    @Null(groups = {Alteracao.class})
+    @Null(groups = Alteracao.class)
     @NotBlank(groups = Cadastro.class)
     String password
 ) {

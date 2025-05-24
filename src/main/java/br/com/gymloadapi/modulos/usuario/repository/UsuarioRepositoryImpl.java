@@ -1,5 +1,7 @@
 package br.com.gymloadapi.modulos.usuario.repository;
 
+import br.com.gymloadapi.modulos.comum.types.Email;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,5 +22,13 @@ public class UsuarioRepositoryImpl implements UsuarioRepositoryCustom {
             .set(usuario.senha, senha)
             .where(usuario.username.eq(username))
             .execute();
+    }
+
+    @Override
+    public boolean existsByEmail(Email email) {
+        return new JPAQueryFactory(entityManager)
+            .selectFrom(usuario)
+            .where(usuario.email.eq(email))
+            .fetchFirst() != null;
     }
 }

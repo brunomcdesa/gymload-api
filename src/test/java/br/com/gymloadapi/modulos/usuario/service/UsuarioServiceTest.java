@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static br.com.gymloadapi.helper.TestsHelper.umMockMultipartFile;
+import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmail;
+import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmailAdmin;
 import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.ADMIN;
 import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.USER;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.*;
@@ -61,13 +63,36 @@ class UsuarioServiceTest {
     }
 
     @Test
+    void cadastrar_deveLancarException_quandoJaExistirUsuarioComMesmoEmail() {
+        var email = umEmail();
+
+        when(repository.existsByUsername("usuario")).thenReturn(false);
+        when(repository.existsByEmail(email)).thenReturn(true);
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.cadastrar(umUsuarioRequest(), false, umMockMultipartFile())
+        );
+        assertEquals("Já existe um usuário com este Email.", exception.getMessage());
+
+        verify(repository).existsByUsername("usuario");
+        verify(repository).existsByEmail(email);
+        verifyNoMoreInteractions(repository);
+        verifyNoInteractions(backBlazeService);
+    }
+
+    @Test
     void cadastrar_deveSalvarUsuarioComum_quandoForCadastroDeUsuarioComum() {
         var file = umMockMultipartFile();
+        var email = umEmail();
+
         when(repository.existsByUsername("usuario")).thenReturn(false);
+        when(repository.existsByEmail(email)).thenReturn(false);
 
         service.cadastrar(umUsuarioRequest(), false, file);
 
         verify(repository).existsByUsername("usuario");
+        verify(repository).existsByEmail(email);
         verify(backBlazeService).uploadFile(anyString(), eq(file));
         verify(repository).save(captor.capture());
 
@@ -75,6 +100,7 @@ class UsuarioServiceTest {
         assertAll(
             () -> assertEquals("Usuario", usuario.getNome()),
             () -> assertEquals("usuario", usuario.getUsername()),
+            () -> assertEquals("teste@teste.com", usuario.getEmail().getValor()),
             () -> assertFalse(usuario.getImagemPerfil().isBlank()),
             () -> assertTrue(usuario.getSenha().startsWith("$2a$")),
             () -> assertEquals(List.of(USER), usuario.getRoles())
@@ -83,11 +109,15 @@ class UsuarioServiceTest {
 
     @Test
     void cadastrar_deveSalvarUsuarioAdmin_quandoForCadastroDeUsuarioAdmin() {
+        var email = umEmailAdmin();
+
         when(repository.existsByUsername("usuarioAdmin")).thenReturn(false);
+        when(repository.existsByEmail(email)).thenReturn(false);
 
         service.cadastrar(umUsuarioAdminRequest(), true, null);
 
         verify(repository).existsByUsername("usuarioAdmin");
+        verify(repository).existsByEmail(email);
         verify(repository).save(captor.capture());
         verifyNoInteractions(backBlazeService);
 

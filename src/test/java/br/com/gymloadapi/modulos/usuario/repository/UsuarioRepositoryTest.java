@@ -7,8 +7,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 import jakarta.persistence.EntityManager;
 
+import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmail;
+import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmailAdmin;
 import static br.com.gymloadapi.modulos.comum.utils.PasswordUtils.encodePassword;
 import static br.com.gymloadapi.modulos.comum.utils.PasswordUtils.isPasswordEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
@@ -32,5 +35,15 @@ class UsuarioRepositoryTest {
 
         var senhaNova = repository.findById(1).get().getSenha();
         assertTrue(isPasswordEquals("654321", senhaNova));
+    }
+
+    @Test
+    void existsByEmail_deveRetornarTrue_quandoExistirUsuarioComMesmoEmail() {
+        assertTrue(repository.existsByEmail(umEmailAdmin()));
+    }
+
+    @Test
+    void existsByEmail_deveRetornarFalse_quandoNaoExistirUsuarioComMesmoEmail() {
+        assertFalse(repository.existsByEmail(umEmail()));
     }
 }

@@ -3,6 +3,7 @@ package br.com.gymloadapi.modulos.usuario.service;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
+import br.com.gymloadapi.modulos.comum.types.Email;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioRequest;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioResponse;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapper;
@@ -35,12 +36,11 @@ public class UsuarioService {
     private final BackBlazeService backBlazeService;
 
     public void cadastrar(UsuarioRequest usuarioRequest, boolean isCadastroAdmin, MultipartFile imagem) {
-        if (repository.existsByUsername(usuarioRequest.username())) {
-            throw new ValidacaoException("Já existe um usuário com este username.");
-        }
+        var email = new Email(usuarioRequest.email());
+        this.validarUsuarioExistente(usuarioRequest, email);
 
         var novoUsuario = usuarioMapper.mapToModel(usuarioRequest, encodePassword(usuarioRequest.password()),
-            isCadastroAdmin ? ROLES_ADMIN : ROLES_USER);
+            isCadastroAdmin ? ROLES_ADMIN : ROLES_USER, email);
 
         if (imagem != null) {
             this.realizarUploadImagemPerfil(novoUsuario, imagem);
@@ -96,5 +96,23 @@ public class UsuarioService {
 
         backBlazeService.uploadFile(imagemPerfilName, imagem);
         usuario.setImagemPerfil(imagemPerfilName);
+    }
+
+    private void validarUsuarioExistente(UsuarioRequest request, Email email) {
+        this.validarUsuarioExistentePorUsername(request.username());
+        this.validarUsuarioExistentePorEmail(email);
+
+    }
+
+    private void validarUsuarioExistentePorUsername(String username) {
+        if (repository.existsByUsername(username)) {
+            throw new ValidacaoException("Já existe um usuário com este username.");
+        }
+    }
+
+    private void validarUsuarioExistentePorEmail(Email email) {
+        if (repository.existsByEmail(email)) {
+            throw new ValidacaoException("Já existe um usuário com este Email.");
+        }
     }
 }

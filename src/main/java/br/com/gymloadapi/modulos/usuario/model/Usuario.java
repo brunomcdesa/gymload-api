@@ -1,5 +1,7 @@
 package br.com.gymloadapi.modulos.usuario.model;
 
+import br.com.gymloadapi.modulos.comum.converter.EmailConverter;
+import br.com.gymloadapi.modulos.comum.types.Email;
 import br.com.gymloadapi.modulos.usuario.enums.EUserRole;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -45,6 +47,10 @@ public class Usuario implements UserDetails {
 
     @Column(length = 75)
     private String imagemPerfil;
+
+    @Column
+    @Convert(converter = EmailConverter.class)
+    private Email email;
 
     @Column(name = "ROLE")
     @Enumerated(STRING)

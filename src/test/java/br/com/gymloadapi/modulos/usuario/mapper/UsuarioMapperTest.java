@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmail;
 import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.USER;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioRequest;
@@ -16,9 +17,10 @@ class UsuarioMapperTest {
 
     @Test
     void mapToModel_deveFazerMapeamentoCorreto_quandoSolicitado() {
-        var usuario = mapper.mapToModel(umUsuarioRequest(), "123Abc!@#", List.of(USER));
+        var usuario = mapper.mapToModel(umUsuarioRequest(), "123Abc!@#", List.of(USER), umEmail());
         assertAll(
             () -> assertEquals("Usuario", usuario.getNome()),
+            () -> assertEquals("teste@teste.com", usuario.getEmail().getValor()),
             () -> assertEquals("usuario", usuario.getUsername()),
             () -> assertEquals("123Abc!@#", usuario.getSenha()),
             () -> assertEquals(List.of(USER), usuario.getRoles())
@@ -32,6 +34,18 @@ class UsuarioMapperTest {
             () -> assertEquals("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9", response.uuid().toString()),
             () -> assertEquals("Usuario Admin", response.nome()),
             () -> assertEquals("usuarioAdmin", response.username())
+        );
+    }
+
+    @Test
+    void editar_deveEditarUsuario_quandoSolicitado() {
+        var usuario = umUsuarioAdmin();
+        mapper.editar(umUsuarioRequest(), usuario);
+
+        assertAll(
+            () -> assertEquals("Usuario", usuario.getNome()),
+            () -> assertEquals("testeAdmin@teste.com", usuario.getEmail().getValor()),
+            () -> assertEquals("usuario", usuario.getUsername())
         );
     }
 }

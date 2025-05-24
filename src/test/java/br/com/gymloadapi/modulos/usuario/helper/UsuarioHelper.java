@@ -7,6 +7,8 @@ import lombok.experimental.UtilityClass;
 import java.util.List;
 import java.util.UUID;
 
+import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmail;
+import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmailAdmin;
 import static br.com.gymloadapi.modulos.comum.utils.PasswordUtils.encodePassword;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_ADMIN;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_USER;
@@ -17,15 +19,15 @@ public class UsuarioHelper {
     public static final UUID USUARIO_ADMIN_UUID = UUID.fromString("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9");
 
     public static UsuarioRequest umUsuarioRequest() {
-        return new UsuarioRequest("Usuario", "usuario", "123456");
+        return new UsuarioRequest("Usuario", "teste@teste.com", "usuario", "123456");
     }
 
     public static UsuarioRequest umUsuarioAdminRequest() {
-        return new UsuarioRequest("Usuario Admin", "usuarioAdmin", "654321");
+        return new UsuarioRequest("Usuario Admin", "testeAdmin@teste.com", "usuarioAdmin", "654321");
     }
 
     public static UsuarioRequest umUsuarioRequestSemSenha() {
-        return new UsuarioRequest("Usuario Edicao", "usernameEdicao", null);
+        return new UsuarioRequest("Usuario Edicao",null, "usernameEdicao", null);
     }
 
     public static Usuario umUsuarioAdmin() {
@@ -36,6 +38,7 @@ public class UsuarioHelper {
             .roles(ROLES_ADMIN)
             .username("usuarioAdmin")
             .senha(encodePassword("654321"))
+            .email(umEmailAdmin())
             .build();
     }
 
@@ -48,6 +51,7 @@ public class UsuarioHelper {
             .username("usuarioUser")
             .imagemPerfil("802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png")
             .senha(encodePassword("123456"))
+            .email(umEmail())
             .build();
     }
 

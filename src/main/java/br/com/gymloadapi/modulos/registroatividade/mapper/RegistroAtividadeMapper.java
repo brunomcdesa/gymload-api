@@ -23,12 +23,22 @@ public interface RegistroAtividadeMapper {
     @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
     RegistroCardio mapToRegistroCardio(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
 
+    @Mapping(target = "duracao", ignore = true)
+    @Mapping(target = "distancia", ignore = true)
+    @Mapping(target = "velocidadeMedia", ignore = true)
     @Mapping(target = "exercicioNome", source = "registroCarga.exercicio.nome")
     @Mapping(target = "tipoExercicio", source = "registroCarga.exercicio.tipoEquipamento")
     @Mapping(target = "grupoMuscularNome", source = "registroCarga.exercicio.grupoMuscular.nome")
     @Mapping(target = "carga", expression = "java(registroCarga.getCargaComUnidadePeso())")
     HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeMusculacaoResponse(RegistroCarga registroCarga);
 
+    @Mapping(target = "peso", ignore = true)
+    @Mapping(target = "carga", ignore = true)
+    @Mapping(target = "qtdSeries", ignore = true)
+    @Mapping(target = "unidadePeso", ignore = true)
+    @Mapping(target = "tipoExercicio", ignore = true)
+    @Mapping(target = "qtdRepeticoes", ignore = true)
+    @Mapping(target = "grupoMuscularNome", ignore = true)
     @Mapping(target = "exercicioNome", source = "registroCardio.exercicio.nome")
     @Mapping(target = "velocidadeMedia", expression = "java(registroCardio.getVelocidadeMedia())")
     HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeAerobicoResponse(RegistroCardio registroCardio);
