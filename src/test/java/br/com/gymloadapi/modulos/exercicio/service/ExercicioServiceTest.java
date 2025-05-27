@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.exercicio.service;
 
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
+import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapper;
 import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapperImpl;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
@@ -15,17 +16,22 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 
+import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
+import static br.com.gymloadapi.modulos.comum.enums.EAcao.EDICAO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.AEROBICO;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ExercicioServiceTest {
@@ -37,34 +43,80 @@ class ExercicioServiceTest {
     private ExercicioRepository repository;
     @Mock
     private GrupoMuscularService grupoMuscularService;
+    @Mock
+    private ExercicioHistoricoService historicoService;
     @Captor
     private ArgumentCaptor<Exercicio> exercicioCaptor;
 
     @BeforeEach
     void setUp() {
-        service = new ExercicioService(repository, mapper, grupoMuscularService);
+        service = new ExercicioService(repository, mapper, grupoMuscularService, historicoService);
     }
 
     @Test
-    void salvar_deveSalvarExercicio_quandoSolicitado() {
-        var request = umExercicioMusculacaoRequest();
-        var grupoMuscular = umGrupoMuscularPeitoral();
+    void salvar_deveSalvarExercicioMusculacao_quandoSolicitado() {
+        when(grupoMuscularService.findById(1)).thenReturn(umGrupoMuscularPeitoral());
 
-        when(grupoMuscularService.findById(1)).thenReturn(grupoMuscular);
-
-        service.salvar(request);
+        service.salvar(umExercicioMusculacaoRequest(), 1);
 
         verify(grupoMuscularService).findById(1);
         verify(repository).save(exercicioCaptor.capture());
+        verify(historicoService).salvar(any(Exercicio.class), eq(1), eq(CADASTRO));
 
         var exercicio = exercicioCaptor.getValue();
         assertAll(
             () -> assertEquals("SUPINO RETO", exercicio.getNome()),
             () -> assertEquals("Supino Reto", exercicio.getDescricao()),
+            () -> assertEquals(MUSCULACAO, exercicio.getTipoExercicio()),
             () -> assertEquals(HALTER, exercicio.getTipoEquipamento()),
             () -> assertEquals(PRONADA, exercicio.getTipoPegada()),
             () -> assertEquals("Peitoral", exercicio.getGrupoMuscular().getNome())
         );
+    }
+
+    @Test
+    void salvar_deveSalvarExercicioAerobico_quandoSolicitadoComTipoExercicioAerobico() {
+        service.salvar(umExercicioAerobicoRequest(), 1);
+
+        verify(repository).save(exercicioCaptor.capture());
+        verify(historicoService).salvar(any(Exercicio.class), eq(1), eq(CADASTRO));
+        verifyNoInteractions(grupoMuscularService);
+
+        var exercicio = exercicioCaptor.getValue();
+        assertAll(
+            () -> assertEquals("ESCADA", exercicio.getNome()),
+            () -> assertEquals("Escada", exercicio.getDescricao()),
+            () -> assertEquals(AEROBICO, exercicio.getTipoExercicio()),
+            () -> assertNull(exercicio.getTipoEquipamento()),
+            () -> assertNull(exercicio.getTipoPegada()),
+            () -> assertNull(exercicio.getGrupoMuscular())
+        );
+    }
+
+    @Test
+    void salvar_deveLancarException_quandoSolicitadoComTipoExercicioMusculacaoECamposObrigatoriosInvalidos() {
+        var request = umExercicioRequestMusculacaoComCamposInvalidos("teste");
+
+        var exception = assertThrowsExactly(ConstraintViolationException.class, () -> service.salvar(request, 1));
+        assertThat(exception.getMessage())
+            .contains("tipoEquipamento: é obrigatório.",
+                "grupoMuscularId: é obrigatório.",
+                "tipoPegada: é obrigatório.");
+
+        verifyNoInteractions(grupoMuscularService, repository, historicoService);
+    }
+
+    @Test
+    void salvar_naoDeveLancarException_quandoSolicitadoComTipoExercicioAerobicoEObrigatoriosInvalidos() {
+        var request =  umExercicioRequestAerobicoComCamposInvalidos("teste");
+
+        var exception = assertThrowsExactly(ConstraintViolationException.class, () -> service.salvar(request, 1));
+        assertThat(exception.getMessage())
+            .contains("tipoEquipamento: deve ser nulo",
+                "grupoMuscularId: deve ser nulo",
+                "tipoPegada: deve ser nulo");
+
+        verifyNoInteractions(grupoMuscularService, repository, historicoService);
     }
 
     @Test
@@ -152,5 +204,108 @@ class ExercicioServiceTest {
         );
 
         verify(repository).buscarExerciciosPorTreino(1);
+    }
+
+    @Test
+    void editar_deveLancarException_quandoNaoEncontrarExercicio() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(NotFoundException.class,
+            () -> service.editar(1, umExercicioMusculacaoRequest(), 1));
+        assertEquals("Exercício não encontrado.", exception.getMessage());
+
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+        verifyNoInteractions(grupoMuscularService, historicoService);
+    }
+
+    @Test
+    void editar_deveLancarException_quandoTentarAlterarOTipoDeExercicio() {
+        when(repository.findById(1)).thenReturn(Optional.of(umExercicioMusculacao(1)));
+
+        var exception = assertThrowsExactly(ValidacaoException.class,
+            () -> service.editar(1, umExercicioAerobicoRequest(), 1));
+        assertEquals("Não é permitido alterar o tipo de exercício.", exception.getMessage());
+
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+        verifyNoInteractions(grupoMuscularService, historicoService);
+    }
+
+    @Test
+    void editar_deveLancarException_quandoSolicitadoComTipoExercicioMusculacaoECamposObrigatoriosInvalidos() {
+        when(repository.findById(1)).thenReturn(Optional.of(umExercicioMusculacao(1)));
+
+        var exception = assertThrowsExactly(ConstraintViolationException.class,
+            () -> service.editar(1, umExercicioRequestMusculacaoComCamposInvalidos("teste"), 1));
+        assertThat(exception.getMessage())
+            .contains("tipoEquipamento: é obrigatório.",
+                "tipoPegada: é obrigatório.",
+                "grupoMuscularId: é obrigatório.");
+
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+        verifyNoInteractions(grupoMuscularService, historicoService);
+    }
+
+    @Test
+    void editar_deveLancarException_quandoSolicitadoComTipoExercicioAerobicoECamposObrigatoriosInvalidos() {
+        when(repository.findById(1)).thenReturn(Optional.of(umExercicioAerobico(1)));
+
+        var exception = assertThrowsExactly(ConstraintViolationException.class,
+            () -> service.editar(1, umExercicioRequestAerobicoComCamposInvalidos("teste"), 1));
+        assertThat(exception.getMessage())
+            .contains("tipoEquipamento: deve ser nulo",
+                "tipoPegada: deve ser nulo",
+                "grupoMuscularId: deve ser nulo");
+
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+        verifyNoInteractions(grupoMuscularService, historicoService);
+    }
+
+    @Test
+    void editar_deveEditarExercicio_quandoSolicitadoComTipoExercicioMusculacaoECamposObrigatoriosValidos() {
+        when(repository.findById(1)).thenReturn(Optional.of(outroExercicioMusculacao(1)));
+        when(grupoMuscularService.findById(1)).thenReturn(umGrupoMuscularPeitoral());
+
+        assertDoesNotThrow(() -> service.editar(1, umExercicioMusculacaoRequest(), 1));
+
+        verify(repository).findById(1);
+        verify(grupoMuscularService).findById(1);
+        verify(repository).save(exercicioCaptor.capture());
+        verify(historicoService).salvar(any(Exercicio.class), eq(1), eq(EDICAO));
+
+        var exercicio = exercicioCaptor.getValue();
+        assertAll(
+            () -> assertEquals("SUPINO RETO", exercicio.getNome()),
+            () -> assertEquals("Supino Reto", exercicio.getDescricao()),
+            () -> assertEquals(MUSCULACAO, exercicio.getTipoExercicio()),
+            () -> assertEquals(HALTER, exercicio.getTipoEquipamento()),
+            () -> assertEquals(PRONADA, exercicio.getTipoPegada()),
+            () -> assertEquals("Peitoral", exercicio.getGrupoMuscular().getNome())
+        );
+    }
+
+    @Test
+    void editar_deveEditarExercicio_quandoSolicitadoComTipoExercicioAerobicoECamposObrigatoriosValidos() {
+        when(repository.findById(1)).thenReturn(Optional.of(umExercicioAerobico(1)));
+
+        assertDoesNotThrow(() -> service.editar(1, umExercicioAerobicoRequest(), 1));
+
+        verify(repository).findById(1);
+        verify(repository).save(exercicioCaptor.capture());
+        verify(historicoService).salvar(any(Exercicio.class), eq(1), eq(EDICAO));
+        verifyNoInteractions(grupoMuscularService);
+
+        var exercicio = exercicioCaptor.getValue();
+        assertAll(
+            () -> assertEquals("ESCADA", exercicio.getNome()),
+            () -> assertEquals("Escada", exercicio.getDescricao()),
+            () -> assertEquals(AEROBICO, exercicio.getTipoExercicio()),
+            () -> assertNull(exercicio.getTipoEquipamento()),
+            () -> assertNull(exercicio.getTipoPegada()),
+            () -> assertNull(exercicio.getGrupoMuscular())
+        );
     }
 }

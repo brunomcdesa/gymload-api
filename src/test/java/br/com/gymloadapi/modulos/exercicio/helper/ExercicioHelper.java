@@ -23,6 +23,22 @@ public class ExercicioHelper {
         return new ExercicioRequest("SUPINO RETO", MUSCULACAO, "Supino Reto", 1, HALTER, PRONADA);
     }
 
+    public static ExercicioRequest umExercicioAerobicoRequest() {
+        return new ExercicioRequest("ESCADA", AEROBICO, "Escada", null, null, null);
+    }
+
+    public static ExercicioRequest umExercicioRequestComCamposInvalidos(String nome) {
+        return new ExercicioRequest(nome, null, null, null, null, null);
+    }
+
+    public static ExercicioRequest umExercicioRequestMusculacaoComCamposInvalidos(String nome) {
+        return new ExercicioRequest(nome, MUSCULACAO, null, null, null, null);
+    }
+
+    public static ExercicioRequest umExercicioRequestAerobicoComCamposInvalidos(String nome) {
+        return new ExercicioRequest(nome, AEROBICO, null, 1, HALTER, PRONADA);
+    }
+
     public static Exercicio umExercicioMusculacao(Integer id) {
         return Exercicio.builder()
             .id(id)

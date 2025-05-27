@@ -1,14 +1,17 @@
 package br.com.gymloadapi.modulos.exercicio.mapper;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
+import br.com.gymloadapi.modulos.comum.enums.EAcao;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioResponse;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
+import br.com.gymloadapi.modulos.exercicio.model.ExercicioHistorico;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring")
+import java.time.LocalDateTime;
+
+@Mapper(componentModel = "spring", imports = LocalDateTime.class)
 public interface ExercicioMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -25,4 +28,17 @@ public interface ExercicioMapper {
     @Mapping(target = "label", expression = "java(exercicio.getNomeComTipoEquipamento())")
     SelectResponse mapToSelectResponse(Exercicio exercicio);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "nome", source = "request.nome")
+    @Mapping(target = "grupoMuscular", source = "grupoMuscular")
+    @BeanMapping(
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
+    void editar(ExercicioRequest request, GrupoMuscular grupoMuscular, @MappingTarget Exercicio exercicio);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "acao", source = "acao")
+    @Mapping(target = "usuarioCadastroId", source = "usuarioId")
+    @Mapping(target = "dataCadastro", expression = "java(LocalDateTime.now())")
+    ExercicioHistorico mapToHistorico(Exercicio exercicio, Integer usuarioId, EAcao acao);
 }

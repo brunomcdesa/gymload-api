@@ -47,6 +47,8 @@ public class SecurityConfiguration {
                 .permitAll()
                 .requestMatchers(POST, "/api/exercicios", "/api/grupos-musculares")
                 .hasRole(ADMIN.name())
+                .requestMatchers(PUT, "/api/exercicios/**")
+                .hasRole(ADMIN.name())
                 .requestMatchers(PUT, "/api/usuarios/{id}/editar")
                 .hasAnyRole(ADMIN.name(), USER.name())
                 .requestMatchers(GET, "/api/usuarios/url-imagem-perfil")

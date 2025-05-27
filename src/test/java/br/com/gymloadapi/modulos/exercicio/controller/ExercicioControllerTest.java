@@ -1,10 +1,10 @@
 package br.com.gymloadapi.modulos.exercicio.controller;
 
 import br.com.gymloadapi.autenticacao.service.TokenService;
+import br.com.gymloadapi.config.TestSecurityConfiguration;
 import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
-import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import org.junit.jupiter.api.Test;
@@ -17,22 +17,21 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioFiltroVazio;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacaoRequest;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(ExercicioController.class)
 @MockitoBean(types = {UsuarioService.class, BackBlazeService.class})
-@Import({SecurityConfiguration.class, TokenService.class, JwtAccessDeinedHandler.class})
+@Import({SecurityConfiguration.class, TokenService.class, JwtAccessDeinedHandler.class, TestSecurityConfiguration.class})
 class ExercicioControllerTest {
 
     private static final String URL = "/api/exercicios";
@@ -61,7 +60,7 @@ class ExercicioControllerTest {
     @WithMockUser(roles = "ADMIN")
     @ValueSource(strings = {"    "})
     void salvar_deveRetornarBadRequest_quandoUsuarioAdminECamposObrigatoriosInvalidos(String exercicioNome) {
-        var request = new ExercicioRequest(exercicioNome, null, null, null, null, null);
+        var request = umExercicioRequestComCamposInvalidos(exercicioNome);
         isBadRequest(post(URL), mockMvc, request,
             "O campo nome é obrigatório.",
             "O campo tipoExercicio é obrigatório.");
@@ -70,12 +69,12 @@ class ExercicioControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithUserDetails
     void salvar_deveRetornarCreated_quandoUsuarioAdminECamposObrigatoriosValidos() {
         var request = umExercicioMusculacaoRequest();
         isCreated(post(URL), mockMvc, request);
 
-        verify(service).salvar(request);
+        verify(service).salvar(request, 1);
     }
 
     @EmptySource
@@ -101,4 +100,39 @@ class ExercicioControllerTest {
         ).get(endpoint).run();
     }
 
+    @Test
+    @WithAnonymousUser
+    void editar_deveRetornarUnauthorized_quandoUsuarioNaoAutenticado() {
+        isUnauthorized(put(URL + "/1/editar"), mockMvc);
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser
+    void editar_deveRetornarForbidden_quandoUsuarioNaoForAdmin() {
+        isForbidden(put(URL + "/1/editar"), mockMvc);
+        verifyNoInteractions(service);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @WithMockUser(roles = "ADMIN")
+    @ValueSource(strings = {"    "})
+    void editar_deveRetornarBadRequest_quandoUsuarioAdminECamposObrigatoriosInvalidos(String exercicioNome) {
+        var request = umExercicioRequestComCamposInvalidos(exercicioNome);
+        isBadRequest(put(URL + "/1/editar"), mockMvc, request,
+            "O campo nome é obrigatório.",
+            "O campo tipoExercicio é obrigatório.");
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithUserDetails
+    void editar_deveRetornarNoContent_quandoUsuarioAdminECamposObrigatoriosValidos() {
+        var request = umExercicioMusculacaoRequest();
+        isNoContent(put(URL + "/1/editar"), mockMvc, request);
+
+        verify(service).editar(1, request, 1);
+    }
 }

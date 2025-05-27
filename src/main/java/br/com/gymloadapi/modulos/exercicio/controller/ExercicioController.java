@@ -5,13 +5,16 @@ import br.com.gymloadapi.modulos.exercicio.dto.ExercicioFiltro;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioResponse;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
+import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,8 +25,8 @@ public class ExercicioController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public void salvar(@RequestBody @Valid ExercicioRequest request) {
-        service.salvar(request);
+    public void salvar(@RequestBody @Valid ExercicioRequest request, @AuthenticationPrincipal Usuario usuario) {
+        service.salvar(request, usuario.getId());
     }
 
     @GetMapping
@@ -39,5 +42,12 @@ public class ExercicioController {
     @GetMapping("treino/{treinoId}")
     public List<ExercicioResponse> buscarExerciciosPorTreino(@PathVariable Integer treinoId) {
         return service.buscarExerciciosPorTreino(treinoId);
+    }
+
+    @PutMapping("{id}/editar")
+    @ResponseStatus(NO_CONTENT)
+    public void editar(@PathVariable Integer id, @RequestBody @Valid ExercicioRequest request,
+                       @AuthenticationPrincipal Usuario usuario) {
+        service.editar(id, request, usuario.getId());
     }
 }

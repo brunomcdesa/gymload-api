@@ -2,11 +2,11 @@ package br.com.gymloadapi.modulos.exercicio.mapper;
 
 import org.junit.jupiter.api.Test;
 
+import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacao;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacaoRequest;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,6 +51,33 @@ class ExercicioMapperTest {
         assertAll(
             () -> assertEquals(1, selectResponse.value()),
             () -> assertEquals("SUPINO RETO (HALTER)", selectResponse.label())
+        );
+    }
+
+    @Test
+    void editar_deveAlterarOsDados_quandoSolicitado() {
+        var exercicio = outroExercicioMusculacao(1);
+        mapper.editar(umExercicioMusculacaoRequest(), umGrupoMuscularPeitoral(), exercicio);
+
+        assertAll(
+            () -> assertEquals("SUPINO RETO", exercicio.getNome()),
+            () -> assertEquals("Supino Reto", exercicio.getDescricao()),
+            () -> assertEquals(HALTER, exercicio.getTipoEquipamento()),
+            () -> assertEquals(PRONADA, exercicio.getTipoPegada()),
+            () -> assertEquals(1, exercicio.getGrupoMuscular().getId()),
+            () -> assertEquals("Peitoral", exercicio.getGrupoMuscular().getNome())
+        );
+    }
+
+    @Test
+    void mapToHistorico_deveRetornarHistorico_quandoSolicitado() {
+        var historico = mapper.mapToHistorico(umExercicioMusculacao(1), 1, CADASTRO);
+
+        assertAll(
+            () -> assertEquals("SUPINO RETO", historico.getExercicio().getNome()),
+            () -> assertEquals(1, historico.getExercicio().getId()),
+            () -> assertEquals(CADASTRO, historico.getAcao()),
+            () -> assertEquals(1, historico.getUsuarioCadastroId())
         );
     }
 }
