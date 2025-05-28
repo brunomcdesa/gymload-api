@@ -94,7 +94,7 @@ class UsuarioControllerTest {
         var file = umMockMultipartFile();
         isCreatedMultipart(POST, URL + "/cadastro", mockMvc, file, "usuarioRequest", request);
 
-        verify(service).cadastrar(request, false, file);
+        verify(service).cadastrar(request, false, file, null);
     }
 
     @Test
@@ -120,12 +120,12 @@ class UsuarioControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithUserDetails
     void cadastrarAdmin_deveRetornarCreated_quandoCamposObrigatoriosValidos() {
         var request = umUsuarioAdminRequest();
         isCreated(post(URL + "/cadastro/admin"), mockMvc, request);
 
-        verify(service).cadastrar(request, true, null);
+        verify(service).cadastrar(request, true, null, umUsuarioAdmin());
     }
 
     @Test

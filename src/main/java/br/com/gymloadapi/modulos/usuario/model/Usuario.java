@@ -113,4 +113,8 @@ public class Usuario implements UserDetails {
     public boolean isAdmin() {
         return this.roles.contains(ADMIN);
     }
+
+    public void alterarSenha(String senha) {
+        this.senha = senha;
+    }
 }

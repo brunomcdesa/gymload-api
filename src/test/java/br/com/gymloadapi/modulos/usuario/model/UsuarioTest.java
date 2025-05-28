@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuario;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UsuarioTest {
 
@@ -42,5 +42,24 @@ class UsuarioTest {
     @Test
     void getRolesArray_deveRetornarTrue_quandoSolicitado() {
         assertArrayEquals(new String[]{"ROLE_USER"}, umUsuario().getRolesArray());
+    }
+
+    @Test
+    void isAdmin_deveRetornarTrue_quandoUsuarioForAdmin() {
+        assertTrue(umUsuarioAdmin().isAdmin());
+    }
+
+    @Test
+    void isAdmin_deveRetornarFalse_quandoUsuarioNaoForAdmin() {
+        assertFalse(umUsuario().isAdmin());
+    }
+
+    @Test
+    void alterarSenha_deveAlterarSenhaDoUsuario_quandoSolicitado() {
+        var usuario = umUsuario();
+
+        usuario.alterarSenha("nova-senha");
+
+        assertEquals("nova-senha", usuario.getSenha());
     }
 }

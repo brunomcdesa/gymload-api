@@ -2,9 +2,7 @@ package br.com.gymloadapi.modulos.usuario.repository;
 
 import br.com.gymloadapi.modulos.comum.types.Email;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.querydsl.jpa.impl.JPAUpdateClause;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 
@@ -14,15 +12,6 @@ import static br.com.gymloadapi.modulos.usuario.model.QUsuario.usuario;
 public class UsuarioRepositoryImpl implements UsuarioRepositoryCustom {
 
     private final EntityManager entityManager;
-
-    @Override
-    @Transactional
-    public void atualizarSenha(String username, String senha) {
-        new JPAUpdateClause(entityManager, usuario)
-            .set(usuario.senha, senha)
-            .where(usuario.username.eq(username))
-            .execute();
-    }
 
     @Override
     public boolean existsByEmail(Email email) {

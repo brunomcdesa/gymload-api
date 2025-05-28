@@ -24,13 +24,13 @@ public class UsuarioHelper {
             22, 82.5, 1.9, MASCULINO);
     }
 
+    public static UsuarioRequest umUsuarioRequest(String nome, String email, String username, String password) {
+        return new UsuarioRequest(nome, email, username, password, null, null, null, null);
+    }
+
     public static UsuarioRequest umUsuarioAdminRequest() {
         return new UsuarioRequest("Usuario Admin", "testeAdmin@teste.com", "usuarioAdmin", "654321",
             null, null, null, null);
-    }
-
-    public static UsuarioRequest umUsuarioRequest(String nome, String email, String username, String password) {
-        return new UsuarioRequest(nome, email, username, password, null, null, null, null);
     }
 
     public static UsuarioRequest umUsuarioRequestSemSenha() {

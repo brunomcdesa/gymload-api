@@ -54,7 +54,7 @@ public class AutenticacaoService implements UserDetailsService {
             throw new ValidacaoException("A senha deve ser diferente da senha anterior.");
         }
 
-        usuarioService.atualizarSenha(usuario.getUsername(), encodePassword(novaSenha));
+        usuarioService.atualizarSenha((Usuario) usuario, encodePassword(novaSenha));
     }
 
     private UserDetails findByUsername(String username) {

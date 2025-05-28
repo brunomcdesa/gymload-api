@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static br.com.gymloadapi.helper.TestsHelper.umMockMultipartFile;
+import static br.com.gymloadapi.modulos.comum.enums.EAcao.ALTERACAO_SENHA;
+import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
 import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmail;
 import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmailAdmin;
 import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.ADMIN;
@@ -39,12 +41,14 @@ class UsuarioServiceTest {
     private UsuarioRepository repository;
     @Mock
     private BackBlazeService backBlazeService;
+    @Mock
+    private UsuarioHistoricoService usuarioHistoricoService;
     @Captor
     private ArgumentCaptor<Usuario> captor;
 
     @BeforeEach
     void setUp() {
-        service = new UsuarioService(mapper, repository, backBlazeService);
+        service = new UsuarioService(mapper, repository, backBlazeService, usuarioHistoricoService);
     }
 
     @Test
@@ -53,13 +57,13 @@ class UsuarioServiceTest {
 
         var exception = assertThrowsExactly(
             ValidacaoException.class,
-            () -> service.cadastrar(umUsuarioRequest(), false, umMockMultipartFile())
+            () -> service.cadastrar(umUsuarioRequest(), false, umMockMultipartFile(), null)
         );
         assertEquals("Já existe um usuário com este username.", exception.getMessage());
 
         verify(repository).existsByUsername("usuario");
         verifyNoMoreInteractions(repository);
-        verifyNoInteractions(backBlazeService);
+        verifyNoInteractions(backBlazeService, usuarioHistoricoService);
     }
 
     @Test
@@ -71,14 +75,14 @@ class UsuarioServiceTest {
 
         var exception = assertThrowsExactly(
             ValidacaoException.class,
-            () -> service.cadastrar(umUsuarioRequest(), false, umMockMultipartFile())
+            () -> service.cadastrar(umUsuarioRequest(), false, umMockMultipartFile(), null)
         );
         assertEquals("Já existe um usuário com este Email.", exception.getMessage());
 
         verify(repository).existsByUsername("usuario");
         verify(repository).existsByEmail(email);
         verifyNoMoreInteractions(repository);
-        verifyNoInteractions(backBlazeService);
+        verifyNoInteractions(backBlazeService, usuarioHistoricoService);
     }
 
     @Test
@@ -89,12 +93,13 @@ class UsuarioServiceTest {
         when(repository.existsByUsername("usuario")).thenReturn(false);
         when(repository.existsByEmail(email)).thenReturn(false);
 
-        service.cadastrar(umUsuarioRequest(), false, file);
+        service.cadastrar(umUsuarioRequest(), false, file, null);
 
         verify(repository).existsByUsername("usuario");
         verify(repository).existsByEmail(email);
         verify(backBlazeService).uploadFile(anyString(), eq(file));
         verify(repository).save(captor.capture());
+        verify(usuarioHistoricoService).salvar(any(Usuario.class), eq(null), eq(CADASTRO));
 
         var usuario = captor.getValue();
         assertAll(
@@ -110,15 +115,16 @@ class UsuarioServiceTest {
     @Test
     void cadastrar_deveSalvarUsuarioAdmin_quandoForCadastroDeUsuarioAdmin() {
         var email = umEmailAdmin();
-
+        var usuarioAutenticado = umUsuarioAdmin();
         when(repository.existsByUsername("usuarioAdmin")).thenReturn(false);
         when(repository.existsByEmail(email)).thenReturn(false);
 
-        service.cadastrar(umUsuarioAdminRequest(), true, null);
+        service.cadastrar(umUsuarioAdminRequest(), true, null, usuarioAutenticado);
 
         verify(repository).existsByUsername("usuarioAdmin");
         verify(repository).existsByEmail(email);
         verify(repository).save(captor.capture());
+        verify(usuarioHistoricoService).salvar(any(Usuario.class), eq(usuarioAutenticado), eq(CADASTRO));
         verifyNoInteractions(backBlazeService);
 
         var usuario = captor.getValue();
@@ -265,8 +271,12 @@ class UsuarioServiceTest {
 
     @Test
     void atualizarSenha_deveAtualizarSenha_quandoSolicitado() {
-        service.atualizarSenha("usuarioUser", "123456");
-        verify(repository).atualizarSenha("usuarioUser", "123456");
+        var usuario = umUsuario();
+
+        service.atualizarSenha(usuario, "123456");
+
+        verify(repository).save(usuario);
+        verify(usuarioHistoricoService).salvar(usuario, null, ALTERACAO_SENHA);
     }
 
     @Test

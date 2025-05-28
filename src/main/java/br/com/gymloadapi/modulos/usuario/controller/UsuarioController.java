@@ -34,13 +34,14 @@ public class UsuarioController {
     @PostMapping("cadastro")
     public void cadastrar(@RequestPart @Validated(Cadastro.class) UsuarioRequest usuarioRequest,
                           @RequestPart(required = false) MultipartFile imagem) {
-        service.cadastrar(usuarioRequest, false, imagem);
+        service.cadastrar(usuarioRequest, false, imagem, null);
     }
 
     @ResponseStatus(CREATED)
     @PostMapping("cadastro/admin")
-    public void cadastrarAdmin(@RequestBody @Validated(Cadastro.class) UsuarioRequest usuarioRequest) {
-        service.cadastrar(usuarioRequest, true, null);
+    public void cadastrarAdmin(@RequestBody @Validated(Cadastro.class) UsuarioRequest usuarioRequest,
+                               @AuthenticationPrincipal Usuario usuario) {
+        service.cadastrar(usuarioRequest, true, null, usuario);
     }
 
     @ResponseStatus(NO_CONTENT)

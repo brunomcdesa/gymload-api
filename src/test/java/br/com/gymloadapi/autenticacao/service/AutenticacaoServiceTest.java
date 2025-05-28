@@ -102,11 +102,12 @@ class AutenticacaoServiceTest {
 
     @Test
     void alterarSenha_naoDeveLancarException_quandoNovaSenhaDiferenteDaAnterior() {
-        when(usuarioService.findByUsername("usuarioUser")).thenReturn(umUsuario());
+        var usuario = umUsuario();
+        when(usuarioService.findByUsername("usuarioUser")).thenReturn(usuario);
 
         assertDoesNotThrow(() -> service.alterarSenha(umLoginUserRequest("654321")));
 
         verify(usuarioService).findByUsername("usuarioUser");
-        verify(usuarioService).atualizarSenha(eq("usuarioUser"), any(String.class));
+        verify(usuarioService).atualizarSenha(eq(usuario), any(String.class));
     }
 }

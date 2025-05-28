@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.usuario.service;
 
+import br.com.gymloadapi.modulos.comum.enums.EAcao;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+import static br.com.gymloadapi.modulos.comum.enums.EAcao.*;
 import static br.com.gymloadapi.modulos.comum.utils.PasswordUtils.encodePassword;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_ADMIN;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_USER;
@@ -34,8 +36,10 @@ public class UsuarioService {
     private final UsuarioMapper usuarioMapper;
     private final UsuarioRepository repository;
     private final BackBlazeService backBlazeService;
+    private final UsuarioHistoricoService usuarioHistoricoService;
 
-    public void cadastrar(UsuarioRequest usuarioRequest, boolean isCadastroAdmin, MultipartFile imagem) {
+    public void cadastrar(UsuarioRequest usuarioRequest, boolean isCadastroAdmin, MultipartFile imagem,
+                          Usuario usuarioAutenticado) {
         var email = new Email(usuarioRequest.email());
         this.validarUsuarioExistente(usuarioRequest, email);
 
@@ -46,7 +50,7 @@ public class UsuarioService {
             this.realizarUploadImagemPerfil(novoUsuario, imagem);
         }
 
-        repository.save(novoUsuario);
+        this.salvarComHistorico(novoUsuario, usuarioAutenticado, CADASTRO);
     }
 
     public UserDetails findByUsername(String username) {
@@ -68,11 +72,13 @@ public class UsuarioService {
         if (imagem != null) {
             this.realizarUploadImagemPerfil(usuario, imagem);
         }
-        repository.save(usuario);
+
+        this.salvarComHistorico(usuario, usuarioAutenticado, EDICAO);
     }
 
-    public void atualizarSenha(String userName, String senha) {
-        repository.atualizarSenha(userName, senha);
+    public void atualizarSenha(Usuario usuario, String senha) {
+        usuario.alterarSenha(senha);
+        this.salvarComHistorico(usuario, null, ALTERACAO_SENHA);
     }
 
     public UsuarioResponse buscarPorUuid(UUID uuid) {
@@ -114,5 +120,10 @@ public class UsuarioService {
         if (repository.existsByEmail(email)) {
             throw new ValidacaoException("Já existe um usuário com este Email.");
         }
+    }
+
+    private void salvarComHistorico(Usuario usuario, Usuario usuarioAutenticado, EAcao acao) {
+        repository.save(usuario);
+        usuarioHistoricoService.salvar(usuario, usuarioAutenticado, acao);
     }
 }
