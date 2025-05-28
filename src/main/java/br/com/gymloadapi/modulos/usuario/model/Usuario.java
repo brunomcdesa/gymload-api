@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.usuario.model;
 
 import br.com.gymloadapi.modulos.comum.converter.EmailConverter;
+import br.com.gymloadapi.modulos.comum.enums.ESexo;
 import br.com.gymloadapi.modulos.comum.types.Email;
 import br.com.gymloadapi.modulos.usuario.enums.EUserRole;
 import lombok.*;
@@ -52,8 +53,21 @@ public class Usuario implements UserDetails {
     @Convert(converter = EmailConverter.class)
     private Email email;
 
-    @Column(name = "ROLE")
+    @Column
+    private Integer idade;
+
+    @Column
+    private Double pesoCorporal;
+
+    @Column
+    private Double altura;
+
     @Enumerated(STRING)
+    @Column(length = 15)
+    private ESexo sexo;
+
+    @Enumerated(STRING)
+    @Column(name = "ROLE")
     @ElementCollection(fetch = EAGER)
     @CollectionTable(name = "USUARIO_ROLE", joinColumns = @JoinColumn(name = "USUARIO_ID"))
     private List<EUserRole> roles;

@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.usuario.dto;
 
+import br.com.gymloadapi.modulos.comum.enums.ESexo;
 import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Alteracao;
 import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Cadastro;
 
@@ -16,6 +17,10 @@ public record UsuarioRequest(
     String username,
     @Null(groups = Alteracao.class)
     @NotBlank(groups = Cadastro.class)
-    String password
+    String password,
+    Integer idade,
+    Double pesoCorporal,
+    Double altura,
+    ESexo sexo
 ) {
 }

@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import java.util.List;
 import java.util.UUID;
 
+import static br.com.gymloadapi.modulos.comum.enums.ESexo.MASCULINO;
 import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmail;
 import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmailAdmin;
 import static br.com.gymloadapi.modulos.comum.utils.PasswordUtils.encodePassword;
@@ -19,15 +20,22 @@ public class UsuarioHelper {
     public static final UUID USUARIO_ADMIN_UUID = UUID.fromString("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9");
 
     public static UsuarioRequest umUsuarioRequest() {
-        return new UsuarioRequest("Usuario", "teste@teste.com", "usuario", "123456");
+        return new UsuarioRequest("Usuario", "teste@teste.com", "usuario", "123456",
+            22, 82.5, 1.9, MASCULINO);
     }
 
     public static UsuarioRequest umUsuarioAdminRequest() {
-        return new UsuarioRequest("Usuario Admin", "testeAdmin@teste.com", "usuarioAdmin", "654321");
+        return new UsuarioRequest("Usuario Admin", "testeAdmin@teste.com", "usuarioAdmin", "654321",
+            null, null, null, null);
+    }
+
+    public static UsuarioRequest umUsuarioRequest(String nome, String email, String username, String password) {
+        return new UsuarioRequest(nome, email, username, password, null, null, null, null);
     }
 
     public static UsuarioRequest umUsuarioRequestSemSenha() {
-        return new UsuarioRequest("Usuario Edicao",null, "usernameEdicao", null);
+        return new UsuarioRequest("Usuario Edicao",null, "usernameEdicao", null,
+            null, null, null, null);
     }
 
     public static Usuario umUsuarioAdmin() {
@@ -39,6 +47,10 @@ public class UsuarioHelper {
             .username("usuarioAdmin")
             .senha(encodePassword("654321"))
             .email(umEmailAdmin())
+            .idade(18)
+            .pesoCorporal(50.4)
+            .altura(1.60)
+            .sexo(MASCULINO)
             .build();
     }
 

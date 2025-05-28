@@ -5,7 +5,6 @@ import br.com.gymloadapi.config.TestSecurityConfiguration;
 import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
-import br.com.gymloadapi.modulos.usuario.dto.UsuarioRequest;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -78,7 +77,7 @@ class UsuarioControllerTest {
     @CsvSource(value = {"NULL,NULL,NULL,NULL", "'','','',''", "'  ','  ','  ','   '"}, nullValues = {"NULL"})
     void cadastrar_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos(String nome, String email,
                                                                             String username, String password) {
-        var request = new UsuarioRequest(nome, email, username, password);
+        var request = umUsuarioRequest(nome, email, username, password);
         isBadRequestMultipart(POST, URL + "/cadastro", mockMvc, umMockMultipartFile(), "usuarioRequest", request,
             "O campo nome é obrigatório.",
             "O campo email é obrigatório.",
@@ -110,7 +109,7 @@ class UsuarioControllerTest {
     @CsvSource(value = {"NULL,NULL,NULL,NULL", "'','','',''", "'  ','  ','  ','   '"}, nullValues = {"NULL"})
     void cadastrarAdmin_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos(String nome, String email,
                                                                                  String username, String password) {
-        var request = new UsuarioRequest(nome, email, username, password);
+        var request = umUsuarioRequest(nome, email, username, password);
         isBadRequest(post(URL + "/cadastro/admin"), mockMvc, request,
             "O campo nome é obrigatório.",
             "O campo email é obrigatório.",
@@ -141,7 +140,7 @@ class UsuarioControllerTest {
     @CsvSource(value = {"NULL,teste@teste.com,NULL,'123'", "'','','',''", "'  ','  ','  ','   '"}, nullValues = "NULL")
     void editar_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos(String nome, String email,
                                                                          String username, String password) {
-        var request = new UsuarioRequest(nome, email, username, password);
+        var request = umUsuarioRequest(nome, email, username, password);
         isBadRequestMultipart(PUT, URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar",
             mockMvc, umMockMultipartFile(), "usuarioRequest", request,
             "O campo nome é obrigatório.",
