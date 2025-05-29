@@ -127,7 +127,7 @@ class RegistroCardioServiceTest {
             NotFoundException.class,
             () -> service.editarRegistro(1, umRegistroAtividadeRequestParaAerobico(), umUsuarioAdmin())
         );
-        assertEquals("Registro de Cardio não encontrado.", exception.getMessage());
+        assertEquals("Registro de cardio não encontrado.", exception.getMessage());
 
         verify(repository).findById(1);
         verifyNoMoreInteractions(repository);
@@ -151,7 +151,7 @@ class RegistroCardioServiceTest {
     }
 
     @Test
-    void editarRegistro_deveEditarRegistroCargas_quandoSolicitado() {
+    void editarRegistro_deveEditarRegistroCardio_quandoSolicitado() {
         when(repository.findById(1)).thenReturn(Optional.of(umRegistroCardio()));
 
         service.editarRegistro(1, umRegistroAtividadeRequestParaAerobico(), umUsuarioAdmin());
@@ -166,5 +166,47 @@ class RegistroCardioServiceTest {
             () -> assertEquals("Esteira", registroCardio.getExercicio().getNome()),
             () -> assertEquals("Usuario", registroCardio.getUsuario().getNome())
         );
+    }
+
+    @Test
+    void excluirRegistro_deveLancarException_quandoNaoEncontrarRegistro() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.excluirRegistro(1, umUsuario())
+        );
+        assertEquals("Registro de cardio não encontrado.", exception.getMessage());
+
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    void excluirRegistro_deveLancarException_quandoUsuarioNaoForAdminNemOMesmoUsuarioQueCriouORegistro() {
+        when(repository.findById(1)).thenReturn(Optional.of(umRegistroCardio()));
+
+        var exception = assertThrowsExactly(
+            PermissaoException.class,
+            () -> service.excluirRegistro(1, outroUsuario())
+        );
+        assertEquals(
+            "Apenas usuários Admin ou o próprio usuário podem excluir este registro de cardio.",
+            exception.getMessage()
+        );
+
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    void excluirRegistro_deveExcluirRegistroCardio_quandoSolicitado() {
+        var registroCardio = umRegistroCardio();
+        when(repository.findById(1)).thenReturn(Optional.of(registroCardio));
+
+        assertDoesNotThrow(() -> service.excluirRegistro(1, umUsuarioAdmin()));
+
+        verify(repository).findById(1);
+        verify(repository).delete(registroCardio);
     }
 }

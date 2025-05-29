@@ -41,10 +41,16 @@ public class RegistroAtividadeController {
         return service.buscarRegistroAtividadeCompleto(exercicioId, usuario.getId());
     }
 
-    @PutMapping("{id}/editar")
     @ResponseStatus(NO_CONTENT)
+    @PutMapping("{id}/editar")
     public void editar(@PathVariable Integer id,
                        @RequestBody @Valid RegistroAtividadeRequest request, @AuthenticationPrincipal Usuario usuario) {
         service.editar(id, request, usuario);
+    }
+
+    @ResponseStatus(NO_CONTENT)
+    @DeleteMapping("{id}/exercicio/{exercicioId}")
+    public void remover(@PathVariable Integer id, @PathVariable Integer exercicioId, @AuthenticationPrincipal Usuario usuario) {
+        service.excluir(id, exercicioId, usuario);
     }
 }

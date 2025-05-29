@@ -59,6 +59,13 @@ public class RegistroAtividadeService {
             .editarRegistro(registroAtividadeId, request, usuario);
     }
 
+    public void excluir(Integer registroAtividadeId, Integer exercicioId, Usuario usuario) {
+        var exercicio = this.findExercicioById(exercicioId);
+
+        locatorService.getRegistroAtividadeService(exercicio.getTipoExercicio())
+            .excluirRegistro(registroAtividadeId, usuario);
+    }
+
     private Exercicio findExercicioById(Integer exercicioId) {
         return exercicioService.findById(exercicioId);
     }

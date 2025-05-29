@@ -4,6 +4,7 @@ import br.com.gymloadapi.modulos.comum.service.LocatorService;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.registroatividade.registrocardio.service.RegistroCardioService;
 import br.com.gymloadapi.modulos.registroatividade.registrocarga.service.RegistroCargaService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,6 +38,12 @@ class RegistroAtividadeServiceTest {
     @Mock
     private RegistroCardioService registroCardioService;
 
+    @BeforeEach
+    void setUp() {
+        lenient().when(locatorService.getRegistroAtividadeService(MUSCULACAO)).thenReturn(registroCargaService);
+        lenient().when(locatorService.getRegistroAtividadeService(AEROBICO)).thenReturn(registroCardioService);
+    }
+
     @Test
     void salvar_deveChamarMetodoSalvarDoRegistroCargaService_quandoSolicitadoComRequestDeMusculacao() {
         var request = umRegistroAtividadeRequestParaMusculacao();
@@ -44,7 +51,6 @@ class RegistroAtividadeServiceTest {
         var exercicio = umExercicioMusculacao(1);
 
         when(exercicioService.findById(1)).thenReturn(exercicio);
-        when(locatorService.getRegistroAtividadeService(MUSCULACAO)).thenReturn(registroCargaService);
 
         service.salvar(request, usuario);
 
@@ -61,7 +67,6 @@ class RegistroAtividadeServiceTest {
         var exercicio = umExercicioAerobico(3);
 
         when(exercicioService.findById(3)).thenReturn(exercicio);
-        when(locatorService.getRegistroAtividadeService(AEROBICO)).thenReturn(registroCardioService);
 
         service.salvar(request, usuario);
 
@@ -84,8 +89,6 @@ class RegistroAtividadeServiceTest {
     @Test
     void buscarDestaques_deveRetornarDestaquesDosExercicios_quandoEncontrarExercicios() {
         when(exercicioService.findByIdIn(List.of(1, 2))).thenReturn(maisUmaListaDeExercicios());
-        when(locatorService.getRegistroAtividadeService(MUSCULACAO)).thenReturn(registroCargaService);
-        when(locatorService.getRegistroAtividadeService(AEROBICO)).thenReturn(registroCardioService);
         when(registroCargaService.buscarDestaque(1, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeMusculacao());
         when(registroCardioService.buscarDestaque(2, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeAerobico());
 
@@ -114,7 +117,6 @@ class RegistroAtividadeServiceTest {
         var exercicio = umExercicioMusculacao(1);
 
         when(exercicioService.findById(1)).thenReturn(exercicio);
-        when(locatorService.getRegistroAtividadeService(MUSCULACAO)).thenReturn(registroCargaService);
         when(registroCargaService.buscarHistoricoRegistroCompleto(1, 2))
             .thenReturn(List.of(umHistoricoRegistroAtividadeResponseDeMusculacao()));
 
@@ -142,7 +144,6 @@ class RegistroAtividadeServiceTest {
         var exercicio = umExercicioAerobico(3);
 
         when(exercicioService.findById(3)).thenReturn(exercicio);
-        when(locatorService.getRegistroAtividadeService(AEROBICO)).thenReturn(registroCardioService);
         when(registroCardioService.buscarHistoricoRegistroCompleto(3, 2))
             .thenReturn(List.of(umHistoricoRegistroAtividadeResponseDeAerobico()));
 
@@ -167,7 +168,6 @@ class RegistroAtividadeServiceTest {
         var usuario = umUsuario();
 
         when(exercicioService.findById(1)).thenReturn(umExercicioMusculacao(1));
-        when(locatorService.getRegistroAtividadeService(MUSCULACAO)).thenReturn(registroCargaService);
 
         service.editar(1, request, usuario);
 
@@ -183,7 +183,6 @@ class RegistroAtividadeServiceTest {
         var usuario = umUsuario();
 
         when(exercicioService.findById(3)).thenReturn(umExercicioAerobico(3));
-        when(locatorService.getRegistroAtividadeService(AEROBICO)).thenReturn(registroCardioService);
 
         service.editar(2, request, usuario);
 
@@ -191,5 +190,31 @@ class RegistroAtividadeServiceTest {
         verify(locatorService).getRegistroAtividadeService(AEROBICO);
         verify(registroCardioService).editarRegistro(2, request, usuario);
         verifyNoInteractions(registroCargaService);
+    }
+
+    @Test
+    void excluir_deveChamarMetodoExcluirRegistro_quandoSolicitadoComIdDeExercicioDeMusculacao() {
+        var usuario = umUsuario();
+
+        when(exercicioService.findById(2)).thenReturn(umExercicioMusculacao(1));
+
+        service.excluir(1, 2, usuario);
+
+        verify(exercicioService).findById(2);
+        verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
+        verify(registroCargaService).excluirRegistro(1, usuario);
+    }
+
+    @Test
+    void excluir_deveChamarMetodoExcluirRegistro_quandoSolicitadoComIdDeExercicioDeAerobico() {
+        var usuario = umUsuario();
+
+        when(exercicioService.findById(2)).thenReturn(umExercicioAerobico(1));
+
+        service.excluir(1, 2, usuario);
+
+        verify(exercicioService).findById(2);
+        verify(locatorService).getRegistroAtividadeService(AEROBICO);
+        verify(registroCardioService).excluirRegistro(1, usuario);
     }
 }

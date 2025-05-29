@@ -22,8 +22,7 @@ import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExerc
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.umRegistroAtividadeRequestParaMusculacao;
 import static br.com.gymloadapi.modulos.registroatividade.registrocarga.helper.RegistroCargaHelper.umRegistroCarga;
 import static br.com.gymloadapi.modulos.registroatividade.registrocarga.helper.RegistroCargaHelper.umaListaRegistroCarga;
-import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuario;
-import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
+import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.*;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -193,5 +192,47 @@ class RegistroCargaServiceTest {
             () -> assertEquals("SUPINO RETO", historicoCargas.getExercicio().getNome()),
             () -> assertEquals("Usuario Admin", historicoCargas.getUsuario().getNome())
         );
+    }
+
+    @Test
+    void excluirRegistro_deveLancarException_quandoNaoEncontrarRegistro() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.excluirRegistro(1, umUsuario())
+        );
+        assertEquals("Registro de carga não encontrado.", exception.getMessage());
+
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    void excluirRegistro_deveLancarException_quandoUsuarioNaoForAdminNemOMesmoUsuarioQueCriouORegistro() {
+        when(repository.findById(1)).thenReturn(Optional.of(umRegistroCarga()));
+
+        var exception = assertThrowsExactly(
+            PermissaoException.class,
+            () -> service.excluirRegistro(1, outroUsuario())
+        );
+        assertEquals(
+            "Apenas usuários Admin ou o próprio usuário podem excluir este registro de carga.",
+            exception.getMessage()
+        );
+
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    void excluirRegistro_deveExcluirRegistroCarga_quandoSolicitado() {
+        var registroCarga = umRegistroCarga();
+        when(repository.findById(1)).thenReturn(Optional.of(registroCarga));
+
+        assertDoesNotThrow(() -> service.excluirRegistro(1, umUsuarioAdmin()));
+
+        verify(repository).findById(1);
+        verify(repository).delete(registroCarga);
     }
 }

@@ -17,4 +17,6 @@ public interface RegistroAtividadeFactory {
     List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer usuarioId);
 
     void editarRegistro(Integer registroAtividadeId, RegistroAtividadeRequest request, Usuario usuario);
+
+    void excluirRegistro(Integer registroAtividadeId, Usuario usuario);
 }

@@ -57,6 +57,14 @@ public class RegistroCargaService implements RegistroAtividadeFactory {
         repository.save(registroCarga);
     }
 
+    @Override
+    public void excluirRegistro(Integer registroAtividadeId, Usuario usuario) {
+        var registroCarga = this.findById(registroAtividadeId);
+        validarUsuarioAlteracao(registroCarga.getUsuarioId(), usuario, "excluir este registro de carga");
+
+        repository.delete(registroCarga);
+    }
+
     private List<RegistroCarga> getAllByExercicioId(Integer exercicioId, Integer usuarioId) {
         return repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId);
     }

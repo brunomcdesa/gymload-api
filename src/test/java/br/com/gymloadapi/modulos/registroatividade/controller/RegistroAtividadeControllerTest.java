@@ -116,4 +116,20 @@ class RegistroAtividadeControllerTest {
 
         verify(service).editar(1, request, umUsuarioAdmin());
     }
+
+    @Test
+    @WithAnonymousUser
+    void remover_deveRetornarUnauthorized_quandoUsuarioNaoAutenticado() {
+        isUnauthorized(delete(URL + "/1/exercicio/1"), mockMvc);
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithUserDetails
+    void remover_deveRetornarNoContent_quandoUsuarioAutenticado() {
+        isNoContent(delete(URL + "/1/exercicio/1"), mockMvc);
+
+        service.excluir(1, 1, umUsuarioAdmin());
+    }
 }

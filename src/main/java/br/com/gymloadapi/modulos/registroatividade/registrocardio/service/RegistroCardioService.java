@@ -58,13 +58,21 @@ public class RegistroCardioService implements RegistroAtividadeFactory {
         repository.save(registroCardio);
     }
 
+    @Override
+    public void excluirRegistro(Integer registroAtividadeId, Usuario usuario) {
+        var registroCardio = this.findById(registroAtividadeId);
+        validarUsuarioAlteracao(registroCardio.getUsuarioId(), usuario, "excluir este registro de cardio");
+
+        repository.delete(registroCardio);
+    }
+
     private List<RegistroCardio> getAllByExercicioId(Integer exercicioId, Integer usuarioId) {
         return repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId);
     }
 
     private RegistroCardio findById(Integer id) {
         return repository.findById(id)
-            .orElseThrow(() -> new NotFoundException("Registro de Cardio não encontrado."));
+            .orElseThrow(() -> new NotFoundException("Registro de cardio não encontrado."));
     }
 
     private String getDestaqueDoHistorico(List<RegistroCardio> registros) {
