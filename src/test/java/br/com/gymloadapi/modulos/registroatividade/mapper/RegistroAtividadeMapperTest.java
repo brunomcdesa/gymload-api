@@ -10,10 +10,10 @@ import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExerc
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacao;
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.umRegistroAtividadeRequestParaAerobico;
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.umRegistroAtividadeRequestParaMusculacao;
-import static br.com.gymloadapi.modulos.registroatividade.registrocardio.helper.RegistroCardioHelper.outroRegistroCardio;
-import static br.com.gymloadapi.modulos.registroatividade.registrocardio.helper.RegistroCardioHelper.umRegistroCardio;
-import static br.com.gymloadapi.modulos.registroatividade.registrocarga.helper.RegistroCargaHelper.maisUmRegistroCarga;
-import static br.com.gymloadapi.modulos.registroatividade.registrocarga.helper.RegistroCargaHelper.umRegistroCarga;
+import static br.com.gymloadapi.modulos.registroatividade.registroaerobico.helper.RegistroMusculacaoHelper.outroRegistroAerobico;
+import static br.com.gymloadapi.modulos.registroatividade.registroaerobico.helper.RegistroMusculacaoHelper.umRegistroAerobico;
+import static br.com.gymloadapi.modulos.registroatividade.registromusculacao.helper.RegistroMusculacaoHelper.maisUmRegistroMusculacao;
+import static br.com.gymloadapi.modulos.registroatividade.registromusculacao.helper.RegistroMusculacaoHelper.umRegistroMusculacao;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuario;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,42 +22,42 @@ class RegistroAtividadeMapperTest {
     private final RegistroAtividadeMapper mapper = new RegistroAtividadeMapperImpl();
 
     @Test
-    void mapToRegistroCarga_deveRetornarRegistroCarga_quandoSolicitado() {
-        var registroCarga = mapper.mapToRegistroCarga(umRegistroAtividadeRequestParaMusculacao(), umExercicioMusculacao(1),
-            umUsuario());
+    void mapToRegistroMusculacao_deveRetornarRegistroMusculacao_quandoSolicitado() {
+        var registroMusculacao = mapper.mapToRegistroMusculacao(umRegistroAtividadeRequestParaMusculacao(),
+            umExercicioMusculacao(1), umUsuario());
 
         assertAll(
-            () -> assertNull(registroCarga.getId()),
-            () -> assertEquals(22.5, registroCarga.getPeso()),
-            () -> assertEquals(KG, registroCarga.getUnidadePeso()),
-            () -> assertEquals(12, registroCarga.getQtdRepeticoes()),
-            () -> assertEquals(4, registroCarga.getQtdSeries()),
-            () -> assertNotNull(registroCarga.getDataCadastro()),
-            () -> assertEquals("Observacao", registroCarga.getObservacao()),
-            () -> assertEquals(1, registroCarga.getExercicio().getId()),
-            () -> assertEquals(2, registroCarga.getUsuario().getId())
+            () -> assertNull(registroMusculacao.getId()),
+            () -> assertEquals(22.5, registroMusculacao.getPeso()),
+            () -> assertEquals(KG, registroMusculacao.getUnidadePeso()),
+            () -> assertEquals(12, registroMusculacao.getQtdRepeticoes()),
+            () -> assertEquals(4, registroMusculacao.getQtdSeries()),
+            () -> assertNotNull(registroMusculacao.getDataCadastro()),
+            () -> assertEquals("Observacao", registroMusculacao.getObservacao()),
+            () -> assertEquals(1, registroMusculacao.getExercicio().getId()),
+            () -> assertEquals(2, registroMusculacao.getUsuario().getId())
         );
     }
 
     @Test
-    void mapToRegistroCardio_deveRetornarRegistroCardio_quandoSolicitado() {
-        var registroCardio = mapper.mapToRegistroCardio(umRegistroAtividadeRequestParaAerobico(), umExercicioAerobico(2),
-            umUsuario());
+    void mapToRegistroAerobico_deveRetornarRegistroAerobico_quandoSolicitado() {
+        var registroAerobico = mapper.mapToRegistroAerobico(umRegistroAtividadeRequestParaAerobico(),
+            umExercicioAerobico(2), umUsuario());
 
         assertAll(
-            () -> assertNull(registroCardio.getId()),
-            () -> assertEquals(20.0, registroCardio.getDistancia()),
-            () -> assertEquals(1.5, registroCardio.getDuracao()),
-            () -> assertNotNull(registroCardio.getDataCadastro()),
-            () -> assertEquals("Observacao", registroCardio.getObservacao()),
-            () -> assertEquals(2, registroCardio.getExercicio().getId()),
-            () -> assertEquals(2, registroCardio.getUsuario().getId())
+            () -> assertNull(registroAerobico.getId()),
+            () -> assertEquals(20.0, registroAerobico.getDistancia()),
+            () -> assertEquals(1.5, registroAerobico.getDuracao()),
+            () -> assertNotNull(registroAerobico.getDataCadastro()),
+            () -> assertEquals("Observacao", registroAerobico.getObservacao()),
+            () -> assertEquals(2, registroAerobico.getExercicio().getId()),
+            () -> assertEquals(2, registroAerobico.getUsuario().getId())
         );
     }
 
     @Test
     void mapToHistoricoRegistroAtividadeMusculacaoResponse_deveRetornarHistoricoDeAtividadeMusculacao_quandoSolicitado() {
-        var historicoRegistroAtividadeResponse = mapper.mapToHistoricoRegistroAtividadeMusculacaoResponse(umRegistroCarga());
+        var historicoRegistroAtividadeResponse = mapper.mapToHistoricoRegistroAtividadeMusculacaoResponse(umRegistroMusculacao());
 
         assertAll(
             () -> assertEquals(1, historicoRegistroAtividadeResponse.id()),
@@ -79,7 +79,7 @@ class RegistroAtividadeMapperTest {
 
     @Test
     void mapToHistoricoRegistroAtividadeAerobicoResponse_deveRetornarHistoricoDeAtividadeAerobico_quandoSolicitado() {
-        var historicoRegistroAtividadeResponse = mapper.mapToHistoricoRegistroAtividadeAerobicoResponse(umRegistroCardio());
+        var historicoRegistroAtividadeResponse = mapper.mapToHistoricoRegistroAtividadeAerobicoResponse(umRegistroAerobico());
 
         assertAll(
             () -> assertEquals(1, historicoRegistroAtividadeResponse.id()),
@@ -98,36 +98,36 @@ class RegistroAtividadeMapperTest {
     }
 
     @Test
-    void editarRegistroCarga_deveAlterarOsDadosDoRegistroCarga_quandoSolicitado() {
-        var registroCarga = maisUmRegistroCarga();
-        mapper.editarRegistroCarga(umRegistroAtividadeRequestParaMusculacao(), registroCarga);
+    void editarRegistroMusculacao_deveAlterarOsDadosDoRegistroMusculacao_quandoSolicitado() {
+        var registroMusculacao = maisUmRegistroMusculacao();
+        mapper.editarRegistroMusculacao(umRegistroAtividadeRequestParaMusculacao(), registroMusculacao);
 
         assertAll(
-            () -> assertEquals(3, registroCarga.getId()),
-            () -> assertEquals(22.5, registroCarga.getPeso()),
-            () -> assertEquals(KG, registroCarga.getUnidadePeso()),
-            () -> assertEquals(12, registroCarga.getQtdRepeticoes()),
-            () -> assertEquals(4, registroCarga.getQtdSeries()),
-            () -> assertNotNull(registroCarga.getDataCadastro()),
-            () -> assertEquals("Observacao", registroCarga.getObservacao()),
-            () -> assertEquals(1, registroCarga.getExercicio().getId()),
-            () -> assertEquals(1, registroCarga.getUsuario().getId())
+            () -> assertEquals(3, registroMusculacao.getId()),
+            () -> assertEquals(22.5, registroMusculacao.getPeso()),
+            () -> assertEquals(KG, registroMusculacao.getUnidadePeso()),
+            () -> assertEquals(12, registroMusculacao.getQtdRepeticoes()),
+            () -> assertEquals(4, registroMusculacao.getQtdSeries()),
+            () -> assertNotNull(registroMusculacao.getDataCadastro()),
+            () -> assertEquals("Observacao", registroMusculacao.getObservacao()),
+            () -> assertEquals(1, registroMusculacao.getExercicio().getId()),
+            () -> assertEquals(1, registroMusculacao.getUsuario().getId())
         );
     }
 
     @Test
-    void editarRegistroCardio_deveAlterarDadosDoRegistroCardio_quandoSolicitado() {
-        var registroCardio = outroRegistroCardio();
-        mapper.editarRegistroCardio(umRegistroAtividadeRequestParaAerobico(), registroCardio);
+    void editarRegistroAerobico_deveAlterarDadosDoRegistroAerobico_quandoSolicitado() {
+        var registroAerobico = outroRegistroAerobico();
+        mapper.editarRegistroAerobico(umRegistroAtividadeRequestParaAerobico(), registroAerobico);
 
         assertAll(
-            () -> assertEquals(2, registroCardio.getId()),
-            () -> assertEquals(20.0, registroCardio.getDistancia()),
-            () -> assertEquals(1.5, registroCardio.getDuracao()),
-            () -> assertNotNull(registroCardio.getDataCadastro()),
-            () -> assertEquals("Observacao", registroCardio.getObservacao()),
-            () -> assertEquals(1, registroCardio.getExercicio().getId()),
-            () -> assertEquals(2, registroCardio.getUsuario().getId())
+            () -> assertEquals(2, registroAerobico.getId()),
+            () -> assertEquals(20.0, registroAerobico.getDistancia()),
+            () -> assertEquals(1.5, registroAerobico.getDuracao()),
+            () -> assertNotNull(registroAerobico.getDataCadastro()),
+            () -> assertEquals("Observacao", registroAerobico.getObservacao()),
+            () -> assertEquals(1, registroAerobico.getExercicio().getId()),
+            () -> assertEquals(2, registroAerobico.getUsuario().getId())
         );
     }
 }

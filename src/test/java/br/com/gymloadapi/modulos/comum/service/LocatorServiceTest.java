@@ -2,10 +2,10 @@ package br.com.gymloadapi.modulos.comum.service;
 
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.registroatividade.mapper.RegistroAtividadeMapper;
-import br.com.gymloadapi.modulos.registroatividade.registrocardio.repository.RegistroCardioRepository;
-import br.com.gymloadapi.modulos.registroatividade.registrocardio.service.RegistroCardioService;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.repository.RegistroCargaRepository;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.service.RegistroCargaService;
+import br.com.gymloadapi.modulos.registroatividade.registroaerobico.repository.RegistroAerobicoRepository;
+import br.com.gymloadapi.modulos.registroatividade.registroaerobico.service.RegistroAaerobicoService;
+import br.com.gymloadapi.modulos.registroatividade.registromusculacao.repository.RegistroMusculacaoRepository;
+import br.com.gymloadapi.modulos.registroatividade.registromusculacao.service.RegistroMusculacaoService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     LocatorService.class,
-    RegistroCargaService.class,
-    RegistroCardioService.class,
+    RegistroMusculacaoService.class,
+    RegistroAaerobicoService.class,
 })
 @MockitoBeans({
     @MockitoBean(types = ExercicioService.class),
-    @MockitoBean(types = RegistroCargaRepository.class),
+    @MockitoBean(types = RegistroMusculacaoRepository.class),
     @MockitoBean(types = RegistroAtividadeMapper.class),
-    @MockitoBean(types = RegistroCardioRepository.class),
+    @MockitoBean(types = RegistroAerobicoRepository.class),
 })
 class LocatorServiceTest {
 
@@ -36,12 +36,12 @@ class LocatorServiceTest {
     private LocatorService service;
 
     @Test
-    void getRegistroAtividadeService_deveRetornarRegistroCargaService_quandoSolicitadoComTipoExercicioMusculacao() {
-        assertInstanceOf(RegistroCargaService.class, service.getRegistroAtividadeService(MUSCULACAO));
+    void getRegistroAtividadeService_deveRetornarRegistroMusculacaoService_quandoSolicitadoComTipoExercicioMusculacao() {
+        assertInstanceOf(RegistroMusculacaoService.class, service.getRegistroAtividadeService(MUSCULACAO));
     }
 
     @Test
-    void getRegistroAtividadeService_deveRetornarRegistroCardioService_quandoSolicitadoComTipoExercicioAerobico() {
-        assertInstanceOf(RegistroCardioService.class, service.getRegistroAtividadeService(AEROBICO));
+    void getRegistroAtividadeService_deveRetornarRegistroAerobicoService_quandoSolicitadoComTipoExercicioAerobico() {
+        assertInstanceOf(RegistroAaerobicoService.class, service.getRegistroAtividadeService(AEROBICO));
     }
 }

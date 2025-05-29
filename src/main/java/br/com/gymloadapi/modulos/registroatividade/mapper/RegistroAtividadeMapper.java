@@ -3,8 +3,8 @@ package br.com.gymloadapi.modulos.registroatividade.mapper;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
-import br.com.gymloadapi.modulos.registroatividade.registrocardio.model.RegistroCardio;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.model.RegistroCarga;
+import br.com.gymloadapi.modulos.registroatividade.registroaerobico.model.RegistroAerobico;
+import br.com.gymloadapi.modulos.registroatividade.registromusculacao.model.RegistroMusculacao;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import org.mapstruct.*;
 
@@ -15,22 +15,22 @@ public interface RegistroAtividadeMapper {
     @Mapping(target = "exercicio", source = "exercicio")
     @Mapping(target = "usuario", source = "usuario")
     @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
-    RegistroCarga mapToRegistroCarga(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
+    RegistroMusculacao mapToRegistroMusculacao(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "exercicio", source = "exercicio")
     @Mapping(target = "usuario", source = "usuario")
     @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
-    RegistroCardio mapToRegistroCardio(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
+    RegistroAerobico mapToRegistroAerobico(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
 
     @Mapping(target = "duracao", ignore = true)
     @Mapping(target = "distancia", ignore = true)
     @Mapping(target = "velocidadeMedia", ignore = true)
-    @Mapping(target = "exercicioNome", source = "registroCarga.exercicio.nome")
-    @Mapping(target = "tipoExercicio", source = "registroCarga.exercicio.tipoEquipamento")
-    @Mapping(target = "grupoMuscularNome", source = "registroCarga.exercicio.grupoMuscular.nome")
-    @Mapping(target = "carga", expression = "java(registroCarga.getCargaComUnidadePeso())")
-    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeMusculacaoResponse(RegistroCarga registroCarga);
+    @Mapping(target = "exercicioNome", source = "registroMusculacao.exercicio.nome")
+    @Mapping(target = "tipoExercicio", source = "registroMusculacao.exercicio.tipoEquipamento")
+    @Mapping(target = "grupoMuscularNome", source = "registroMusculacao.exercicio.grupoMuscular.nome")
+    @Mapping(target = "carga", expression = "java(registroMusculacao.getPesoComUnidadePeso())")
+    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeMusculacaoResponse(RegistroMusculacao registroMusculacao);
 
     @Mapping(target = "peso", ignore = true)
     @Mapping(target = "carga", ignore = true)
@@ -39,17 +39,17 @@ public interface RegistroAtividadeMapper {
     @Mapping(target = "tipoExercicio", ignore = true)
     @Mapping(target = "qtdRepeticoes", ignore = true)
     @Mapping(target = "grupoMuscularNome", ignore = true)
-    @Mapping(target = "exercicioNome", source = "registroCardio.exercicio.nome")
-    @Mapping(target = "velocidadeMedia", expression = "java(registroCardio.getVelocidadeMedia())")
-    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeAerobicoResponse(RegistroCardio registroCardio);
+    @Mapping(target = "exercicioNome", source = "registroAerobico.exercicio.nome")
+    @Mapping(target = "velocidadeMedia", expression = "java(registroAerobico.getVelocidadeMedia())")
+    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeAerobicoResponse(RegistroAerobico registroAerobico);
 
     @BeanMapping(
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
-    void editarRegistroCarga(RegistroAtividadeRequest request, @MappingTarget RegistroCarga registroCarga);
+    void editarRegistroMusculacao(RegistroAtividadeRequest request, @MappingTarget RegistroMusculacao registroMusculacao);
 
     @BeanMapping(
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
-    void editarRegistroCardio(RegistroAtividadeRequest request, @MappingTarget RegistroCardio registroCardio);
+    void editarRegistroAerobico(RegistroAtividadeRequest request, @MappingTarget RegistroAerobico registroAerobico);
 }

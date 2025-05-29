@@ -3,8 +3,8 @@ package br.com.gymloadapi.modulos.comum.enums;
 import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Aerobico;
 import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Musculacao;
 import br.com.gymloadapi.modulos.registroatividade.factory.RegistroAtividadeFactory;
-import br.com.gymloadapi.modulos.registroatividade.registrocardio.service.RegistroCardioService;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.service.RegistroCargaService;
+import br.com.gymloadapi.modulos.registroatividade.registroaerobico.service.RegistroAaerobicoService;
+import br.com.gymloadapi.modulos.registroatividade.registromusculacao.service.RegistroMusculacaoService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,8 +12,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ETipoExercicio {
 
-    MUSCULACAO("Musculação", Musculacao.class, RegistroCargaService.class),
-    AEROBICO("Aeróbico", Aerobico.class, RegistroCardioService.class);
+    MUSCULACAO("Musculação", Musculacao.class, RegistroMusculacaoService.class),
+    AEROBICO("Aeróbico", Aerobico.class, RegistroAaerobicoService.class);
 
     private final String descricao;
     private final Class<?> groupValidator;

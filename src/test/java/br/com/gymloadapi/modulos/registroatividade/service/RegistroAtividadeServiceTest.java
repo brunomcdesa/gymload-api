@@ -2,8 +2,8 @@ package br.com.gymloadapi.modulos.registroatividade.service;
 
 import br.com.gymloadapi.modulos.comum.service.LocatorService;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
-import br.com.gymloadapi.modulos.registroatividade.registrocardio.service.RegistroCardioService;
-import br.com.gymloadapi.modulos.registroatividade.registrocarga.service.RegistroCargaService;
+import br.com.gymloadapi.modulos.registroatividade.registroaerobico.service.RegistroAaerobicoService;
+import br.com.gymloadapi.modulos.registroatividade.registromusculacao.service.RegistroMusculacaoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,18 +34,18 @@ class RegistroAtividadeServiceTest {
     @Mock
     private ExercicioService exercicioService;
     @Mock
-    private RegistroCargaService registroCargaService;
+    private RegistroMusculacaoService registroMusculacaoService;
     @Mock
-    private RegistroCardioService registroCardioService;
+    private RegistroAaerobicoService registroAaerobicoService;
 
     @BeforeEach
     void setUp() {
-        lenient().when(locatorService.getRegistroAtividadeService(MUSCULACAO)).thenReturn(registroCargaService);
-        lenient().when(locatorService.getRegistroAtividadeService(AEROBICO)).thenReturn(registroCardioService);
+        lenient().when(locatorService.getRegistroAtividadeService(MUSCULACAO)).thenReturn(registroMusculacaoService);
+        lenient().when(locatorService.getRegistroAtividadeService(AEROBICO)).thenReturn(registroAaerobicoService);
     }
 
     @Test
-    void salvar_deveChamarMetodoSalvarDoRegistroCargaService_quandoSolicitadoComRequestDeMusculacao() {
+    void salvar_deveChamarMetodoSalvarDoRegistroMusculacaoService_quandoSolicitadoComRequestDeMusculacao() {
         var request = umRegistroAtividadeRequestParaMusculacao();
         var usuario = umUsuario();
         var exercicio = umExercicioMusculacao(1);
@@ -56,12 +56,12 @@ class RegistroAtividadeServiceTest {
 
         verify(exercicioService).findById(1);
         verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
-        verify(registroCargaService).salvarRegistro(request, exercicio, usuario);
-        verifyNoInteractions(registroCardioService);
+        verify(registroMusculacaoService).salvarRegistro(request, exercicio, usuario);
+        verifyNoInteractions(registroAaerobicoService);
     }
 
     @Test
-    void salvar_deveChamarMetodoSalvarDoRegistroCardioService_quandoSolicitadoComRequestDeAerobico() {
+    void salvar_deveChamarMetodoSalvarDoRegistroAerobicoService_quandoSolicitadoComRequestDeAerobico() {
         var request = umRegistroAtividadeRequestParaAerobico();
         var usuario = umUsuario();
         var exercicio = umExercicioAerobico(3);
@@ -72,8 +72,8 @@ class RegistroAtividadeServiceTest {
 
         verify(exercicioService).findById(3);
         verify(locatorService).getRegistroAtividadeService(AEROBICO);
-        verify(registroCardioService).salvarRegistro(request, exercicio, usuario);
-        verifyNoInteractions(registroCargaService);
+        verify(registroAaerobicoService).salvarRegistro(request, exercicio, usuario);
+        verifyNoInteractions(registroMusculacaoService);
     }
 
     @Test
@@ -83,41 +83,41 @@ class RegistroAtividadeServiceTest {
         assertTrue(service.buscarDestaques(umRegistroAtividadeFiltros(), 1).isEmpty());
 
         verify(exercicioService).findByIdIn(List.of(1, 2));
-        verifyNoInteractions(locatorService, registroCargaService, registroCardioService);
+        verifyNoInteractions(locatorService, registroMusculacaoService, registroAaerobicoService);
     }
 
     @Test
     void buscarDestaques_deveRetornarDestaquesDosExercicios_quandoEncontrarExercicios() {
         when(exercicioService.findByIdIn(List.of(1, 2))).thenReturn(maisUmaListaDeExercicios());
-        when(registroCargaService.buscarDestaque(1, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeMusculacao());
-        when(registroCardioService.buscarDestaque(2, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeAerobico());
+        when(registroMusculacaoService.buscarDestaque(1, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeMusculacao());
+        when(registroAaerobicoService.buscarDestaque(2, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeAerobico());
 
         var responses = service.buscarDestaques(umRegistroAtividadeFiltros(), 1);
         assertAll(
             () -> assertEquals(1, responses.getFirst().exercicioId()),
             () -> assertEquals("22.5 (KG)", responses.getFirst().destaque()),
-            () -> assertEquals("20.0 (KG)", responses.getFirst().ultimaCarga()),
+            () -> assertEquals("20.0 (KG)", responses.getFirst().ultimoPeso()),
             () -> assertNull(responses.getFirst().ultimaDistancia()),
             () -> assertEquals(2, responses.getLast().exercicioId()),
             () -> assertEquals("22.5 KM", responses.getLast().destaque()),
-            () -> assertNull(responses.getLast().ultimaCarga()),
+            () -> assertNull(responses.getLast().ultimoPeso()),
             () -> assertEquals("11,25 KM", responses.getLast().ultimaDistancia())
         );
 
         verify(exercicioService).findByIdIn(List.of(1, 2));
         verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
         verify(locatorService).getRegistroAtividadeService(AEROBICO);
-        verify(registroCargaService).buscarDestaque(1, 1);
-        verify(registroCardioService).buscarDestaque(2, 1);
+        verify(registroMusculacaoService).buscarDestaque(1, 1);
+        verify(registroAaerobicoService).buscarDestaque(2, 1);
     }
 
     @Test
     @SuppressWarnings("LineLength")
-    void buscarRegistroAtividadeCompleto_deveChamarMetodobuscarRegistroAtividadeCompletoDoRegistroCargaService_quandoSolicitadoComExercicioDeMusculacao() {
+    void buscarRegistroAtividadeCompleto_deveChamarMetodoBuscarRegistroAtividadeCompletoDoRegistroMusculacaoService_quandoSolicitadoComExercicioDeMusculacao() {
         var exercicio = umExercicioMusculacao(1);
 
         when(exercicioService.findById(1)).thenReturn(exercicio);
-        when(registroCargaService.buscarHistoricoRegistroCompleto(1, 2))
+        when(registroMusculacaoService.buscarHistoricoRegistroCompleto(1, 2))
             .thenReturn(List.of(umHistoricoRegistroAtividadeResponseDeMusculacao()));
 
         var response = service.buscarRegistroAtividadeCompleto(1, 2);
@@ -134,17 +134,17 @@ class RegistroAtividadeServiceTest {
 
         verify(exercicioService).findById(1);
         verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
-        verify(registroCargaService).buscarHistoricoRegistroCompleto(1, 2);
-        verifyNoInteractions(registroCardioService);
+        verify(registroMusculacaoService).buscarHistoricoRegistroCompleto(1, 2);
+        verifyNoInteractions(registroAaerobicoService);
     }
 
     @Test
     @SuppressWarnings("LineLength")
-    void buscarRegistroAtividadeCompleto_deveChamarMetodobuscarRegistroAtividadeCompletoDoRegistroCardioService_quandoSolicitadoComRequestDeCardio() {
+    void buscarRegistroAtividadeCompleto_deveChamarMetodoBuscarRegistroAtividadeCompletoDoRegistroAerobicoService_quandoSolicitadoComRequestDeAerobico() {
         var exercicio = umExercicioAerobico(3);
 
         when(exercicioService.findById(3)).thenReturn(exercicio);
-        when(registroCardioService.buscarHistoricoRegistroCompleto(3, 2))
+        when(registroAaerobicoService.buscarHistoricoRegistroCompleto(3, 2))
             .thenReturn(List.of(umHistoricoRegistroAtividadeResponseDeAerobico()));
 
         var response = service.buscarRegistroAtividadeCompleto(3, 2);
@@ -158,12 +158,12 @@ class RegistroAtividadeServiceTest {
 
         verify(exercicioService).findById(3);
         verify(locatorService).getRegistroAtividadeService(AEROBICO);
-        verify(registroCardioService).buscarHistoricoRegistroCompleto(3, 2);
-        verifyNoInteractions(registroCargaService);
+        verify(registroAaerobicoService).buscarHistoricoRegistroCompleto(3, 2);
+        verifyNoInteractions(registroMusculacaoService);
     }
 
     @Test
-    void editar_deveChamarMetodoEditarDoRegistroCargaService_quandoSolicitadoComRequestDeMusculacao() {
+    void editar_deveChamarMetodoEditarDoRegistroMusculacaoService_quandoSolicitadoComRequestDeMusculacao() {
         var request = umRegistroAtividadeRequestParaMusculacao();
         var usuario = umUsuario();
 
@@ -173,12 +173,12 @@ class RegistroAtividadeServiceTest {
 
         verify(exercicioService).findById(1);
         verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
-        verify(registroCargaService).editarRegistro(1, request, usuario);
-        verifyNoInteractions(registroCardioService);
+        verify(registroMusculacaoService).editarRegistro(1, request, usuario);
+        verifyNoInteractions(registroAaerobicoService);
     }
 
     @Test
-    void editar_deveChamarMetodoEditarDoRegistroCardioService_quandoSolicitadoComRequestDeAerobico() {
+    void editar_deveChamarMetodoEditarDoRegistroAerobicoService_quandoSolicitadoComRequestDeAerobico() {
         var request = umRegistroAtividadeRequestParaAerobico();
         var usuario = umUsuario();
 
@@ -188,8 +188,8 @@ class RegistroAtividadeServiceTest {
 
         verify(exercicioService).findById(3);
         verify(locatorService).getRegistroAtividadeService(AEROBICO);
-        verify(registroCardioService).editarRegistro(2, request, usuario);
-        verifyNoInteractions(registroCargaService);
+        verify(registroAaerobicoService).editarRegistro(2, request, usuario);
+        verifyNoInteractions(registroMusculacaoService);
     }
 
     @Test
@@ -202,7 +202,7 @@ class RegistroAtividadeServiceTest {
 
         verify(exercicioService).findById(2);
         verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
-        verify(registroCargaService).excluirRegistro(1, usuario);
+        verify(registroMusculacaoService).excluirRegistro(1, usuario);
     }
 
     @Test
@@ -215,6 +215,6 @@ class RegistroAtividadeServiceTest {
 
         verify(exercicioService).findById(2);
         verify(locatorService).getRegistroAtividadeService(AEROBICO);
-        verify(registroCardioService).excluirRegistro(1, usuario);
+        verify(registroAaerobicoService).excluirRegistro(1, usuario);
     }
 }
