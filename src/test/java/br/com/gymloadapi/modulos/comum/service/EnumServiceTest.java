@@ -22,8 +22,7 @@ class EnumServiceTest {
             .containsExactly(tuple("HALTER", "Halter"), tuple("BARRA", "Barra"),
                 tuple("MAQUINA", "Maquina"), tuple("POLIA", "Polia"),
                 tuple("ANILHA", "Anilha"), tuple("BOLA", "Bola"),
-                tuple("KETLLEBEL", "Kettlebel"), tuple("BAG", "Bag"),
-                tuple("CORPORAL", "Corporal"));
+                tuple("KETLLEBEL", "Kettlebel"), tuple("BAG", "Bag"));
     }
 
     @Test
@@ -45,6 +44,8 @@ class EnumServiceTest {
     void getTiposExerciciosSelect_deveRetornarTodosOsTiposDeExercicios_quandoSolicitado() {
         assertThat(service.getTiposExerciciosSelect())
             .extracting(SelectResponse::value, SelectResponse::label)
-            .containsExactly(tuple("MUSCULACAO", "Musculação"), tuple("AEROBICO", "Aeróbico"));
+            .containsExactly(tuple("MUSCULACAO", "Musculação"),
+                tuple("AEROBICO", "Aeróbico"),
+                tuple("CALISTENIA", "Calistenia"));
     }
 }

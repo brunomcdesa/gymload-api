@@ -14,8 +14,7 @@ public enum ETipoEquipamento {
     ANILHA("Anilha"),
     BOLA("Bola"),
     KETLLEBEL("Kettlebel"),
-    BAG("Bag"),
-    CORPORAL("Corporal");
+    BAG("Bag");
 
     private final String descricao;
 }

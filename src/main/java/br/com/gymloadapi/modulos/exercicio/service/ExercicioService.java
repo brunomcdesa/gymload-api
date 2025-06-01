@@ -34,7 +34,7 @@ public class ExercicioService {
         request.aplicarGroupValidators();
         var exercicio = exercicioMapper.mapToModel(
             request,
-            mapNullBoolean(request.isExercicioMusculacao(), () -> grupoMuscularService.findById(request.grupoMuscularId()))
+            mapNullBoolean(request.deveConterGrupoMuscular(), () -> grupoMuscularService.findById(request.grupoMuscularId()))
         );
 
         this.saveComHistorico(exercicio, usuarioId, CADASTRO);
@@ -73,7 +73,7 @@ public class ExercicioService {
         request.aplicarGroupValidators();
 
         exercicioMapper.editar(request,
-            mapNullBoolean(request.isExercicioMusculacao(), () -> grupoMuscularService.findById(request.grupoMuscularId())),
+            mapNullBoolean(request.deveConterGrupoMuscular(), () -> grupoMuscularService.findById(request.grupoMuscularId())),
             exercicio);
         this.saveComHistorico(exercicio, usuarioId, EDICAO);
     }

@@ -66,7 +66,8 @@ class RegistroAerobicoServiceTest {
             () -> assertEquals(1, response.exercicioId()),
             () -> assertEquals("-", response.destaque()),
             () -> assertNull(response.ultimoPeso()),
-            () -> assertEquals("-", response.ultimaDistancia())
+            () -> assertEquals("-", response.ultimaDistancia()),
+            () -> assertNull(response.ultimaQtdMaxRepeticoes())
         );
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, 1);

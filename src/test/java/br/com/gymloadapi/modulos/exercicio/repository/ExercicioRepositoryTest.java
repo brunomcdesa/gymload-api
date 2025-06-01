@@ -21,11 +21,13 @@ public class ExercicioRepositoryTest {
     void findAllComplete_deveRetornarTodosOsExercicios_quandoSolicitado() {
         var exercicios = repository.findAllComplete();
         assertAll(
-            () -> assertEquals(2, exercicios.size()),
+            () -> assertEquals(3, exercicios.size()),
             () -> assertEquals(1, exercicios.getFirst().getId()),
             () -> assertEquals("SUPINO RETO", exercicios.getFirst().getNome()),
-            () -> assertEquals(2, exercicios.getLast().getId()),
-            () -> assertEquals("PUXADA ALTA", exercicios.getLast().getNome())
+            () -> assertEquals(2, exercicios.get(1).getId()),
+            () -> assertEquals("PUXADA ALTA", exercicios.get(1).getNome()),
+            () -> assertEquals(3, exercicios.getLast().getId()),
+            () -> assertEquals("ABDOMINAL SUPRA", exercicios.getLast().getNome())
         );
     }
 
@@ -33,11 +35,13 @@ public class ExercicioRepositoryTest {
     void findAllCompleteByPredicate_deveRetornarTodosOsExercicios_quandoSolicitado() {
         var exercicios = repository.findAllCompleteByPredicate(umExercicioFiltroVazio().toPredicate());
         assertAll(
-            () -> assertEquals(2, exercicios.size()),
+            () -> assertEquals(3, exercicios.size()),
             () -> assertEquals(1, exercicios.getFirst().getId()),
             () -> assertEquals("SUPINO RETO", exercicios.getFirst().getNome()),
-            () -> assertEquals(2, exercicios.getLast().getId()),
-            () -> assertEquals("PUXADA ALTA", exercicios.getLast().getNome())
+            () -> assertEquals(2, exercicios.get(1).getId()),
+            () -> assertEquals("PUXADA ALTA", exercicios.get(1).getNome()),
+            () -> assertEquals(3, exercicios.getLast().getId()),
+            () -> assertEquals("ABDOMINAL SUPRA", exercicios.getLast().getNome())
         );
     }
 

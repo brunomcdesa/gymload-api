@@ -35,10 +35,11 @@ public class RegistroMusculacaoService implements RegistroAtividadeFactory {
     @Override
     public RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId) {
         var registrosMusculacao = this.getAllByExercicioId(exercicioId, usuarioId);
+        var destaqueRegistro = this.getDestaqueDoRegistro(registrosMusculacao);
+        var ultimoRegistro = this.getUltimoRegistro(registrosMusculacao);
 
-        return new RegistroAtividadeResponse(exercicioId, this.getDestaqueDoRegistro(registrosMusculacao),
-            this.getUltimoRegistro(registrosMusculacao), null
-        );
+        return registroAtividadeMapper.mapToRegistroAtividadeResponse(exercicioId, destaqueRegistro, ultimoRegistro,
+            null, null);
     }
 
     @Override

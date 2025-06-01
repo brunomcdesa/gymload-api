@@ -9,6 +9,7 @@ public record RegistroAtividadeResponse(
     Integer exercicioId,
     String destaque,
     String ultimoPeso,
-    String ultimaDistancia
+    String ultimaDistancia,
+    Integer ultimaQtdMaxRepeticoes
 ) {
 }

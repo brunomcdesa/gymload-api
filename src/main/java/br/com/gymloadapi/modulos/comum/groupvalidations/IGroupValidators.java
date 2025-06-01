@@ -9,4 +9,6 @@ public interface IGroupValidators {
     interface Musculacao {}
 
     interface Aerobico {}
+
+    interface Calistenia {}
 }

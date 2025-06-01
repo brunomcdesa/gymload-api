@@ -73,7 +73,8 @@ class RegistroMusculacaoServiceTest {
             () -> assertEquals(1, response.exercicioId()),
             () -> assertEquals("-", response.destaque()),
             () -> assertEquals("-", response.ultimoPeso()),
-            () -> assertNull(response.ultimaDistancia())
+            () -> assertNull(response.ultimaDistancia()),
+            () -> assertNull(response.ultimaQtdMaxRepeticoes())
         );
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, usuario.getId());

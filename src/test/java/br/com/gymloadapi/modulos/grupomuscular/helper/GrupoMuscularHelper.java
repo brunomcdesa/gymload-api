@@ -29,7 +29,15 @@ public class GrupoMuscularHelper {
             .build();
     }
 
+    public static GrupoMuscular umGrupoMuscularAbdomen() {
+        return GrupoMuscular.builder()
+            .id(3)
+            .nome("Abdomen")
+            .codigo("ABDOMEN")
+            .build();
+    }
+
     public static List<GrupoMuscular> umaListaGrupoMusculares() {
-        return List.of(umGrupoMuscularPeitoral(), umGrupoMuscularCostas());
+        return List.of(umGrupoMuscularPeitoral(), umGrupoMuscularCostas(), umGrupoMuscularAbdomen());
     }
 }

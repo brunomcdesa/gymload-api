@@ -19,7 +19,7 @@ public record HistoricoRegistroAtividadeResponse(
     String carga,
     Double peso,
     EUnidadePeso unidadePeso,
-    ETipoEquipamento tipoExercicio,
+    ETipoEquipamento tipoEquipamento,
     String grupoMuscularNome,
     Integer qtdRepeticoes,
     Integer qtdSeries,

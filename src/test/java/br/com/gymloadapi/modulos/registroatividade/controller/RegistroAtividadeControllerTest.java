@@ -74,12 +74,12 @@ class RegistroAtividadeControllerTest {
 
     @WithUserDetails
     @ParameterizedTest
-    @ValueSource(strings = {"/destaques?exerciciosIds=1,2", "/1/completo"})
+    @ValueSource(strings = {"/destaques?exerciciosIds=1,2,3", "/1/completo"})
     void gets_devemRetornarOk_quandoUsuarioAutenticado(String endpoint) {
         isOk(get(URL + endpoint), mockMvc);
 
         Map.<String, Runnable>of(
-            "/destaques?exerciciosIds=1,2", () -> verify(service).buscarDestaques(umRegistroAtividadeFiltros(), 1),
+            "/destaques?exerciciosIds=1,2,3", () -> verify(service).buscarDestaques(umRegistroAtividadeFiltros(), 1),
             "/1/completo", () -> verify(service).buscarRegistroAtividadeCompleto(1, 1)
         ).get(endpoint).run();
     }

@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.registroatividade.helper;
 
+import br.com.gymloadapi.modulos.comum.enums.EUnidadePeso;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeFiltros;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
@@ -25,7 +26,7 @@ public class RegistroAtividadeHelper {
     }
 
     public static RegistroAtividadeFiltros umRegistroAtividadeFiltros() {
-        return new RegistroAtividadeFiltros(List.of(1, 2));
+        return new RegistroAtividadeFiltros(List.of(1, 2, 3));
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaAerobico() {
@@ -33,12 +34,29 @@ public class RegistroAtividadeHelper {
             20.0, 1.5);
     }
 
+    public static RegistroAtividadeRequest umRegistroAtividadeRequestParaCalistenia() {
+        return new RegistroAtividadeRequest(4, "Observacao", null, null, 20, 5,
+            null, null);
+    }
+
+    public static RegistroAtividadeRequest umRegistroAtividadeRequestSomenteComPesoEUnidadePeso(Double peso,
+                                                                                                EUnidadePeso unidadePeso) {
+        return new RegistroAtividadeRequest(null, null, peso, unidadePeso, null, null, null, null);
+    }
+
     public static RegistroAtividadeResponse umRegistroAtividadeResponseComDadosDeMusculacao() {
-        return new RegistroAtividadeResponse(1, "22.5 (KG)", "20.0 (KG)", null);
+        return new RegistroAtividadeResponse(1, "22.5 (KG)", "20.0 (KG)", null,
+            null);
     }
 
     public static RegistroAtividadeResponse umRegistroAtividadeResponseComDadosDeAerobico() {
-        return new RegistroAtividadeResponse(2, "22.5 KM", null, "11,25 KM");
+        return new RegistroAtividadeResponse(2, "22.5 KM", null, "11,25 KM",
+            null);
+    }
+
+    public static RegistroAtividadeResponse umRegistroAtividadeResponseComDadosDeCalistenia() {
+        return new RegistroAtividadeResponse(3, "30 Reps", null, null,
+            30);
     }
 
     public static HistoricoRegistroAtividadeResponse umHistoricoRegistroAtividadeResponseDeMusculacao() {
@@ -52,5 +70,12 @@ public class RegistroAtividadeHelper {
         return new HistoricoRegistroAtividadeResponse(2, "ESTEIRA", "Observacao",
             LocalDate.of(2025, 4, 4), null,  null, null, null, null,
             null, null, 22.5, 2.0, "11,25 km/h");
+    }
+
+    public static HistoricoRegistroAtividadeResponse umHistoricoRegistroAtividadeResponseDeCalistenia() {
+        return new HistoricoRegistroAtividadeResponse(3, "Abdominal Supra", "Observacao",
+            LocalDate.of(2025, 4, 4), null, null, null, null,
+            "Abdomen", 30, 4, null, null, null
+        );
     }
 }

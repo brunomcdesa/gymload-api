@@ -58,8 +58,10 @@ class GrupoMuscularServiceTest {
         assertAll(
             () -> assertEquals(1, responses.getFirst().id()),
             () -> assertEquals("Peitoral", responses.getFirst().nome()),
-            () -> assertEquals(2, responses.getLast().id()),
-            () -> assertEquals("Costas", responses.getLast().nome())
+            () -> assertEquals(2, responses.get(1).id()),
+            () -> assertEquals("Costas", responses.get(1).nome()),
+            () -> assertEquals(3, responses.getLast().id()),
+            () -> assertEquals("Abdomen", responses.getLast().nome())
         );
 
         verify(repository).findAll();
@@ -74,8 +76,10 @@ class GrupoMuscularServiceTest {
         assertAll(
             () -> assertEquals(1, selectResponses.getFirst().value()),
             () -> assertEquals("Peitoral", selectResponses.getFirst().label()),
-            () -> assertEquals(2, selectResponses.getLast().value()),
-            () -> assertEquals("Costas", selectResponses.getLast().label())
+            () -> assertEquals(2, selectResponses.get(1).value()),
+            () -> assertEquals("Costas", selectResponses.get(1).label()),
+            () -> assertEquals(3, selectResponses.getLast().value()),
+            () -> assertEquals("Abdomen", selectResponses.getLast().label())
         );
 
         verify(repository).findAll();

@@ -15,4 +15,8 @@ public class MapUtils {
     public static <T, C> C mapNullWithBackup(T value, Function<T, C> function, C backup) {
         return (value != null) ? function.apply(value) : backup;
     }
+
+    public static <T, C> C mapNull(T value, Supplier<C> function) {
+        return (value != null) ? function.get() : null;
+    }
 }

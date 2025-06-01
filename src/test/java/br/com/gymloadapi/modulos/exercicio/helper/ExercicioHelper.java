@@ -9,11 +9,9 @@ import java.util.List;
 
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.MAQUINA;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.AEROBICO;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.*;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
-import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularCostas;
-import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
+import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.*;
 import static java.util.Collections.emptyList;
 
 @UtilityClass
@@ -75,6 +73,17 @@ public class ExercicioHelper {
             .build();
     }
 
+    public static Exercicio umExercicioCalistenia(Integer id) {
+        return Exercicio.builder()
+            .id(id)
+            .nome("Abdominal Supra")
+            .descricao("ABDOMINAL SUPRA")
+            .tipoExercicio(CALISTENIA)
+            .treinos(emptyList())
+            .grupoMuscular(umGrupoMuscularAbdomen())
+            .build();
+    }
+
     public static List<Exercicio> umaListaDeExercicios() {
         return List.of(umExercicioMusculacao(1), outroExercicioMusculacao(2));
     }
@@ -84,7 +93,7 @@ public class ExercicioHelper {
     }
 
     public static List<Exercicio> maisUmaListaDeExercicios() {
-        return List.of(umExercicioMusculacao(1), umExercicioAerobico(2));
+        return List.of(umExercicioMusculacao(1), umExercicioAerobico(2), umExercicioCalistenia(3));
     }
 
     public static ExercicioFiltro umExercicioFiltroVazio() {

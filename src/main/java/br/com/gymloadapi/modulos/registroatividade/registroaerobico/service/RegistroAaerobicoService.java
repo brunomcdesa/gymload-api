@@ -36,10 +36,11 @@ public class RegistroAaerobicoService implements RegistroAtividadeFactory {
     @Override
     public RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId) {
         var registrosAerobico = this.getAllByExercicioId(exercicioId, usuarioId);
+        var destaqueRegistro = this.getDestaqueDoRegistro(registrosAerobico);
+        var ultimoRegistro = this.getUltimoResgistro(registrosAerobico);
 
-        return new RegistroAtividadeResponse(exercicioId, this.getDestaqueDoHistorico(registrosAerobico),
-            null, this.getUltimoResgistro(registrosAerobico)
-        );
+        return registroAtividadeMapper.mapToRegistroAtividadeResponse(exercicioId, destaqueRegistro , null,
+            ultimoRegistro, null);
     }
 
     @Override
@@ -75,7 +76,7 @@ public class RegistroAaerobicoService implements RegistroAtividadeFactory {
             .orElseThrow(() -> new NotFoundException("Registro de aeróbico não encontrado."));
     }
 
-    private String getDestaqueDoHistorico(List<RegistroAerobico> registrosAerobico) {
+    private String getDestaqueDoRegistro(List<RegistroAerobico> registrosAerobico) {
         var optionalMaiorDistancia = registrosAerobico.stream()
             .map(RegistroAerobico::getDistancia)
             .mapToDouble(Double::doubleValue)
