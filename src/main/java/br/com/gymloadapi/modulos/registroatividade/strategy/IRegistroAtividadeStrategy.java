@@ -1,4 +1,4 @@
-package br.com.gymloadapi.modulos.registroatividade.factory;
+package br.com.gymloadapi.modulos.registroatividade.strategy;
 
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
@@ -8,7 +8,7 @@ import br.com.gymloadapi.modulos.usuario.model.Usuario;
 
 import java.util.List;
 
-public interface RegistroAtividadeFactory {
+public interface IRegistroAtividadeStrategy {
 
     void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
 
@@ -19,4 +19,6 @@ public interface RegistroAtividadeFactory {
     void editarRegistro(Integer registroAtividadeId, RegistroAtividadeRequest request, Usuario usuario);
 
     void excluirRegistro(Integer registroAtividadeId, Usuario usuario);
+
+    void repetirUltimoRegistro(Exercicio exercicio, Usuario usuario);
 }

@@ -238,4 +238,39 @@ class RegistroMusculacaoServiceTest {
         verify(repository).findById(1);
         verify(repository).delete(registroMusculacao);
     }
+
+    @Test
+    void repetirUltimoRegistro_deveRepetirUltimoRegistro_quandoEncontrarAlgumRegistroParaOExercicioDoUsuario() {
+        when(repository.findLastByExercicioIdAndUsuarioId(1, 1)).thenReturn(Optional.of(umRegistroMusculacao()));
+
+        service.repetirUltimoRegistro(umExercicioMusculacao(1), umUsuarioAdmin());
+
+        verify(repository).findLastByExercicioIdAndUsuarioId(1, 1);
+        verify(repository).save(registroMusculacaoCaptor.capture());
+
+        var registroMusculacao = registroMusculacaoCaptor.getValue();
+        assertAll(
+            () -> assertEquals(22.5, registroMusculacao.getPeso()),
+            () -> assertEquals(KG, registroMusculacao.getUnidadePeso()),
+            () -> assertEquals(12, registroMusculacao.getQtdRepeticoes()),
+            () -> assertEquals(4, registroMusculacao.getQtdSeries()),
+            () -> assertEquals("SUPINO RETO", registroMusculacao.getExercicio().getNome()),
+            () -> assertEquals("Usuario Admin", registroMusculacao.getUsuario().getNome())
+        );
+    }
+
+    @Test
+    void repetirUltimoRegistro_deveLancarException_quandoNaoEncontrarAlgumRegistroParaOExercicioDoUsuario() {
+        when(repository.findLastByExercicioIdAndUsuarioId(1, 1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.repetirUltimoRegistro(umExercicioMusculacao(1), umUsuarioAdmin())
+        );
+        assertEquals("Você ainda não possui nenhum registro para o exercício de musculação SUPINO RETO.",
+            exception.getMessage());
+
+        verify(repository).findLastByExercicioIdAndUsuarioId(1, 1);
+        verifyNoMoreInteractions(repository);
+    }
 }

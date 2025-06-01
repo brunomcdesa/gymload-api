@@ -49,7 +49,6 @@ class RegistroCalisteniaServiceTest {
         verify(repository).save(registroCalisteniaCaptor.capture());
 
         var registroCalistenia = registroCalisteniaCaptor.getValue();
-
         assertAll(
             () -> assertNull(registroCalistenia.getPesoAdicional()),
             () -> assertNull(registroCalistenia.getUnidadePeso()),
@@ -186,7 +185,6 @@ class RegistroCalisteniaServiceTest {
         verify(repository).save(registroCalisteniaCaptor.capture());
 
         var registroCalistenia = registroCalisteniaCaptor.getValue();
-
         assertAll(
             () -> assertEquals(10, registroCalistenia.getPesoAdicional()),
             () -> assertEquals(KG, registroCalistenia.getUnidadePeso()),
@@ -237,5 +235,40 @@ class RegistroCalisteniaServiceTest {
 
         verify(repository).findById(1);
         verify(repository).delete(registroCalistenia);
+    }
+
+    @Test
+    void repetirUltimoRegistro_deveRepetirUltimoRegistro_quandoEncontrarAlgumRegistroParaOExercicioDoUsuario() {
+        when(repository.findLastByExercicioIdAndUsuarioId(3, 1)).thenReturn(Optional.of(umRegistroCalistenia()));
+
+        service.repetirUltimoRegistro(umExercicioCalistenia(3), umUsuarioAdmin());
+
+        verify(repository).findLastByExercicioIdAndUsuarioId(3, 1);
+        verify(repository).save(registroCalisteniaCaptor.capture());
+
+        var registroCalistenia = registroCalisteniaCaptor.getValue();
+        assertAll(
+            () -> assertNull(registroCalistenia.getPesoAdicional()),
+            () -> assertNull(registroCalistenia.getUnidadePeso()),
+            () -> assertEquals(30, registroCalistenia.getQtdRepeticoes()),
+            () -> assertEquals(4, registroCalistenia.getQtdSeries()),
+            () -> assertEquals("Abdominal Supra", registroCalistenia.getExercicio().getNome()),
+            () -> assertEquals("Usuario Admin", registroCalistenia.getUsuario().getNome())
+        );
+    }
+
+    @Test
+    void repetirUltimoRegistro_deveLancarException_quandoNaoEncontrarAlgumRegistroParaOExercicioDoUsuario() {
+        when(repository.findLastByExercicioIdAndUsuarioId(3, 1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.repetirUltimoRegistro(umExercicioCalistenia(3), umUsuarioAdmin())
+        );
+        assertEquals("Você ainda não possui nenhum registro para o exercício calistênico Abdominal Supra.",
+            exception.getMessage());
+
+        verify(repository).findLastByExercicioIdAndUsuarioId(3, 1);
+        verifyNoMoreInteractions(repository);
     }
 }

@@ -9,6 +9,7 @@ import br.com.gymloadapi.modulos.registroatividade.service.RegistroAtividadeServ
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -40,10 +41,12 @@ class RegistroAtividadeControllerTest {
     @MockitoBean
     private RegistroAtividadeService service;
 
-    @Test
+    @EmptySource
     @WithAnonymousUser
-    void salvar_deveRetornarUnauthorized_quandoUsuarioNaoAutenticado() {
-        isUnauthorized(post(URL), mockMvc);
+    @ParameterizedTest
+    @ValueSource(strings = {"/exercicio/1/repetir-ultimo-registro"})
+    void posts_devemRetornarUnauthorized_quandoUsuarioNaoAutenticado(String endpoint) {
+        isUnauthorized(post(URL + endpoint), mockMvc);
         verifyNoInteractions(service);
     }
 
@@ -130,6 +133,14 @@ class RegistroAtividadeControllerTest {
     void remover_deveRetornarNoContent_quandoUsuarioAutenticado() {
         isNoContent(delete(URL + "/1/exercicio/1"), mockMvc);
 
-        service.excluir(1, 1, umUsuarioAdmin());
+        verify(service).excluir(1, 1, umUsuarioAdmin());
+    }
+
+    @Test
+    @WithUserDetails
+    void repetirUltimoRegistro_deveRetornarCreated_quandoUsuarioAutenticado() {
+        isCreated(post(URL + "/exercicio/1/repetir-ultimo-registro"), mockMvc);
+
+        verify(service).repetirUltimoRegistro(1, umUsuarioAdmin());
     }
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import jakarta.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 import static br.com.gymloadapi.modulos.exercicio.model.QExercicio.exercicio;
 import static br.com.gymloadapi.modulos.grupomuscular.model.QGrupoMuscular.grupoMuscular;
@@ -27,5 +28,18 @@ public class RegistroCalisteniaRepositoryImpl implements RegistroCalisteniaRepos
             .where(registroCalistenia.exercicio.id.eq(exercicioId)
                 .and(registroCalistenia.usuario.id.eq(usuarioId)))
             .fetch();
+    }
+
+    @Override
+    public Optional<RegistroCalistenia> findLastByExercicioIdAndUsuarioId(Integer exercicioId, Integer usuarioId) {
+        return Optional.ofNullable(new JPAQueryFactory(entityManager)
+            .selectFrom(registroCalistenia)
+            .innerJoin(registroCalistenia.exercicio, exercicio).fetchJoin()
+            .innerJoin(registroCalistenia.usuario, usuario).fetchJoin()
+            .where(registroCalistenia.exercicio.id.eq(exercicioId)
+                .and(registroCalistenia.usuario.id.eq(usuarioId)))
+            .orderBy(registroCalistenia.id.desc())
+            .fetchFirst()
+        );
     }
 }

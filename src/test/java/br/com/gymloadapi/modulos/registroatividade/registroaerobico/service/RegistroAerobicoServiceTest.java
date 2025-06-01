@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class RegistroAerobicoServiceTest {
 
-    private RegistroAaerobicoService service;
+    private RegistroAerobicoService service;
     private final RegistroAtividadeMapper registroAtividadeMapper = new RegistroAtividadeMapperImpl();
 
     @Mock
@@ -39,7 +39,7 @@ class RegistroAerobicoServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new RegistroAaerobicoService(repository, registroAtividadeMapper);
+        service = new RegistroAerobicoService(repository, registroAtividadeMapper);
     }
 
     @Test
@@ -209,5 +209,38 @@ class RegistroAerobicoServiceTest {
 
         verify(repository).findById(1);
         verify(repository).delete(registroAerobico);
+    }
+
+    @Test
+    void repetirUltimoRegistro_deveRepetirUltimoRegistro_quandoEncontrarAlgumRegistroParaOExercicioDoUsuario() {
+        when(repository.findLastByExercicioIdAndUsuarioId(2, 1)).thenReturn(Optional.of(umRegistroAerobico()));
+
+        service.repetirUltimoRegistro(umExercicioAerobico(2), umUsuarioAdmin());
+
+        verify(repository).findLastByExercicioIdAndUsuarioId(2, 1);
+        verify(repository).save(registroAerobicoCaptor.capture());
+
+        var registroAerobico = registroAerobicoCaptor.getValue();
+        assertAll(
+            () -> assertEquals(22.6, registroAerobico.getDistancia()),
+            () -> assertEquals(1.33, registroAerobico.getDuracao()),
+            () -> assertEquals("Esteira", registroAerobico.getExercicio().getNome()),
+            () -> assertEquals("Usuario", registroAerobico.getUsuario().getNome())
+        );
+    }
+
+    @Test
+    void repetirUltimoRegistro_deveLancarException_quandoNaoEncontrarAlgumRegistroParaOExercicioDoUsuario() {
+        when(repository.findLastByExercicioIdAndUsuarioId(2, 1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.repetirUltimoRegistro(umExercicioAerobico(2), umUsuarioAdmin())
+        );
+        assertEquals("Você ainda não possui nenhum registro para o exercício aeróbico Esteira.",
+            exception.getMessage());
+
+        verify(repository).findLastByExercicioIdAndUsuarioId(2, 1);
+        verifyNoMoreInteractions(repository);
     }
 }

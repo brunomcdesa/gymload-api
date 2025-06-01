@@ -26,7 +26,14 @@ class RegistroMusculacaoRepositoryTest {
             () -> assertEquals(12, registrosMusculacao.getFirst().getQtdRepeticoes()),
             () -> assertEquals(4, registrosMusculacao.getFirst().getQtdSeries()),
             () -> assertEquals(1, registrosMusculacao.getFirst().getExercicio().getId()),
-            () -> assertEquals(1, registrosMusculacao.getFirst().getUsuario().getId())
+            () -> assertEquals(1, registrosMusculacao.getFirst().getUsuario().getId()),
+
+            () -> assertEquals(2, registrosMusculacao.getLast().getId()),
+            () -> assertEquals(25.0, registrosMusculacao.getLast().getPeso()),
+            () -> assertEquals(8, registrosMusculacao.getLast().getQtdRepeticoes()),
+            () -> assertEquals(3, registrosMusculacao.getLast().getQtdSeries()),
+            () -> assertEquals(1, registrosMusculacao.getLast().getExercicio().getId()),
+            () -> assertEquals(1, registrosMusculacao.getLast().getUsuario().getId())
         );
     }
 
@@ -35,5 +42,26 @@ class RegistroMusculacaoRepositoryTest {
     @CsvSource(value = {"9999,1", "1,999999"})
     void findAllByExercicioIdAndUsuarioId_deveRetornarListaVazia_quandoNaoEncontrarRegistrosParaOExercicioOuParaOUsuario(Integer exercicioId, Integer usuarioId) {
         assertTrue(repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId).isEmpty());
+    }
+
+    @Test
+    void findLastByExercicioIdAndUsuarioId_deveRetornarUltimoRegistro_quandoEncontrarRegistrosParaOExercicioEParaOUsuario() {
+        var ultimoRegistro = repository.findLastByExercicioIdAndUsuarioId(1, 1).get();
+
+        assertAll(
+            () -> assertEquals(2, ultimoRegistro.getId()),
+            () -> assertEquals(25.0, ultimoRegistro.getPeso()),
+            () -> assertEquals(8, ultimoRegistro.getQtdRepeticoes()),
+            () -> assertEquals(3, ultimoRegistro.getQtdSeries()),
+            () -> assertEquals(1, ultimoRegistro.getExercicio().getId()),
+            () -> assertEquals(1, ultimoRegistro.getUsuario().getId())
+        );
+    }
+
+    @ParameterizedTest
+    @SuppressWarnings("LineLength")
+    @CsvSource(value = {"9999,1", "1,999999"})
+    void findLastByExercicioIdAndUsuarioId_deveRetornarOptionalVazio_quandoNaoEncontrarNenhumRegistroParaOExercicioOuParaOUsuario(Integer exercicioId, Integer usuarioId) {
+        assertTrue(repository.findLastByExercicioIdAndUsuarioId(exercicioId, usuarioId).isEmpty());
     }
 }

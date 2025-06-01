@@ -81,4 +81,16 @@ public interface RegistroAtividadeMapper {
 
     RegistroAtividadeResponse mapToRegistroAtividadeResponse(Integer exercicioId, String destaque, String ultimoPeso,
                                                              String ultimaDistancia, Integer ultimaQtdMaxRepeticoes);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
+    RegistroMusculacao copiarRegistroMusculacao(RegistroMusculacao registroMusculacao);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
+    RegistroAerobico copiarRegistroAerobico(RegistroAerobico registroMusculacao);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
+    RegistroCalistenia copiarRegistroCalistenia(RegistroCalistenia registroMusculacao);
 }

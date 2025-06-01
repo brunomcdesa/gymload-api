@@ -1,8 +1,7 @@
 package br.com.gymloadapi.modulos.registroatividade.service;
 
-import br.com.gymloadapi.modulos.comum.service.LocatorService;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
-import br.com.gymloadapi.modulos.registroatividade.registroaerobico.service.RegistroAaerobicoService;
+import br.com.gymloadapi.modulos.registroatividade.registroaerobico.service.RegistroAerobicoService;
 import br.com.gymloadapi.modulos.registroatividade.registrocalistenia.service.RegistroCalisteniaService;
 import br.com.gymloadapi.modulos.registroatividade.registromusculacao.service.RegistroMusculacaoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,13 +10,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationContext;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.*;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.*;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuario;
@@ -30,21 +29,22 @@ class RegistroAtividadeServiceTest {
     @InjectMocks
     private RegistroAtividadeService service;
     @Mock
-    private LocatorService locatorService;
+    private ApplicationContext applicationContext;
     @Mock
     private ExercicioService exercicioService;
     @Mock
     private RegistroMusculacaoService registroMusculacaoService;
     @Mock
-    private RegistroAaerobicoService registroAaerobicoService;
+    private RegistroAerobicoService registroAerobicoService;
     @Mock
     private RegistroCalisteniaService registroCalisteniaService;
 
     @BeforeEach
     void setUp() {
-        lenient().when(locatorService.getRegistroAtividadeService(MUSCULACAO)).thenReturn(registroMusculacaoService);
-        lenient().when(locatorService.getRegistroAtividadeService(AEROBICO)).thenReturn(registroAaerobicoService);
-        lenient().when(locatorService.getRegistroAtividadeService(CALISTENIA)).thenReturn(registroCalisteniaService);
+        when(applicationContext.getBean(RegistroMusculacaoService.class)).thenReturn(registroMusculacaoService);
+        when(applicationContext.getBean(RegistroAerobicoService.class)).thenReturn(registroAerobicoService);
+        when(applicationContext.getBean(RegistroCalisteniaService.class)).thenReturn(registroCalisteniaService);
+        service.init();
     }
 
     @Test
@@ -58,9 +58,8 @@ class RegistroAtividadeServiceTest {
         service.salvar(request, usuario);
 
         verify(exercicioService).findById(1);
-        verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
         verify(registroMusculacaoService).salvarRegistro(request, exercicio, usuario);
-        verifyNoInteractions(registroAaerobicoService, registroCalisteniaService);
+        verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
     }
 
     @Test
@@ -74,8 +73,7 @@ class RegistroAtividadeServiceTest {
         service.salvar(request, usuario);
 
         verify(exercicioService).findById(3);
-        verify(locatorService).getRegistroAtividadeService(AEROBICO);
-        verify(registroAaerobicoService).salvarRegistro(request, exercicio, usuario);
+        verify(registroAerobicoService).salvarRegistro(request, exercicio, usuario);
         verifyNoInteractions(registroMusculacaoService, registroCalisteniaService);
     }
 
@@ -90,9 +88,8 @@ class RegistroAtividadeServiceTest {
         service.salvar(request, usuario);
 
         verify(exercicioService).findById(4);
-        verify(locatorService).getRegistroAtividadeService(CALISTENIA);
         verify(registroCalisteniaService).salvarRegistro(request, exercicio, usuario);
-        verifyNoInteractions(registroMusculacaoService, registroAaerobicoService);
+        verifyNoInteractions(registroMusculacaoService, registroAerobicoService);
     }
 
     @Test
@@ -102,14 +99,14 @@ class RegistroAtividadeServiceTest {
         assertTrue(service.buscarDestaques(umRegistroAtividadeFiltros(), 1).isEmpty());
 
         verify(exercicioService).findByIdIn(List.of(1, 2, 3));
-        verifyNoInteractions(locatorService, registroMusculacaoService, registroAaerobicoService, registroCalisteniaService);
+        verifyNoInteractions(registroMusculacaoService, registroAerobicoService, registroCalisteniaService);
     }
 
     @Test
     void buscarDestaques_deveRetornarDestaquesDosExercicios_quandoEncontrarExercicios() {
         when(exercicioService.findByIdIn(List.of(1, 2, 3))).thenReturn(maisUmaListaDeExercicios());
         when(registroMusculacaoService.buscarDestaque(1, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeMusculacao());
-        when(registroAaerobicoService.buscarDestaque(2, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeAerobico());
+        when(registroAerobicoService.buscarDestaque(2, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeAerobico());
         when(registroCalisteniaService.buscarDestaque(3, 1)).thenReturn(umRegistroAtividadeResponseComDadosDeCalistenia());
 
         var responses = service.buscarDestaques(umRegistroAtividadeFiltros(), 1);
@@ -132,10 +129,8 @@ class RegistroAtividadeServiceTest {
         );
 
         verify(exercicioService).findByIdIn(List.of(1, 2, 3));
-        verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
-        verify(locatorService).getRegistroAtividadeService(AEROBICO);
         verify(registroMusculacaoService).buscarDestaque(1, 1);
-        verify(registroAaerobicoService).buscarDestaque(2, 1);
+        verify(registroAerobicoService).buscarDestaque(2, 1);
         verify(registroCalisteniaService).buscarDestaque(3, 1);
     }
 
@@ -161,9 +156,8 @@ class RegistroAtividadeServiceTest {
         );
 
         verify(exercicioService).findById(1);
-        verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
         verify(registroMusculacaoService).buscarHistoricoRegistroCompleto(1, 2);
-        verifyNoInteractions(registroAaerobicoService, registroCalisteniaService);
+        verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
     }
 
     @Test
@@ -172,7 +166,7 @@ class RegistroAtividadeServiceTest {
         var exercicio = umExercicioAerobico(2);
 
         when(exercicioService.findById(2)).thenReturn(exercicio);
-        when(registroAaerobicoService.buscarHistoricoRegistroCompleto(2, 2))
+        when(registroAerobicoService.buscarHistoricoRegistroCompleto(2, 2))
             .thenReturn(List.of(umHistoricoRegistroAtividadeResponseDeAerobico()));
 
         var response = service.buscarRegistroAtividadeCompleto(2, 2);
@@ -185,8 +179,7 @@ class RegistroAtividadeServiceTest {
         );
 
         verify(exercicioService).findById(2);
-        verify(locatorService).getRegistroAtividadeService(AEROBICO);
-        verify(registroAaerobicoService).buscarHistoricoRegistroCompleto(2, 2);
+        verify(registroAerobicoService).buscarHistoricoRegistroCompleto(2, 2);
         verifyNoInteractions(registroMusculacaoService, registroCalisteniaService);
     }
 
@@ -210,9 +203,8 @@ class RegistroAtividadeServiceTest {
         );
 
         verify(exercicioService).findById(3);
-        verify(locatorService).getRegistroAtividadeService(CALISTENIA);
         verify(registroCalisteniaService).buscarHistoricoRegistroCompleto(3, 2);
-        verifyNoInteractions(registroAaerobicoService, registroMusculacaoService);
+        verifyNoInteractions(registroAerobicoService, registroMusculacaoService);
     }
 
     @Test
@@ -225,9 +217,8 @@ class RegistroAtividadeServiceTest {
         service.editar(1, request, usuario);
 
         verify(exercicioService).findById(1);
-        verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
         verify(registroMusculacaoService).editarRegistro(1, request, usuario);
-        verifyNoInteractions(registroAaerobicoService, registroCalisteniaService);
+        verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
     }
 
     @Test
@@ -240,8 +231,7 @@ class RegistroAtividadeServiceTest {
         service.editar(2, request, usuario);
 
         verify(exercicioService).findById(3);
-        verify(locatorService).getRegistroAtividadeService(AEROBICO);
-        verify(registroAaerobicoService).editarRegistro(2, request, usuario);
+        verify(registroAerobicoService).editarRegistro(2, request, usuario);
         verifyNoInteractions(registroMusculacaoService, registroCalisteniaService);
     }
 
@@ -255,9 +245,8 @@ class RegistroAtividadeServiceTest {
         service.editar(1, request, usuario);
 
         verify(exercicioService).findById(4);
-        verify(locatorService).getRegistroAtividadeService(CALISTENIA);
         verify(registroCalisteniaService).editarRegistro(1, request, usuario);
-        verifyNoInteractions(registroAaerobicoService, registroMusculacaoService);
+        verifyNoInteractions(registroAerobicoService, registroMusculacaoService);
     }
 
     @Test
@@ -269,9 +258,8 @@ class RegistroAtividadeServiceTest {
         service.excluir(1, 2, usuario);
 
         verify(exercicioService).findById(2);
-        verify(locatorService).getRegistroAtividadeService(MUSCULACAO);
         verify(registroMusculacaoService).excluirRegistro(1, usuario);
-        verifyNoInteractions(registroAaerobicoService, registroCalisteniaService);
+        verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
     }
 
     @Test
@@ -283,8 +271,7 @@ class RegistroAtividadeServiceTest {
         service.excluir(1, 2, usuario);
 
         verify(exercicioService).findById(2);
-        verify(locatorService).getRegistroAtividadeService(AEROBICO);
-        verify(registroAaerobicoService).excluirRegistro(1, usuario);
+        verify(registroAerobicoService).excluirRegistro(1, usuario);
         verifyNoInteractions(registroMusculacaoService, registroCalisteniaService);
     }
 
@@ -297,8 +284,49 @@ class RegistroAtividadeServiceTest {
         service.excluir(1, 3, usuario);
 
         verify(exercicioService).findById(3);
-        verify(locatorService).getRegistroAtividadeService(CALISTENIA);
         verify(registroCalisteniaService).excluirRegistro(1, usuario);
-        verifyNoInteractions(registroAaerobicoService, registroMusculacaoService);
+        verifyNoInteractions(registroAerobicoService, registroMusculacaoService);
+    }
+
+    @Test
+    void repetirUltimoRegistro_deveChamarMetodoRepetirUltimoRegistro_quandoSolicitadoComIdDeExercicioDeMusculacao() {
+        var usuario = umUsuario();
+        var exercicio = umExercicioMusculacao(1);
+
+        when(exercicioService.findById(1)).thenReturn(exercicio);
+
+        service.repetirUltimoRegistro(1, usuario);
+
+        verify(exercicioService).findById(1);
+        verify(registroMusculacaoService).repetirUltimoRegistro(exercicio, usuario);
+        verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
+    }
+
+    @Test
+    void repetirUltimoRegistro_deveChamarMetodoRepetirUltimoRegistro_quandoSolicitadoComIdDeExercicioDeAerobico() {
+        var usuario = umUsuario();
+        var exercicio = umExercicioAerobico(2);
+
+        when(exercicioService.findById(2)).thenReturn(exercicio);
+
+        service.repetirUltimoRegistro(2, usuario);
+
+        verify(exercicioService).findById(2);
+        verify(registroAerobicoService).repetirUltimoRegistro(exercicio, usuario);
+        verifyNoInteractions(registroMusculacaoService, registroCalisteniaService);
+    }
+
+    @Test
+    void repetirUltimoRegistro_deveChamarMetodoRepetirUltimoRegistro_quandoSolicitadoComIdDeExercicioDeCalistenia() {
+        var usuario = umUsuario();
+        var exercicio = umExercicioCalistenia(3);
+
+        when(exercicioService.findById(3)).thenReturn(exercicio);
+
+        service.repetirUltimoRegistro(3, usuario);
+
+        verify(exercicioService).findById(3);
+        verify(registroCalisteniaService).repetirUltimoRegistro(exercicio, usuario);
+        verifyNoInteractions(registroMusculacaoService, registroAerobicoService);
     }
 }

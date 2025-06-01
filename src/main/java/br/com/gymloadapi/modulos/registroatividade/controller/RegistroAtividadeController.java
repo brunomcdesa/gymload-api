@@ -53,4 +53,10 @@ public class RegistroAtividadeController {
     public void remover(@PathVariable Integer id, @PathVariable Integer exercicioId, @AuthenticationPrincipal Usuario usuario) {
         service.excluir(id, exercicioId, usuario);
     }
+
+    @ResponseStatus(CREATED)
+    @PostMapping("exercicio/{exercicioId}/repetir-ultimo-registro")
+    public void repetirUltimoRegistro(@PathVariable Integer exercicioId, @AuthenticationPrincipal Usuario usuario) {
+        service.repetirUltimoRegistro(exercicioId, usuario);
+    }
 }

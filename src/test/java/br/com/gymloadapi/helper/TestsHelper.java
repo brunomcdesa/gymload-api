@@ -109,6 +109,13 @@ public class TestsHelper {
     }
 
     @SneakyThrows
+    public static void isCreated(MockHttpServletRequestBuilder endpoint, MockMvc mockMvc) {
+        mockMvc.perform(endpoint
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isCreated());
+    }
+
+    @SneakyThrows
     public static void isCreatedMultipart(HttpMethod method, String endpoint, MockMvc mvc, MockMultipartFile file,
                                           String requestName, Object request) {
         performMultipart(mvc, method, endpoint, file, requestName, request)

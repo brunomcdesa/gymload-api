@@ -10,10 +10,8 @@ import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.*;
 import static br.com.gymloadapi.modulos.registroatividade.registroaerobico.helper.RegistroMusculacaoHelper.outroRegistroAerobico;
 import static br.com.gymloadapi.modulos.registroatividade.registroaerobico.helper.RegistroMusculacaoHelper.umRegistroAerobico;
-import static br.com.gymloadapi.modulos.registroatividade.registrocalistenia.helper.RegistroCalisteniaHelper.maisUmRegistroCalistenia;
-import static br.com.gymloadapi.modulos.registroatividade.registrocalistenia.helper.RegistroCalisteniaHelper.umRegistroCalistenia;
-import static br.com.gymloadapi.modulos.registroatividade.registromusculacao.helper.RegistroMusculacaoHelper.maisUmRegistroMusculacao;
-import static br.com.gymloadapi.modulos.registroatividade.registromusculacao.helper.RegistroMusculacaoHelper.umRegistroMusculacao;
+import static br.com.gymloadapi.modulos.registroatividade.registrocalistenia.helper.RegistroCalisteniaHelper.*;
+import static br.com.gymloadapi.modulos.registroatividade.registromusculacao.helper.RegistroMusculacaoHelper.*;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuario;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -225,6 +223,55 @@ class RegistroAtividadeMapperTest {
             () -> assertNull(response.ultimoPeso()),
             () -> assertNull(response.ultimaDistancia()),
             () -> assertEquals(20, response.ultimaQtdMaxRepeticoes())
+        );
+    }
+
+    @Test
+    void copiarRegistroMusculacao_deveCopiarRegistroMusculacao_quandoSolicitado() {
+        var novoRegistroMusculacao = mapper.copiarRegistroMusculacao(outroRegistroMusculacao());
+
+        assertAll(
+            () -> assertNull(novoRegistroMusculacao.getId()),
+            () -> assertEquals(25.0, novoRegistroMusculacao.getPeso()),
+            () -> assertEquals(KG, novoRegistroMusculacao.getUnidadePeso()),
+            () -> assertEquals(8, novoRegistroMusculacao.getQtdRepeticoes()),
+            () -> assertEquals(2, novoRegistroMusculacao.getQtdSeries()),
+            () -> assertNotNull(novoRegistroMusculacao.getDataCadastro()),
+            () -> assertEquals("Observacao", novoRegistroMusculacao.getObservacao()),
+            () -> assertEquals(1, novoRegistroMusculacao.getExercicio().getId()),
+            () -> assertEquals(1, novoRegistroMusculacao.getUsuario().getId())
+        );
+    }
+
+    @Test
+    void copiarRegistroAerobico_deveCopiarRegistroAerobico_quandoSolicitado() {
+        var novoRegistroAerobico = mapper.copiarRegistroAerobico(outroRegistroAerobico());
+
+        assertAll(
+            () -> assertNull(novoRegistroAerobico.getId()),
+            () -> assertEquals(26.6, novoRegistroAerobico.getDistancia()),
+            () -> assertEquals(1.92, novoRegistroAerobico.getDuracao()),
+            () -> assertNotNull(novoRegistroAerobico.getDataCadastro()),
+            () -> assertEquals("Observacao", novoRegistroAerobico.getObservacao()),
+            () -> assertEquals(1, novoRegistroAerobico.getExercicio().getId()),
+            () -> assertEquals(2, novoRegistroAerobico.getUsuario().getId())
+        );
+    }
+
+    @Test
+    void copiarRegistroCalistenia_deveCopiarRegistroCalistenia_quandoSolicitado() {
+        var novoRegistroCalistenia = mapper.copiarRegistroCalistenia(outroRegistroCalistenia());
+
+        assertAll(
+            () -> assertNull(novoRegistroCalistenia.getId()),
+            () -> assertEquals(10.0, novoRegistroCalistenia.getPesoAdicional()),
+            () -> assertEquals(KG, novoRegistroCalistenia.getUnidadePeso()),
+            () -> assertEquals(15, novoRegistroCalistenia.getQtdRepeticoes()),
+            () -> assertEquals(5, novoRegistroCalistenia.getQtdSeries()),
+            () -> assertNotNull(novoRegistroCalistenia.getDataCadastro()),
+            () -> assertEquals("Observacao", novoRegistroCalistenia.getObservacao()),
+            () -> assertEquals(1, novoRegistroCalistenia.getExercicio().getId()),
+            () -> assertEquals(1, novoRegistroCalistenia.getUsuario().getId())
         );
     }
 }

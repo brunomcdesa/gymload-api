@@ -5,7 +5,7 @@ import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
-import br.com.gymloadapi.modulos.registroatividade.factory.RegistroAtividadeFactory;
+import br.com.gymloadapi.modulos.registroatividade.strategy.IRegistroAtividadeStrategy;
 import br.com.gymloadapi.modulos.registroatividade.mapper.RegistroAtividadeMapper;
 import br.com.gymloadapi.modulos.registroatividade.registromusculacao.model.RegistroMusculacao;
 import br.com.gymloadapi.modulos.registroatividade.registromusculacao.repository.RegistroMusculacaoRepository;
@@ -18,11 +18,12 @@ import java.util.List;
 import java.util.Objects;
 
 import static br.com.gymloadapi.modulos.comum.utils.ValidacaoUtils.validarUsuarioAlteracao;
+import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 
 @Service
 @RequiredArgsConstructor
-public class RegistroMusculacaoService implements RegistroAtividadeFactory {
+public class RegistroMusculacaoService implements IRegistroAtividadeStrategy {
 
     private final RegistroMusculacaoRepository repository;
     private final RegistroAtividadeMapper registroAtividadeMapper;
@@ -65,6 +66,18 @@ public class RegistroMusculacaoService implements RegistroAtividadeFactory {
         validarUsuarioAlteracao(registroMusculacao.getUsuarioId(), usuario, "excluir este registro de musculação");
 
         repository.delete(registroMusculacao);
+    }
+
+    @Override
+    public void repetirUltimoRegistro(Exercicio exercicio, Usuario usuario) {
+        repository.findLastByExercicioIdAndUsuarioId(exercicio.getId(), usuario.getId())
+            .ifPresentOrElse(registroMusculacao -> {
+                var novoRegistroMusculacao = registroAtividadeMapper.copiarRegistroMusculacao(registroMusculacao);
+                repository.save(novoRegistroMusculacao);
+            }, () -> {
+                throw new NotFoundException(format("Você ainda não possui nenhum registro para o exercício de musculação %s.",
+                    exercicio.getNome()));
+            });
     }
 
     private List<RegistroMusculacao> getAllByExercicioId(Integer exercicioId, Integer usuarioId) {
