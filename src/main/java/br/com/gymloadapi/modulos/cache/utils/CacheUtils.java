@@ -12,6 +12,10 @@ public class CacheUtils {
     public static final String CACHE_EXERCICIOS_POR_IDS = "exerciciosPorIds";
     public static final String CACHE_EXERCICIOS_POR_TREINO = "exerciciosPorTreino";
     public static final String CACHE_EXERCICIO_POR_ID = "exercicioPorId";
+    public static final String CACHE_TIPOS_EQUIPAMENTOS_SELECT = "tiposEquipamentosSelect";
+    public static final String CACHE_TIPOS_PEGADAS_SELECT = "tiposPegadasSelect";
+    public static final String CACHE_UNIDADES_PESOS_SELECT = "unidadesPesosSelect";
+    public static final String CACHE_TIPOS_EXERCICIOS_SELECT = "tiposExerciciosSelect";
 
     public static List<String> getCachesExercicio() {
         return List.of(CACHE_TODOS_EXERCICIOS_FILTRO, CACHE_TODOS_EXERCICIOS_SELECT, CACHE_EXERCICIOS_POR_IDS,
