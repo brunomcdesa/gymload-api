@@ -55,12 +55,9 @@ class ExercicioServiceTest {
         }
 
         @Bean
-        public ExercicioService exercicioService(
-            ExercicioRepository repository,
-            ExercicioMapper exercicioMapper,
-            GrupoMuscularService grupoMuscularService,
-            ExercicioHistoricoService historicoService
-        ) {
+        public ExercicioService exercicioService(ExercicioRepository repository, ExercicioMapper exercicioMapper,
+                                                 GrupoMuscularService grupoMuscularService,
+                                                 ExercicioHistoricoService historicoService) {
             return new ExercicioService(repository, exercicioMapper, grupoMuscularService, historicoService);
         }
     }

@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.grupomuscular.service;
 
+import br.com.gymloadapi.modulos.cache.config.CacheConfig;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.grupomuscular.mapper.GrupoMuscularMapper;
 import br.com.gymloadapi.modulos.grupomuscular.mapper.GrupoMuscularMapperImpl;
@@ -10,30 +11,57 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Objects;
 import java.util.Optional;
 
+import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.getCachesGruposMusculares;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@Import({GrupoMuscularServiceTest.TestServiceConfig.class, CacheConfig.class})
 class GrupoMuscularServiceTest {
 
-    private GrupoMuscularService service;
-    private final GrupoMuscularMapper mapper = new GrupoMuscularMapperImpl();
+    @TestConfiguration
+    static class TestServiceConfig {
+        @Bean
+        public GrupoMuscularMapper grupoMuscularMapper() {
+            return new GrupoMuscularMapperImpl();
+        }
 
-    @Mock
+        @Bean
+        public GrupoMuscularService grupoMuscularService(GrupoMuscularRepository repository,
+                                                         GrupoMuscularMapper grupoMuscularMapper) {
+            return new GrupoMuscularService(repository, grupoMuscularMapper);
+        }
+    }
+
+    @Autowired
+    private GrupoMuscularService service;
+    @Autowired
+    private CacheManager cacheManager;
+    @MockitoBean
     private GrupoMuscularRepository repository;
     @Captor
     private ArgumentCaptor<GrupoMuscular> captor;
 
     @BeforeEach
     void setUp() {
-        service = new GrupoMuscularService(repository, mapper);
+        getCachesGruposMusculares().stream()
+            .map(cacheManager::getCache)
+            .filter(Objects::nonNull)
+            .forEach(Cache::clear);
     }
 
     @Test
@@ -47,6 +75,20 @@ class GrupoMuscularServiceTest {
             () -> assertEquals("Peitoral", grupoMuscular.getNome()),
             () -> assertEquals("PEITORAL", grupoMuscular.getCodigo())
         );
+    }
+
+    @Test
+    void salvar_deveRemoverTodosOsCachesDeGruposMusculares_quandoSalvarUmNovoGrupoMuscular() {
+        service.findAllResponse();
+        service.findAllSelect();
+
+        service.salvar(umGrupoMuscularRequest());
+
+        service.findAllResponse();
+        service.findAllSelect();
+
+        verify(repository, times(4)).findAll();
+        verify(repository).save(any(GrupoMuscular.class));
     }
 
     @Test
@@ -68,6 +110,15 @@ class GrupoMuscularServiceTest {
     }
 
     @Test
+    void findAllResponse_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
+        service.findAllResponse();
+        service.findAllResponse();
+        service.findAllResponse();
+
+        verify(repository).findAll();
+    }
+
+    @Test
     void findAllSelect_deveRetornarSelectResponse_quandoSolicitado() {
         when(repository.findAll()).thenReturn(umaListaGrupoMusculares());
 
@@ -81,6 +132,15 @@ class GrupoMuscularServiceTest {
             () -> assertEquals(3, selectResponses.getLast().value()),
             () -> assertEquals("Abdomen", selectResponses.getLast().label())
         );
+
+        verify(repository).findAll();
+    }
+
+    @Test
+    void findAllSelect_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
+        service.findAllSelect();
+        service.findAllSelect();
+        service.findAllSelect();
 
         verify(repository).findAll();
     }
@@ -105,6 +165,17 @@ class GrupoMuscularServiceTest {
             () -> assertEquals("Peitoral", grupoMuscular.getNome()),
             () -> assertEquals("PEITORAL", grupoMuscular.getCodigo())
         );
+
+        verify(repository).findById(1);
+    }
+
+    @Test
+    void findById_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
+        when(repository.findById(1)).thenReturn(Optional.of(umGrupoMuscularPeitoral()));
+
+        service.findById(1);
+        service.findById(1);
+        service.findById(1);
 
         verify(repository).findById(1);
     }
