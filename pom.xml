@@ -26,6 +26,7 @@
         <puppycrawl.checkstyle.version>10.12.6</puppycrawl.checkstyle.version>
         <jwt.version>4.5.0</jwt.version>
         <s3.version>2.31.21</s3.version>
+        <caffeine.version>3.2.0</caffeine.version>
     </properties>
 
     <dependencies>
@@ -122,6 +123,18 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
             <version>${s3.version}</version>
+        </dependency>
+
+        <!-- Spring Cache -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>${caffeine.version}</version>
         </dependency>
     </dependencies>
 

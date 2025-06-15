@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.exercicio.service;
 
+import br.com.gymloadapi.modulos.cache.config.CacheConfig;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapper;
@@ -13,13 +14,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import jakarta.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.getCachesExercicio;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.EDICAO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
@@ -28,29 +37,53 @@ import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@Import({ExercicioServiceTest.TestServiceConfig.class, CacheConfig.class})
 class ExercicioServiceTest {
 
-    private ExercicioService service;
-    private final ExercicioMapper mapper = new ExercicioMapperImpl();
+    @TestConfiguration
+    static class TestServiceConfig {
+        @Bean
+        public ExercicioMapper exercicioMapper() {
+            return new ExercicioMapperImpl();
+        }
 
-    @Mock
+        @Bean
+        public ExercicioService exercicioService(
+            ExercicioRepository repository,
+            ExercicioMapper exercicioMapper,
+            GrupoMuscularService grupoMuscularService,
+            ExercicioHistoricoService historicoService
+        ) {
+            return new ExercicioService(repository, exercicioMapper, grupoMuscularService, historicoService);
+        }
+    }
+
+    @Autowired
+    private ExercicioService service;
+    @Autowired
+    private CacheManager cacheManager;
+    @MockitoBean
     private ExercicioRepository repository;
-    @Mock
+    @MockitoBean
     private GrupoMuscularService grupoMuscularService;
-    @Mock
+    @MockitoBean
     private ExercicioHistoricoService historicoService;
     @Captor
     private ArgumentCaptor<Exercicio> exercicioCaptor;
 
     @BeforeEach
     void setUp() {
-        service = new ExercicioService(repository, mapper, grupoMuscularService, historicoService);
+        getCachesExercicio().stream()
+            .map(cacheManager::getCache)
+            .filter(Objects::nonNull)
+            .forEach(Cache::clear);
     }
 
     @Test
@@ -94,6 +127,29 @@ class ExercicioServiceTest {
     }
 
     @Test
+    void salvar_deveRemoverTodosOsCachesDeExercicios_quandoSalvarUmNovoExercicio() {
+        service.buscarTodosSelect();
+        service.buscarExerciciosPorTreino(1);
+        service.buscarTodos(umExercicioFiltroVazio());
+        service.findByIdIn(List.of(1));
+
+        service.salvar(umExercicioAerobicoRequest(), 1);
+
+        service.buscarTodosSelect();
+        service.buscarExerciciosPorTreino(1);
+        service.buscarTodos(umExercicioFiltroVazio());
+        service.findByIdIn(List.of(1));
+
+        verify(repository, times(2)).findAllComplete();
+        verify(repository, times(2)).buscarExerciciosPorTreino(1);
+        verify(repository, times(2)).findAllCompleteByPredicate(any(Predicate.class));
+        verify(repository, times(2)).findByIdIn(List.of(1));
+        verify(repository).save(any(Exercicio.class));
+        verify(historicoService).salvar(any(Exercicio.class), eq(1), eq(CADASTRO));
+        verifyNoInteractions(grupoMuscularService);
+    }
+
+    @Test
     void salvar_deveLancarException_quandoSolicitadoComTipoExercicioMusculacaoECamposObrigatoriosInvalidos() {
         var request = umExercicioRequestMusculacaoComCamposInvalidos("teste");
 
@@ -108,7 +164,7 @@ class ExercicioServiceTest {
 
     @Test
     void salvar_naoDeveLancarException_quandoSolicitadoComTipoExercicioAerobicoEObrigatoriosInvalidos() {
-        var request =  umExercicioRequestAerobicoComCamposInvalidos("teste");
+        var request = umExercicioRequestAerobicoComCamposInvalidos("teste");
 
         var exception = assertThrowsExactly(ConstraintViolationException.class, () -> service.salvar(request, 1));
         assertThat(exception.getMessage())
@@ -131,6 +187,17 @@ class ExercicioServiceTest {
             () -> assertEquals(2, responses.getLast().id()),
             () -> assertEquals("PUXADA ALTA", responses.getLast().nome())
         );
+
+        verify(repository).findAllCompleteByPredicate(any(Predicate.class));
+    }
+
+    @Test
+    void buscarTodos_deveRetornarDadosDoCache_quandoSolicitadoVariasVezesSeguidas() {
+        when(repository.findAllCompleteByPredicate(any(Predicate.class))).thenReturn(emptyList());
+
+        service.buscarTodos(umExercicioFiltroVazio());
+        service.buscarTodos(umExercicioFiltroVazio());
+        service.buscarTodos(umExercicioFiltroVazio());
 
         verify(repository).findAllCompleteByPredicate(any(Predicate.class));
     }
@@ -159,6 +226,17 @@ class ExercicioServiceTest {
     }
 
     @Test
+    void findById_deveRetornarExercicioDoCache_quandoSolicitadoVariasVezes() {
+        when(repository.findById(1)).thenReturn(Optional.of(umExercicioMusculacao(1)));
+
+        service.findById(1);
+        service.findById(1);
+        service.findById(1);
+
+        verify(repository).findById(1);
+    }
+
+    @Test
     void buscarTodosSelect_deveRetornarSelectDeExercicios_quandoSolicitado() {
         when(repository.findAllComplete()).thenReturn(umaListaDeExercicios());
 
@@ -169,6 +247,17 @@ class ExercicioServiceTest {
             () -> assertEquals(2, exerciciosSelect.getLast().value()),
             () -> assertEquals("PUXADA ALTA (MAQUINA)", exerciciosSelect.getLast().label())
         );
+
+        verify(repository).findAllComplete();
+    }
+
+    @Test
+    void buscarTodosSelect_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
+        when(repository.findAllComplete()).thenReturn(umaListaDeExercicios());
+
+        service.buscarTodosSelect();
+        service.buscarTodosSelect();
+        service.buscarTodosSelect();
 
         verify(repository).findAllComplete();
     }
@@ -190,9 +279,19 @@ class ExercicioServiceTest {
     }
 
     @Test
+    void findByIdIn_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
+        when(repository.findByIdIn(List.of(1, 2))).thenReturn(umaListaDeExercicios());
+
+        service.findByIdIn(List.of(1, 2));
+        service.findByIdIn(List.of(1, 2));
+        service.findByIdIn(List.of(1, 2));
+
+        verify(repository).findByIdIn(List.of(1, 2));
+    }
+
+    @Test
     void buscarExerciciosPorTreino_deveRetornarExerciciosPorTreinoEUsuario_quandoSolicitado() {
-        when(repository.buscarExerciciosPorTreino(1))
-            .thenReturn(umaListaDeExercicios());
+        when(repository.buscarExerciciosPorTreino(1)).thenReturn(umaListaDeExercicios());
 
         var exercicios = service.buscarExerciciosPorTreino(1);
 
@@ -202,6 +301,17 @@ class ExercicioServiceTest {
             () -> assertEquals(2, exercicios.getLast().id()),
             () -> assertEquals("PUXADA ALTA", exercicios.getLast().nome())
         );
+
+        verify(repository).buscarExerciciosPorTreino(1);
+    }
+
+    @Test
+    void buscarExerciciosPorTreino_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
+        when(repository.buscarExerciciosPorTreino(1)).thenReturn(umaListaDeExercicios());
+
+        service.buscarExerciciosPorTreino(1);
+        service.buscarExerciciosPorTreino(1);
+        service.buscarExerciciosPorTreino(1);
 
         verify(repository).buscarExerciciosPorTreino(1);
     }
@@ -307,5 +417,33 @@ class ExercicioServiceTest {
             () -> assertNull(exercicio.getTipoPegada()),
             () -> assertNull(exercicio.getGrupoMuscular())
         );
+    }
+
+    @Test
+    void editar_deveRemoverTodosOsCachesDeExercicio_quandoSolicitadoEditarUmExercicio() {
+        when(repository.findById(2)).thenReturn(Optional.of(umExercicioAerobico(2)));
+
+        service.buscarTodosSelect();
+        service.buscarExerciciosPorTreino(1);
+        service.buscarTodos(umExercicioFiltroVazio());
+        service.findByIdIn(List.of(1));
+        service.findById(2);
+
+        service.editar(2, umExercicioAerobicoRequest(), 1);
+
+        service.buscarTodosSelect();
+        service.buscarExerciciosPorTreino(1);
+        service.buscarTodos(umExercicioFiltroVazio());
+        service.findByIdIn(List.of(1));
+        service.findById(2);
+
+        verify(repository, times(2)).findAllComplete();
+        verify(repository, times(2)).buscarExerciciosPorTreino(1);
+        verify(repository, times(2)).findAllCompleteByPredicate(any(Predicate.class));
+        verify(repository, times(2)).findByIdIn(List.of(1));
+        verify(repository, times(3)).findById(2);
+        verify(repository).save(exercicioCaptor.capture());
+        verify(historicoService).salvar(any(Exercicio.class), eq(1), eq(EDICAO));
+        verifyNoInteractions(grupoMuscularService);
     }
 }

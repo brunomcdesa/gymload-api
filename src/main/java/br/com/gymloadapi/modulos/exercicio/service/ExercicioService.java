@@ -13,10 +13,14 @@ import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.exercicio.repository.ExercicioRepository;
 import br.com.gymloadapi.modulos.grupomuscular.service.GrupoMuscularService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.*;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.EDICAO;
 import static br.com.gymloadapi.modulos.comum.utils.MapUtils.mapNullBoolean;
@@ -30,6 +34,12 @@ public class ExercicioService {
     private final GrupoMuscularService grupoMuscularService;
     private final ExercicioHistoricoService historicoService;
 
+    @Caching(evict = {
+        @CacheEvict(value = CACHE_TODOS_EXERCICIOS_FILTRO, allEntries = true),
+        @CacheEvict(value = CACHE_TODOS_EXERCICIOS_SELECT, allEntries = true),
+        @CacheEvict(value = CACHE_EXERCICIOS_POR_TREINO, allEntries = true),
+        @CacheEvict(value = CACHE_EXERCICIOS_POR_IDS, allEntries = true),
+    })
     public void salvar(ExercicioRequest request, Integer usuarioId) {
         request.aplicarGroupValidators();
         var exercicio = exercicioMapper.mapToModel(
@@ -40,33 +50,45 @@ public class ExercicioService {
         this.saveComHistorico(exercicio, usuarioId, CADASTRO);
     }
 
+    @Cacheable(value = CACHE_TODOS_EXERCICIOS_FILTRO)
     public List<ExercicioResponse> buscarTodos(ExercicioFiltro filtro) {
         return repository.findAllCompleteByPredicate(filtro.toPredicate()).stream()
             .map(exercicioMapper::mapModelToResponse)
             .toList();
     }
 
+    @Cacheable(value = CACHE_EXERCICIO_POR_ID, key = "#id")
     public Exercicio findById(Integer id) {
         return repository.findById(id)
             .orElseThrow(() -> new NotFoundException("Exercício não encontrado."));
     }
 
+    @Cacheable(value = CACHE_TODOS_EXERCICIOS_SELECT)
     public List<SelectResponse> buscarTodosSelect() {
         return repository.findAllComplete().stream()
             .map(exercicioMapper::mapToSelectResponse)
             .toList();
     }
 
+    @Cacheable(value = CACHE_EXERCICIOS_POR_IDS, key = "#exercicioIds")
     public List<Exercicio> findByIdIn(List<Integer> exercicioIds) {
         return repository.findByIdIn(exercicioIds);
     }
 
+    @Cacheable(value = CACHE_EXERCICIOS_POR_TREINO, key = "#treinoId")
     public List<ExercicioResponse> buscarExerciciosPorTreino(Integer treinoId) {
         return repository.buscarExerciciosPorTreino(treinoId).stream()
             .map(exercicioMapper::mapModelToResponse)
             .toList();
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = CACHE_EXERCICIO_POR_ID, key = "#id"),
+        @CacheEvict(value = CACHE_TODOS_EXERCICIOS_FILTRO, allEntries = true),
+        @CacheEvict(value = CACHE_TODOS_EXERCICIOS_SELECT, allEntries = true),
+        @CacheEvict(value = CACHE_EXERCICIOS_POR_TREINO, allEntries = true),
+        @CacheEvict(value = CACHE_EXERCICIOS_POR_IDS, allEntries = true)
+    })
     public void editar(Integer id, ExercicioRequest request, Integer usuarioId) {
         var exercicio = this.findById(id);
         this.validarAlteracaoTipoExercicio(exercicio, request.tipoExercicio());
