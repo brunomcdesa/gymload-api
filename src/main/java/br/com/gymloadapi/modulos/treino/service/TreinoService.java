@@ -12,10 +12,15 @@ import br.com.gymloadapi.modulos.treino.model.Treino;
 import br.com.gymloadapi.modulos.treino.repository.TreinoRepository;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO;
+import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.CACHE_TODOS_TREINOS_DO_USUARIO;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.*;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.INATIVO;
@@ -29,6 +34,10 @@ public class TreinoService {
     private final ExercicioService exercicioService;
     private final TreinoHistoricoService historicoService;
 
+    @Caching(evict = {
+        @CacheEvict(value = CACHE_TODOS_TREINOS_DO_USUARIO, key = "#usuario.id"),
+        @CacheEvict(value = CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO, key = "#usuario.id")
+    })
     public void salvar(TreinoRequest request, Usuario usuario) {
         var exercicios = exercicioService.findByIdIn(request.exerciciosIds());
         var treino = treinoMapper.mapToModel(request, usuario, exercicios);
@@ -36,13 +45,24 @@ public class TreinoService {
         this.saveComHistorico(treino, usuario.getId(), CADASTRO);
     }
 
-    public List<TreinoResponse> listarTodosDoUsuario(Integer usuarioId, boolean buscarInativos) {
-        var situacoes = buscarInativos ? List.of(ATIVO, INATIVO) : List.of(ATIVO);
-        return repository.findByUsuarioIdAndSituacaoIn(usuarioId, situacoes).stream()
+    @Cacheable(value = CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO, key = "#usuarioId")
+    public List<TreinoResponse> listarTodosAtivosDoUsuario(Integer usuarioId) {
+        return this.findAllByUsuarioIdAndSituacoes(usuarioId, List.of(ATIVO)).stream()
             .map(treinoMapper::mapToResponse)
             .toList();
     }
 
+    @Cacheable(value = CACHE_TODOS_TREINOS_DO_USUARIO, key = "#usuarioId")
+    public List<TreinoResponse> listarTodosDoUsuario(Integer usuarioId) {
+        return this.findAllByUsuarioIdAndSituacoes(usuarioId, List.of(ATIVO, INATIVO)).stream()
+            .map(treinoMapper::mapToResponse)
+            .toList();
+    }
+
+    @Caching(evict = {
+        @CacheEvict(value = CACHE_TODOS_TREINOS_DO_USUARIO, key = "#usuarioId"),
+        @CacheEvict(value = CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO, key = "#usuarioId")
+    })
     public void editar(Integer id, TreinoRequest request, Integer usuarioId) {
         var treino = this.findCompleteById(id);
         if (!treino.getExerciciosIds().equals(request.exerciciosIds()) || !treino.getNome().equals(request.nome())) {
@@ -53,6 +73,10 @@ public class TreinoService {
         }
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = CACHE_TODOS_TREINOS_DO_USUARIO, key = "#usuarioId"),
+        @CacheEvict(value = CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO, key = "#usuarioId")
+    })
     public void ativar(Integer id, Integer usuarioId) {
         var treino = this.findCompleteById(id);
         this.validarSituacao(treino.getSituacao(), ATIVO);
@@ -61,6 +85,10 @@ public class TreinoService {
         this.saveComHistorico(treino, usuarioId, ATIVACAO);
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = CACHE_TODOS_TREINOS_DO_USUARIO, key = "#usuarioId"),
+        @CacheEvict(value = CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO, key = "#usuarioId")
+    })
     public void inativar(Integer id, Integer usuarioId) {
         var treino = this.findCompleteById(id);
         this.validarSituacao(treino.getSituacao(), INATIVO);
@@ -83,5 +111,9 @@ public class TreinoService {
     private void saveComHistorico(Treino treino, Integer usuarioId, EAcao acao) {
         repository.save(treino);
         historicoService.salvar(treino, usuarioId, acao);
+    }
+
+    private List<Treino> findAllByUsuarioIdAndSituacoes(Integer usuarioId, List<ESituacao> situacoes) {
+        return repository.findByUsuarioIdAndSituacaoIn(usuarioId, situacoes);
     }
 }

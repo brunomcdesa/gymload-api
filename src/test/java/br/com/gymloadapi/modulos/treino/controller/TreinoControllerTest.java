@@ -80,16 +80,16 @@ class TreinoControllerTest {
         verifyNoInteractions(service);
     }
 
-    @ParameterizedTest
     @WithUserDetails
+    @ParameterizedTest
     @ValueSource(strings = {"true", "false"})
     void listarTodosDoUsuario_deveRetornarOk_quandoInformarParametros(String buscarInativos) {
         isOk(get(URL)
             .param("buscarInativos", String.valueOf(buscarInativos)), mockMvc);
 
         Map.<String, Runnable>of(
-            "true", () -> verify(service).listarTodosDoUsuario(1, true),
-            "false", () -> verify(service).listarTodosDoUsuario(1, false)
+            "true", () -> verify(service).listarTodosDoUsuario(1),
+            "false", () -> verify(service).listarTodosAtivosDoUsuario(1)
         ).get(buscarInativos).run();
     }
 
@@ -97,7 +97,7 @@ class TreinoControllerTest {
     @WithUserDetails
     void listarTodosDoUsuario_deveRetornarOk_quandoNaoInformarParametros() {
         isOk(get(URL), mockMvc);
-        verify(service).listarTodosDoUsuario(1, false);
+        verify(service).listarTodosAtivosDoUsuario(1);
     }
 
     @ParameterizedTest

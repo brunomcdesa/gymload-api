@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.treino.service;
 
+import br.com.gymloadapi.modulos.cache.config.CacheConfig;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
@@ -12,13 +13,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.getCachesTreinos;
+import static br.com.gymloadapi.modulos.comum.enums.EAcao.*;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.INATIVO;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.outraListaDeExercicios;
@@ -28,24 +38,43 @@ import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAd
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@Import({TreinoServiceTest.TestServiceConfig.class, CacheConfig.class})
 class TreinoServiceTest {
 
-    private TreinoService service;
-    private final TreinoMapper mapper = new TreinoMapperImpl();
+    @TestConfiguration
+    static class TestServiceConfig {
+        @Bean
+        public TreinoMapper treinoMapper() {
+            return new TreinoMapperImpl();
+        }
 
-    @Mock
+        @Bean
+        public TreinoService treinoService(TreinoRepository repository, TreinoMapper treinoMapper,
+                                           ExercicioService exercicioService, TreinoHistoricoService treinoHistoricoService) {
+            return new TreinoService(treinoMapper, repository, exercicioService, treinoHistoricoService);
+        }
+    }
+
+    @Autowired
+    private TreinoService service;
+    @Autowired
+    private CacheManager cacheManager;
+    @MockitoBean
     private TreinoRepository repository;
-    @Mock
+    @MockitoBean
     private ExercicioService exercicioService;
-    @Mock
+    @MockitoBean
     private TreinoHistoricoService historicoService;
     @Captor
     private ArgumentCaptor<Treino> captor;
 
     @BeforeEach
     void setUp() {
-        service = new TreinoService(mapper, repository, exercicioService, historicoService);
+        getCachesTreinos().stream()
+            .map(cacheManager::getCache)
+            .filter(Objects::nonNull)
+            .forEach(Cache::clear);
     }
 
     @Test
@@ -56,6 +85,7 @@ class TreinoServiceTest {
 
         verify(exercicioService).findByIdIn(List.of(1, 2));
         verify(repository).save(captor.capture());
+        verify(historicoService).salvar(any(Treino.class), eq(1), eq(CADASTRO));
 
         var treino = captor.getValue();
 
@@ -68,12 +98,29 @@ class TreinoServiceTest {
     }
 
     @Test
-    void listarTodosDoUsuario_deveRetornarTreinosAtivosDoUsuario_quandoSolicitadoComBuscarInativosFalse() {
+    void salvar_deveRemoverCachesTreinos_quandoSalvarTreinoNovoParaOUsuario() {
+        service.listarTodosAtivosDoUsuario(1);
+        service.listarTodosDoUsuario(1);
+
+        service.salvar(umTreinoRequest(), umUsuarioAdmin());
+
+        service.listarTodosAtivosDoUsuario(1);
+        service.listarTodosDoUsuario(1);
+
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO, INATIVO));
+        verify(exercicioService).findByIdIn(List.of(1, 2));
+        verify(repository).save(any(Treino.class));
+        verify(historicoService).salvar(any(Treino.class), eq(1), eq(CADASTRO));
+    }
+
+    @Test
+    void listarTodosAtivosDoUsuario_deveRetornarTreinosAtivosDoUsuario_quandoSolicitado() {
         var usuario = umUsuarioAdmin();
         when(repository.findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO)))
             .thenReturn(List.of(umTreino(ATIVO)));
 
-        var response = service.listarTodosDoUsuario(usuario.getId(), false);
+        var response = service.listarTodosAtivosDoUsuario(usuario.getId());
         assertAll(
             () -> assertEquals(1, response.getFirst().id()),
             () -> assertEquals("Um Treino", response.getFirst().nome()),
@@ -85,12 +132,21 @@ class TreinoServiceTest {
     }
 
     @Test
-    void listarTodosDoUsuario_deveRetornarTodosOsTreinosDoUsuario_quandoSolicitadoComBuscarInativosTrue() {
+    void listarTodosAtivosDoUsuario_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
+        service.listarTodosAtivosDoUsuario(1);
+        service.listarTodosAtivosDoUsuario(1);
+        service.listarTodosAtivosDoUsuario(1);
+
+        verify(repository).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
+    }
+
+    @Test
+    void listarTodosDoUsuario_deveRetornarTodosOsTreinosDoUsuario_quandoSolicitado() {
         var usuario = umUsuarioAdmin();
         when(repository.findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO, INATIVO)))
             .thenReturn(List.of(umTreino(ATIVO), umTreino(INATIVO)));
 
-        var response = service.listarTodosDoUsuario(usuario.getId(), true);
+        var response = service.listarTodosDoUsuario(usuario.getId());
         assertAll(
             () -> assertEquals(1, response.getFirst().id()),
             () -> assertEquals("Um Treino", response.getFirst().nome()),
@@ -100,6 +156,15 @@ class TreinoServiceTest {
         );
 
         verify(repository).findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO, INATIVO));
+    }
+
+    @Test
+    void listarTodosDoUsuario_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
+        service.listarTodosDoUsuario(1);
+        service.listarTodosDoUsuario(1);
+        service.listarTodosDoUsuario(1);
+
+        verify(repository).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO, INATIVO));
     }
 
     @Test
@@ -131,6 +196,7 @@ class TreinoServiceTest {
         verify(repository).findCompleteById(1);
         verify(exercicioService).findByIdIn(List.of(1, 2));
         verify(repository).save(captor.capture());
+        verify(historicoService).salvar(any(Treino.class), eq(1), eq(EDICAO));
 
         var treino = captor.getValue();
         assertAll(
@@ -167,6 +233,27 @@ class TreinoServiceTest {
     }
 
     @Test
+    void editar_deveRemoverCachesTreinos_quandoAlterarAlgumTreino() {
+        when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
+        when(exercicioService.findByIdIn(List.of(1, 2))).thenReturn(umaListaDeExercicios());
+
+        service.listarTodosAtivosDoUsuario(1);
+        service.listarTodosDoUsuario(1);
+
+        service.editar(1, maisUmTreinoRequest(), 1);
+
+        service.listarTodosAtivosDoUsuario(1);
+        service.listarTodosDoUsuario(1);
+
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO, INATIVO));
+        verify(exercicioService).findByIdIn(List.of(1, 2));
+        verify(repository).findCompleteById(1);
+        verify(repository).save(any(Treino.class));
+        verify(historicoService).salvar(any(Treino.class), eq(1), eq(EDICAO));
+    }
+
+    @Test
     void ativar_deveLancarException_quandoNaoEncontrTreino() {
         when(repository.findCompleteById(1)).thenReturn(Optional.empty());
 
@@ -182,8 +269,7 @@ class TreinoServiceTest {
 
     @Test
     void ativar_deveLancarException_quandoTreinoJaEstiverAtivo() {
-        var treino = umTreino(ATIVO);
-        when(repository.findCompleteById(1)).thenReturn(Optional.of(treino));
+        when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
 
         var exception = assertThrowsExactly(
             ValidacaoException.class,
@@ -197,8 +283,7 @@ class TreinoServiceTest {
 
     @Test
     void ativar_deveAtivarTreino_quandoTreinoEstiverInativo() {
-        var treino = umTreino(INATIVO);
-        when(repository.findCompleteById(1)).thenReturn(Optional.of(treino));
+        when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(INATIVO)));
 
         service.ativar(1, 1);
 
@@ -206,6 +291,25 @@ class TreinoServiceTest {
         verify(repository).save(captor.capture());
 
         assertEquals(ATIVO, captor.getValue().getSituacao());
+    }
+
+    @Test
+    void ativar_deveRemoverCachesTreinos_quandoAtivarUmTreinoDoUsuario() {
+        when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(INATIVO)));
+
+        service.listarTodosAtivosDoUsuario(1);
+        service.listarTodosDoUsuario(1);
+
+        service.ativar(1, 1);
+
+        service.listarTodosAtivosDoUsuario(1);
+        service.listarTodosDoUsuario(1);
+
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO, INATIVO));
+        verify(repository).findCompleteById(1);
+        verify(repository).save(any(Treino.class));
+        verify(historicoService).salvar(any(Treino.class), eq(1), eq(ATIVACAO));
     }
 
     @Test
@@ -224,8 +328,7 @@ class TreinoServiceTest {
 
     @Test
     void inativar_deveLancarException_quandoTreinoJaEstiverInativo() {
-        var treino = umTreino(INATIVO);
-        when(repository.findCompleteById(1)).thenReturn(Optional.of(treino));
+        when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(INATIVO)));
 
         var exception = assertThrowsExactly(
             ValidacaoException.class,
@@ -239,8 +342,7 @@ class TreinoServiceTest {
 
     @Test
     void inativar_deveInativarTreino_quandoTreinoEstiverAtivo() {
-        var treino = umTreino(ATIVO);
-        when(repository.findCompleteById(1)).thenReturn(Optional.of(treino));
+        when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
 
         service.inativar(1, 1);
 
@@ -250,4 +352,22 @@ class TreinoServiceTest {
         assertEquals(INATIVO, captor.getValue().getSituacao());
     }
 
+    @Test
+    void inativar_deveRemoverCachesTreinos_quandoInativarUmTreinoDoUsuario() {
+        when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
+
+        service.listarTodosAtivosDoUsuario(1);
+        service.listarTodosDoUsuario(1);
+
+        service.inativar(1, 1);
+
+        service.listarTodosAtivosDoUsuario(1);
+        service.listarTodosDoUsuario(1);
+
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO, INATIVO));
+        verify(repository).findCompleteById(1);
+        verify(repository).save(any(Treino.class));
+        verify(historicoService).salvar(any(Treino.class), eq(1), eq(INATIVACAO));
+    }
 }
