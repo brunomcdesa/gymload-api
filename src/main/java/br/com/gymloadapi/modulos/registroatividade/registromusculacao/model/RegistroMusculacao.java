@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.registroatividade.registromusculacao.model;
 
+import br.com.gymloadapi.modulos.comum.enums.ETipoPegada;
 import br.com.gymloadapi.modulos.comum.enums.EUnidadePeso;
 import br.com.gymloadapi.modulos.registroatividade.model.RegistroAtividade;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 
 import jakarta.persistence.*;
 
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.SEQUENCE;
 
 @Table
@@ -38,6 +40,10 @@ public class RegistroMusculacao extends RegistroAtividade {
 
     @Column(nullable = false)
     private Integer qtdSeries;
+
+    @Column
+    @Enumerated(STRING)
+    private ETipoPegada tipoPegada;
 
     public String getPesoComUnidadePeso() {
         return this.peso + " (" + unidadePeso.name() + ")";

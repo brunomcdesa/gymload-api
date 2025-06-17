@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import java.time.LocalDate;
 import java.util.List;
 
+import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.*;
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacao;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
@@ -24,6 +25,7 @@ public class RegistroMusculacaoHelper {
             .observacao("Observacao")
             .exercicio(umExercicioMusculacao(1))
             .usuario(umUsuarioAdmin())
+            .tipoPegada(SUPINADA)
             .build();
     }
 
@@ -38,6 +40,7 @@ public class RegistroMusculacaoHelper {
             .observacao("Observacao")
             .exercicio(umExercicioMusculacao(1))
             .usuario(umUsuarioAdmin())
+            .tipoPegada(MISTA)
             .build();
     }
 
@@ -52,6 +55,7 @@ public class RegistroMusculacaoHelper {
             .qtdSeries(3)
             .exercicio(umExercicioMusculacao(1))
             .usuario(umUsuarioAdmin())
+            .tipoPegada(NEUTRA)
             .build();
     }
 

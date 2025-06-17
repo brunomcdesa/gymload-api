@@ -2,7 +2,6 @@ package br.com.gymloadapi.modulos.exercicio.model;
 
 import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
 import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
-import br.com.gymloadapi.modulos.comum.enums.ETipoPegada;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
 import br.com.gymloadapi.modulos.treino.model.Treino;
 import lombok.*;
@@ -41,10 +40,6 @@ public class Exercicio {
     @Column
     @Enumerated(STRING)
     private ETipoExercicio tipoExercicio;
-
-    @Column
-    @Enumerated(STRING)
-    private ETipoPegada tipoPegada;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "FK_GRUPO_MUSCULAR", referencedColumnName = "ID",

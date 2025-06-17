@@ -10,7 +10,7 @@ public enum ETipoPegada {
     PRONADA("Pronada"),
     SUPINADA("Supinada"),
     NEUTRA("Neutra"),
-    CORDA("Corda");
+    MISTA("Mista");
 
     private final String descricao;
 }

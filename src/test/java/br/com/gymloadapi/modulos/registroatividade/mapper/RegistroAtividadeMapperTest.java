@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.MISTA;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.*;
@@ -33,7 +35,8 @@ class RegistroAtividadeMapperTest {
             () -> assertNotNull(registroMusculacao.getDataCadastro()),
             () -> assertEquals("Observacao", registroMusculacao.getObservacao()),
             () -> assertEquals(1, registroMusculacao.getExercicio().getId()),
-            () -> assertEquals(2, registroMusculacao.getUsuario().getId())
+            () -> assertEquals(2, registroMusculacao.getUsuario().getId()),
+            () -> assertEquals(PRONADA, registroMusculacao.getTipoPegada())
         );
     }
 
@@ -149,7 +152,8 @@ class RegistroAtividadeMapperTest {
             () -> assertNotNull(registroMusculacao.getDataCadastro()),
             () -> assertEquals("Observacao", registroMusculacao.getObservacao()),
             () -> assertEquals(1, registroMusculacao.getExercicio().getId()),
-            () -> assertEquals(1, registroMusculacao.getUsuario().getId())
+            () -> assertEquals(1, registroMusculacao.getUsuario().getId()),
+            () -> assertEquals(PRONADA, registroMusculacao.getTipoPegada())
         );
     }
 
@@ -239,7 +243,8 @@ class RegistroAtividadeMapperTest {
             () -> assertNotNull(novoRegistroMusculacao.getDataCadastro()),
             () -> assertEquals("Observacao", novoRegistroMusculacao.getObservacao()),
             () -> assertEquals(1, novoRegistroMusculacao.getExercicio().getId()),
-            () -> assertEquals(1, novoRegistroMusculacao.getUsuario().getId())
+            () -> assertEquals(1, novoRegistroMusculacao.getUsuario().getId()),
+            () -> assertEquals(MISTA, novoRegistroMusculacao.getTipoPegada())
         );
     }
 

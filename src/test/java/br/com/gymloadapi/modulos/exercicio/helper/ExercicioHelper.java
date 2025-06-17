@@ -10,7 +10,6 @@ import java.util.List;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.MAQUINA;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.*;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.*;
 import static java.util.Collections.emptyList;
 
@@ -18,23 +17,23 @@ import static java.util.Collections.emptyList;
 public class ExercicioHelper {
 
     public static ExercicioRequest umExercicioMusculacaoRequest() {
-        return new ExercicioRequest("SUPINO RETO", MUSCULACAO, "Supino Reto", 1, HALTER, PRONADA);
+        return new ExercicioRequest("SUPINO RETO", MUSCULACAO, "Supino Reto", 1, HALTER);
     }
 
     public static ExercicioRequest umExercicioAerobicoRequest() {
-        return new ExercicioRequest("ESCADA", AEROBICO, "Escada", null, null, null);
+        return new ExercicioRequest("ESCADA", AEROBICO, "Escada", null, null);
     }
 
     public static ExercicioRequest umExercicioRequestComCamposInvalidos(String nome) {
-        return new ExercicioRequest(nome, null, null, null, null, null);
+        return new ExercicioRequest(nome, null, null, null, null);
     }
 
     public static ExercicioRequest umExercicioRequestMusculacaoComCamposInvalidos(String nome) {
-        return new ExercicioRequest(nome, MUSCULACAO, null, null, null, null);
+        return new ExercicioRequest(nome, MUSCULACAO, null, null, null);
     }
 
     public static ExercicioRequest umExercicioRequestAerobicoComCamposInvalidos(String nome) {
-        return new ExercicioRequest(nome, AEROBICO, null, 1, HALTER, PRONADA);
+        return new ExercicioRequest(nome, AEROBICO, null, 1, HALTER);
     }
 
     public static Exercicio umExercicioMusculacao(Integer id) {
@@ -44,7 +43,6 @@ public class ExercicioHelper {
             .descricao("Supino Reto")
             .tipoEquipamento(HALTER)
             .tipoExercicio(MUSCULACAO)
-            .tipoPegada(PRONADA)
             .grupoMuscular(umGrupoMuscularPeitoral())
             .treinos(emptyList())
             .build();
@@ -57,7 +55,6 @@ public class ExercicioHelper {
             .descricao("Puxada Alta")
             .tipoEquipamento(MAQUINA)
             .tipoExercicio(MUSCULACAO)
-            .tipoPegada(PRONADA)
             .grupoMuscular(umGrupoMuscularCostas())
             .treinos(emptyList())
             .build();

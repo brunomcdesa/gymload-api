@@ -11,18 +11,19 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
 
 @UtilityClass
 public class RegistroAtividadeHelper {
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestComCamposNull() {
-        return new RegistroAtividadeRequest(null, null, null, null, null, null, null, null);
+        return new RegistroAtividadeRequest(null, null, null, null, null, null, null, null, null);
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaMusculacao() {
         return new RegistroAtividadeRequest(1, "Observacao", 22.5, KG, 12, 4,
-            null, null);
+            null, null, PRONADA);
     }
 
     public static RegistroAtividadeFiltros umRegistroAtividadeFiltros() {
@@ -31,17 +32,17 @@ public class RegistroAtividadeHelper {
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaAerobico() {
         return new RegistroAtividadeRequest(3, "Observacao", null, null, null, null,
-            20.0, 1.5);
+            20.0, 1.5, null);
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaCalistenia() {
         return new RegistroAtividadeRequest(4, "Observacao", null, null, 20, 5,
-            null, null);
+            null, null, null);
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestSomenteComPesoEUnidadePeso(Double peso,
                                                                                                 EUnidadePeso unidadePeso) {
-        return new RegistroAtividadeRequest(null, null, peso, unidadePeso, null, null, null, null);
+        return new RegistroAtividadeRequest(null, null, peso, unidadePeso, null, null, null, null, null);
     }
 
     public static RegistroAtividadeResponse umRegistroAtividadeResponseComDadosDeMusculacao() {

@@ -2,7 +2,6 @@ package br.com.gymloadapi.modulos.exercicio.dto;
 
 import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
 import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
-import br.com.gymloadapi.modulos.comum.enums.ETipoPegada;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -14,9 +13,6 @@ public record ExercicioResponse(
     String descricao,
     String grupoMuscularNome,
     ETipoExercicio tipoExercicio,
-    //TODO: remover este atributo apos subir a proxima versao
-    ETipoExercicio tipoExercicioo,
-    ETipoEquipamento tipoEquipamento,
-    ETipoPegada tipoPegada
+    ETipoEquipamento tipoEquipamento
 ) {
 }

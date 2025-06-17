@@ -30,7 +30,7 @@ class EnumServiceTest {
         assertThat(service.getTiposPegadasSelect())
             .extracting(SelectResponse::value, SelectResponse::label)
             .containsExactly(tuple("PRONADA", "Pronada"), tuple("SUPINADA", "Supinada"),
-                tuple("NEUTRA", "Neutra"), tuple("CORDA", "Corda"));
+                tuple("NEUTRA", "Neutra"), tuple("MISTA", "Mista"));
     }
 
     @Test

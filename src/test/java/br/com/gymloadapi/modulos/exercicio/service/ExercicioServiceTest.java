@@ -34,7 +34,6 @@ import static br.com.gymloadapi.modulos.comum.enums.EAcao.EDICAO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.AEROBICO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
 import static java.util.Collections.emptyList;
@@ -99,7 +98,6 @@ class ExercicioServiceTest {
             () -> assertEquals("Supino Reto", exercicio.getDescricao()),
             () -> assertEquals(MUSCULACAO, exercicio.getTipoExercicio()),
             () -> assertEquals(HALTER, exercicio.getTipoEquipamento()),
-            () -> assertEquals(PRONADA, exercicio.getTipoPegada()),
             () -> assertEquals("Peitoral", exercicio.getGrupoMuscular().getNome())
         );
     }
@@ -118,7 +116,6 @@ class ExercicioServiceTest {
             () -> assertEquals("Escada", exercicio.getDescricao()),
             () -> assertEquals(AEROBICO, exercicio.getTipoExercicio()),
             () -> assertNull(exercicio.getTipoEquipamento()),
-            () -> assertNull(exercicio.getTipoPegada()),
             () -> assertNull(exercicio.getGrupoMuscular())
         );
     }
@@ -153,8 +150,7 @@ class ExercicioServiceTest {
         var exception = assertThrowsExactly(ConstraintViolationException.class, () -> service.salvar(request, 1));
         assertThat(exception.getMessage())
             .contains("tipoEquipamento: é obrigatório.",
-                "grupoMuscularId: é obrigatório.",
-                "tipoPegada: é obrigatório.");
+                "grupoMuscularId: é obrigatório.");
 
         verifyNoInteractions(grupoMuscularService, repository, historicoService);
     }
@@ -166,8 +162,7 @@ class ExercicioServiceTest {
         var exception = assertThrowsExactly(ConstraintViolationException.class, () -> service.salvar(request, 1));
         assertThat(exception.getMessage())
             .contains("tipoEquipamento: deve ser nulo",
-                "grupoMuscularId: deve ser nulo",
-                "tipoPegada: deve ser nulo");
+                "grupoMuscularId: deve ser nulo");
 
         verifyNoInteractions(grupoMuscularService, repository, historicoService);
     }
@@ -347,7 +342,6 @@ class ExercicioServiceTest {
             () -> service.editar(1, umExercicioRequestMusculacaoComCamposInvalidos("teste"), 1));
         assertThat(exception.getMessage())
             .contains("tipoEquipamento: é obrigatório.",
-                "tipoPegada: é obrigatório.",
                 "grupoMuscularId: é obrigatório.");
 
         verify(repository).findById(1);
@@ -363,7 +357,6 @@ class ExercicioServiceTest {
             () -> service.editar(1, umExercicioRequestAerobicoComCamposInvalidos("teste"), 1));
         assertThat(exception.getMessage())
             .contains("tipoEquipamento: deve ser nulo",
-                "tipoPegada: deve ser nulo",
                 "grupoMuscularId: deve ser nulo");
 
         verify(repository).findById(1);
@@ -389,7 +382,6 @@ class ExercicioServiceTest {
             () -> assertEquals("Supino Reto", exercicio.getDescricao()),
             () -> assertEquals(MUSCULACAO, exercicio.getTipoExercicio()),
             () -> assertEquals(HALTER, exercicio.getTipoEquipamento()),
-            () -> assertEquals(PRONADA, exercicio.getTipoPegada()),
             () -> assertEquals("Peitoral", exercicio.getGrupoMuscular().getNome())
         );
     }
@@ -411,7 +403,6 @@ class ExercicioServiceTest {
             () -> assertEquals("Escada", exercicio.getDescricao()),
             () -> assertEquals(AEROBICO, exercicio.getTipoExercicio()),
             () -> assertNull(exercicio.getTipoEquipamento()),
-            () -> assertNull(exercicio.getTipoPegada()),
             () -> assertNull(exercicio.getGrupoMuscular())
         );
     }

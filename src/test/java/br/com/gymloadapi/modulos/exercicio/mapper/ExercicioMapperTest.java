@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -23,7 +22,6 @@ class ExercicioMapperTest {
             () -> assertEquals("SUPINO RETO", model.getNome()),
             () -> assertEquals("Supino Reto", model.getDescricao()),
             () -> assertEquals(HALTER, model.getTipoEquipamento()),
-            () -> assertEquals(PRONADA, model.getTipoPegada()),
             () -> assertEquals(1, model.getGrupoMuscular().getId()),
             () -> assertEquals("Peitoral", model.getGrupoMuscular().getNome())
         );
@@ -38,9 +36,7 @@ class ExercicioMapperTest {
             () -> assertEquals("SUPINO RETO", response.nome()),
             () -> assertEquals("Supino Reto", response.descricao()),
             () -> assertEquals("Peitoral", response.grupoMuscularNome()),
-            () -> assertEquals(MUSCULACAO, response.tipoExercicio()),
-            () -> assertEquals(PRONADA, response.tipoPegada()),
-            () -> assertEquals(MUSCULACAO, response.tipoExercicioo())
+            () -> assertEquals(MUSCULACAO, response.tipoExercicio())
         );
     }
 
@@ -63,7 +59,6 @@ class ExercicioMapperTest {
             () -> assertEquals("SUPINO RETO", exercicio.getNome()),
             () -> assertEquals("Supino Reto", exercicio.getDescricao()),
             () -> assertEquals(HALTER, exercicio.getTipoEquipamento()),
-            () -> assertEquals(PRONADA, exercicio.getTipoPegada()),
             () -> assertEquals(1, exercicio.getGrupoMuscular().getId()),
             () -> assertEquals("Peitoral", exercicio.getGrupoMuscular().getNome())
         );

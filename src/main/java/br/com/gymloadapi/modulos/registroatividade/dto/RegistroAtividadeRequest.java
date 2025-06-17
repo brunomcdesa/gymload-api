@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.registroatividade.dto;
 
+import br.com.gymloadapi.modulos.comum.enums.ETipoPegada;
 import br.com.gymloadapi.modulos.comum.enums.EUnidadePeso;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Aerobico;
@@ -38,7 +39,11 @@ public record RegistroAtividadeRequest(
 
     @Null(groups = {Musculacao.class, Calistenia.class})
     @NotNull(groups = Aerobico.class)
-    Double duracao
+    Double duracao,
+
+    @Null(groups = {Aerobico.class, Calistenia.class})
+    @NotNull(groups = Musculacao.class)
+    ETipoPegada tipoPegada
 ) {
 
     public void aplicarGroupValidators(Class<?> groupValidator) {

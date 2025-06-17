@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.SUPINADA;
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacao;
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.umRegistroAtividadeRequestParaMusculacao;
@@ -57,7 +59,8 @@ class RegistroMusculacaoServiceTest {
             () -> assertEquals(12, registroMusculacao.getQtdRepeticoes()),
             () -> assertEquals(4, registroMusculacao.getQtdSeries()),
             () -> assertEquals("SUPINO RETO", registroMusculacao.getExercicio().getNome()),
-            () -> assertEquals("Usuario Admin", registroMusculacao.getUsuario().getNome())
+            () -> assertEquals("Usuario Admin", registroMusculacao.getUsuario().getNome()),
+            () -> assertEquals(PRONADA, registroMusculacao.getTipoPegada())
         );
     }
 
@@ -193,7 +196,8 @@ class RegistroMusculacaoServiceTest {
             () -> assertEquals(12, registroMusculacao.getQtdRepeticoes()),
             () -> assertEquals(4, registroMusculacao.getQtdSeries()),
             () -> assertEquals("SUPINO RETO", registroMusculacao.getExercicio().getNome()),
-            () -> assertEquals("Usuario Admin", registroMusculacao.getUsuario().getNome())
+            () -> assertEquals("Usuario Admin", registroMusculacao.getUsuario().getNome()),
+            () -> assertEquals(PRONADA, registroMusculacao.getTipoPegada())
         );
     }
 
@@ -255,7 +259,8 @@ class RegistroMusculacaoServiceTest {
             () -> assertEquals(12, registroMusculacao.getQtdRepeticoes()),
             () -> assertEquals(4, registroMusculacao.getQtdSeries()),
             () -> assertEquals("SUPINO RETO", registroMusculacao.getExercicio().getNome()),
-            () -> assertEquals("Usuario Admin", registroMusculacao.getUsuario().getNome())
+            () -> assertEquals("Usuario Admin", registroMusculacao.getUsuario().getNome()),
+            () -> assertEquals(SUPINADA, registroMusculacao.getTipoPegada())
         );
     }
 
