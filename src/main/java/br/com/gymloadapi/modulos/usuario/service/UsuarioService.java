@@ -11,6 +11,7 @@ import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapper;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import br.com.gymloadapi.modulos.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import static br.com.gymloadapi.modulos.comum.utils.ValidacaoUtils.validarUsuari
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
@@ -40,17 +42,22 @@ public class UsuarioService {
 
     public void cadastrar(UsuarioRequest usuarioRequest, boolean isCadastroAdmin, MultipartFile imagem,
                           Usuario usuarioAutenticado) {
+        log.info("Iniciando cadastro de usuario: {}", usuarioRequest.username());
         var email = new Email(usuarioRequest.email());
         this.validarUsuarioExistente(usuarioRequest, email);
+        log.info("Email valido e usuario inexistente no sistema.");
 
         var novoUsuario = usuarioMapper.mapToModel(usuarioRequest, encodePassword(usuarioRequest.password()),
             isCadastroAdmin ? ROLES_ADMIN : ROLES_USER, email);
+        log.info("Novo usuario criado.");
 
         if (imagem != null) {
             this.realizarUploadImagemPerfil(novoUsuario, imagem);
+            log.info("Imagem do usuario salva no backblaze.");
         }
 
         this.salvarComHistorico(novoUsuario, usuarioAutenticado, CADASTRO);
+        log.info("Finalizando cadastro do usuario: {}", usuarioRequest.username());
     }
 
     public UserDetails findByUsername(String username) {
