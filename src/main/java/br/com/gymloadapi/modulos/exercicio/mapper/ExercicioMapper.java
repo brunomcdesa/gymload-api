@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public interface ExercicioMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "treinos", ignore = true)
     @Mapping(target = "nome", source = "request.nome")
     @Mapping(target = "grupoMuscular", source = "grupoMuscular")
     Exercicio mapToModel(ExercicioRequest request, GrupoMuscular grupoMuscular);

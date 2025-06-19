@@ -13,16 +13,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Mapper(componentModel = "spring", imports = {UUID.class, Email.class, LocalDateTime.class})
+@Mapper(componentModel = "spring", imports = {UUID.class, LocalDateTime.class})
 public interface UsuarioMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "senha", source = "encryptedPassword")
     @Mapping(target = "roles", source = "roles")
-    @Mapping(target = "uuid", expression = "java(UUID.randomUUID())")
     @Mapping(target = "email", source = "email")
+    @Mapping(target = "imagemPerfil", ignore = true)
+    @Mapping(target = "senha", source = "encryptedPassword")
+    @Mapping(target = "uuid", expression = "java(UUID.randomUUID())")
     Usuario mapToModel(UsuarioRequest usuarioRequest, String encryptedPassword, List<EUserRole> roles, Email email);
 
+    @Mapping(target = "email", source = "usuario.email.valor")
     UsuarioResponse mapModelToResponse(Usuario usuario);
 
     @BeanMapping(

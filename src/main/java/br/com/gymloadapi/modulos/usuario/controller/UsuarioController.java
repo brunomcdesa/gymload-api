@@ -60,4 +60,9 @@ public class UsuarioController {
     public String buscarUrlImagemPerfil(@AuthenticationPrincipal Usuario usuario) {
         return service.buscarUrlImagemPerfil(usuario);
     }
+
+    @GetMapping("detalhar")
+    public UsuarioResponse detalharDadosProprios(@AuthenticationPrincipal Usuario usuario) {
+        return service.buscarPorUuid(usuario.getUuid());
+    }
 }

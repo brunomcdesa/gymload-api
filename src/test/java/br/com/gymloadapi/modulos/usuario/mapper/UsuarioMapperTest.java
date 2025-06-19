@@ -39,6 +39,7 @@ class UsuarioMapperTest {
             () -> assertEquals("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9", response.uuid().toString()),
             () -> assertEquals("Usuario Admin", response.nome()),
             () -> assertEquals("usuarioAdmin", response.username()),
+            () -> assertEquals("testeAdmin@teste.com", response.email()),
             () -> assertEquals(18, response.idade()),
             () -> assertEquals(50.4, response.pesoCorporal()),
             () -> assertEquals(1.6, response.altura()),

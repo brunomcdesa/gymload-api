@@ -9,6 +9,7 @@ import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -42,9 +43,10 @@ class UsuarioControllerTest {
     @MockitoBean
     private UsuarioService service;
 
+    @EmptySource
     @WithAnonymousUser
     @ParameterizedTest
-    @ValueSource(strings = {"", "/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar", "/url-imagem-perfil"})
+    @ValueSource(strings = {"/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar", "/url-imagem-perfil", "/detalhar"})
     void gets_devemRetorarUnauthorized_quandoUsuarioNaoAutenticado(String endpoint) {
         isUnauthorized(get(URL + endpoint), mockMvc);
         verifyNoInteractions(service);
@@ -164,14 +166,15 @@ class UsuarioControllerTest {
 
     @WithUserDetails
     @ParameterizedTest
-    @ValueSource(strings = {"/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar", "/url-imagem-perfil"})
-    void detalharByUuid_deveRetornarOk_quandoUsuarioAutenticado(String endpoint) {
+    @ValueSource(strings = {"/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar", "/url-imagem-perfil", "/detalhar"})
+    void gets_devemRetornarOk_quandoUsuarioAutenticado(String endpoint) {
         isOk(get(URL + endpoint), mockMvc);
 
         Map.<String, Runnable>of(
             "/8689ea4e-3a85-4b6b-80f2-fc04f3cdd712/detalhar", () -> verify(service)
                 .buscarPorUuid(UUID.fromString("8689ea4e-3a85-4b6b-80f2-fc04f3cdd712")),
-            "/url-imagem-perfil", () -> verify(service).buscarUrlImagemPerfil(umUsuarioAdmin())
+            "/url-imagem-perfil", () -> verify(service).buscarUrlImagemPerfil(umUsuarioAdmin()),
+                "/detalhar", () -> verify(service).buscarPorUuid(UUID.fromString("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9"))
         ).get(endpoint).run();
     }
 }

@@ -53,6 +53,8 @@ public class SecurityConfiguration {
                 .hasAnyRole(ADMIN.name(), USER.name())
                 .requestMatchers(GET, "/api/usuarios/url-imagem-perfil")
                 .hasAnyRole(ADMIN.name(), USER.name())
+                .requestMatchers(GET, "/api/usuarios/detalhar")
+                .hasAnyRole(ADMIN.name(), USER.name())
                 .requestMatchers("/api/usuarios/**")
                 .hasRole(ADMIN.name())
                 .anyRequest().authenticated()
