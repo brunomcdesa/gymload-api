@@ -27,7 +27,7 @@ api:
     secretKey: ${BACKBLAZE_SECRET_KEY}
     region: ${BACKBLAZE_REGION}
     bucket:
-      name: gymload
+      name: ${BACKBLAZE_BUCKET}
     endpoint: ${BACKBLAZE_ENDPOINT}
     default-user-image: user-default.png
 
