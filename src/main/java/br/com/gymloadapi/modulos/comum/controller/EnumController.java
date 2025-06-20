@@ -14,25 +14,30 @@ import java.util.List;
 @RequestMapping("api/enums")
 public class EnumController {
 
-    private final EnumService enumService;
+    private final EnumService service;
 
     @GetMapping("tipos-exercicios/select")
     public List<SelectResponse> getTiposExerciciosSelect() {
-        return enumService.getTiposExerciciosSelect();
+        return service.getTiposExerciciosSelect();
     }
 
     @GetMapping("tipos-pegadas/select")
     public List<SelectResponse> getTiposPegadasSelect() {
-        return enumService.getTiposPegadasSelect();
+        return service.getTiposPegadasSelect();
     }
 
     @GetMapping("unidades-pesos/select")
     public List<SelectResponse> getUnidadesPesosSelect() {
-        return enumService.getUnidadesPesosSelect();
+        return service.getUnidadesPesosSelect();
     }
 
     @GetMapping("tipos-equipamentos/select")
     public List<SelectResponse> getTiposEquipamentosSelect() {
-        return enumService.getTiposEquipamentosSelect();
+        return service.getTiposEquipamentosSelect();
+    }
+
+    @GetMapping("sexo/select")
+    public List<SelectResponse> getSexoSelect() {
+        return service.getSexoSelect();
     }
 }

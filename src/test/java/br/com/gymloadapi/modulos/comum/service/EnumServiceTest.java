@@ -48,4 +48,12 @@ class EnumServiceTest {
                 tuple("AEROBICO", "Aeróbico"),
                 tuple("CALISTENIA", "Calistenia"));
     }
+
+    @Test
+    void getSexoSelect_deveRetornarTodosSexos_quandoSolicitado() {
+        assertThat(service.getSexoSelect())
+            .extracting(SelectResponse::value, SelectResponse::label)
+            .containsExactly(tuple("MASCULINO", "Masculino"),
+                tuple("FEMININO", "Feminino"));
+    }
 }

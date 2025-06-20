@@ -16,6 +16,7 @@ public class CacheUtils {
     public static final String CACHE_TIPOS_PEGADAS_SELECT = "tiposPegadasSelect";
     public static final String CACHE_UNIDADES_PESOS_SELECT = "unidadesPesosSelect";
     public static final String CACHE_TIPOS_EXERCICIOS_SELECT = "tiposExerciciosSelect";
+    public static final String CACHE_SEXO_SELECT = "sexoSelect";
     public static final String CACHE_TODOS_GRUPOS_MUSCULARES = "todosGruposMusculares";
     public static final String CACHE_TODOS_GRUPOS_MUSCULARES_SELECT = "todosGruposMuscularesSelect";
     public static final String CACHE_GRUPO_MUSCULAR_POR_ID = "todosGrupoMuscularPorId";

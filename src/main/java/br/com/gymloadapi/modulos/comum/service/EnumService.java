@@ -1,10 +1,7 @@
 package br.com.gymloadapi.modulos.comum.service;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
-import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
-import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
-import br.com.gymloadapi.modulos.comum.enums.ETipoPegada;
-import br.com.gymloadapi.modulos.comum.enums.EUnidadePeso;
+import br.com.gymloadapi.modulos.comum.enums.*;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +38,13 @@ public class EnumService {
     public List<SelectResponse> getTiposExerciciosSelect() {
         return Arrays.stream(ETipoExercicio.values())
             .map(tipoExercicio -> new SelectResponse(tipoExercicio.name(), tipoExercicio.getDescricao()))
+            .toList();
+    }
+
+    @Cacheable(value = CACHE_SEXO_SELECT)
+    public List<SelectResponse> getSexoSelect() {
+        return Arrays.stream(ESexo.values())
+            .map(sexo -> new SelectResponse(sexo.name(), sexo.getDescricao()))
             .toList();
     }
 }
