@@ -139,14 +139,14 @@ class UsuarioControllerTest {
 
     @WithUserDetails
     @ParameterizedTest
-    @CsvSource(value = {"NULL,teste@teste.com,NULL,'123'", "'','','',''", "'  ','  ','  ','   '"}, nullValues = "NULL")
+    @CsvSource(value = {"NULL,NULL,NULL,'123'", "'','','',''", "'  ','  ','  ','   '"}, nullValues = "NULL")
     void editar_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos(String nome, String email,
                                                                          String username, String password) {
         var request = umUsuarioRequest(nome, email, username, password);
         isBadRequestMultipart(PUT, URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar",
             mockMvc, umMockMultipartFile(), "usuarioRequest", request,
             "O campo nome é obrigatório.",
-            "O campo email deve ser nulo",
+            "O campo email é obrigatório.",
             "O campo username é obrigatório.",
             "O campo password deve ser nulo");
 
@@ -156,7 +156,7 @@ class UsuarioControllerTest {
     @Test
     @WithUserDetails
     void editar_deveRetornarNoContent_quandoCamposObrigatoriosValidos() {
-        var request = umUsuarioRequestSemSenha();
+        var request = umUsuarioRequestSemSenha("teste@teste.com");
         var file = umMockMultipartFile();
         isNoContentMultipart(PUT, URL + "/c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9/editar", mockMvc,
             file, "usuarioRequest", request);

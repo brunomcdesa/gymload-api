@@ -30,8 +30,8 @@ public interface UsuarioMapper {
     @BeanMapping(
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
-    @Mapping(target = "email", ignore = true)
-    void editar(UsuarioRequest usuarioRequest, @MappingTarget Usuario usuario);
+    @Mapping(target = "email", source = "email")
+    void editar(UsuarioRequest usuarioRequest, Email email, @MappingTarget Usuario usuario);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "acao", source = "acao")

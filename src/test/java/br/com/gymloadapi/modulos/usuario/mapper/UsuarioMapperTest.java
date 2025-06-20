@@ -50,11 +50,11 @@ class UsuarioMapperTest {
     @Test
     void editar_deveEditarUsuario_quandoSolicitado() {
         var usuario = umUsuarioAdmin();
-        mapper.editar(umUsuarioRequest(), usuario);
+        mapper.editar(umUsuarioRequest(), umEmail(), usuario);
 
         assertAll(
             () -> assertEquals("Usuario", usuario.getNome()),
-            () -> assertEquals("testeAdmin@teste.com", usuario.getEmail().getValor()),
+            () -> assertEquals("teste@teste.com", usuario.getEmail().getValor()),
             () -> assertEquals("usuario", usuario.getUsername()),
             () -> assertEquals(22, usuario.getIdade()),
             () -> assertEquals(82.5, usuario.getPesoCorporal()),

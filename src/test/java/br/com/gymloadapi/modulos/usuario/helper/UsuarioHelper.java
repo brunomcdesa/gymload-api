@@ -33,8 +33,8 @@ public class UsuarioHelper {
             null, null, null, null);
     }
 
-    public static UsuarioRequest umUsuarioRequestSemSenha() {
-        return new UsuarioRequest("Usuario Edicao",null, "usernameEdicao", null,
+    public static UsuarioRequest umUsuarioRequestSemSenha(String email) {
+        return new UsuarioRequest("Usuario Edicao",email, "usernameEdicao", null,
             null, null, null, null);
     }
 

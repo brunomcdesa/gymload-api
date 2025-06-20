@@ -4,6 +4,7 @@ import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.PermissaoException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
+import br.com.gymloadapi.modulos.comum.types.Email;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapper;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapperImpl;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
@@ -187,7 +188,8 @@ class UsuarioServiceTest {
 
         var exception = assertThrowsExactly(
             NotFoundException.class,
-            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), umMockMultipartFile(), umUsuarioAdmin())
+            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha("teste@teste.com"),
+                umMockMultipartFile(), umUsuarioAdmin())
         );
         assertEquals("Usuário não encontrado.", exception.getMessage());
 
@@ -202,7 +204,8 @@ class UsuarioServiceTest {
 
         var exception = assertThrowsExactly(
             PermissaoException.class,
-            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), umMockMultipartFile(), outroUsuario())
+            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha("teste@teste.com"),
+                umMockMultipartFile(), outroUsuario())
         );
         assertEquals("Apenas usuários Admin ou o próprio usuário podem alterar suas informações.", exception.getMessage());
 
@@ -215,7 +218,7 @@ class UsuarioServiceTest {
     void editar_deveEditarUsuario_quandoUsuarioAutenticadoForAdmin() {
         when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(umUsuario()));
 
-        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(),
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha("teste@teste.com"),
             umMockMultipartFile(), umUsuarioAdmin()));
 
         verify(repository).findByUuid(USUARIO_ADMIN_UUID);
@@ -234,7 +237,7 @@ class UsuarioServiceTest {
     void editar_deveEditarUsuario_quandoUsuarioAutenticadoForOMesmoUsuarioQueEstaSendoEditado() {
         when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(umUsuario()));
 
-        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(),
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha("teste@teste.com"),
             umMockMultipartFile(), umUsuario()));
 
         verify(repository).findByUuid(USUARIO_ADMIN_UUID);
@@ -255,7 +258,7 @@ class UsuarioServiceTest {
 
         when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(usuario));
 
-        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha(), null, usuario));
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha("teste@teste.com"), null, usuario));
 
         verify(repository).findByUuid(USUARIO_ADMIN_UUID);
         verify(repository).save(captor.capture());
@@ -267,6 +270,36 @@ class UsuarioServiceTest {
             () -> assertEquals("usernameEdicao", usuarioSalvo.getUsername()),
             () -> assertEquals("802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png", usuarioSalvo.getImagemPerfil())
         );
+    }
+
+    @Test
+    void editar_deveLancarException_quandoEmailDiferenteDoAtualEJaExistirUsuarioComOMesmoEmail() {
+        var usuario = umUsuario();
+        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(usuario));
+        when(repository.existsByEmail(any(Email.class))).thenReturn(true);
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha("email@teste.com"), null, usuario)
+        );
+        assertEquals("Já existe um usuário com este Email.", exception.getMessage());
+
+        verify(repository).findByUuid(USUARIO_ADMIN_UUID);
+        verify(repository).existsByEmail(any(Email.class));
+        verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    void editar_naoDeveLancarException_quandoEmailIgualAoAtual() {
+        var usuario = umUsuario();
+        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(usuario));
+
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha("teste@teste.com"),
+            null, usuario));
+
+        verify(repository).findByUuid(USUARIO_ADMIN_UUID);
+        verify(repository).save(any(Usuario.class));
+        verifyNoMoreInteractions(repository);
     }
 
     @Test

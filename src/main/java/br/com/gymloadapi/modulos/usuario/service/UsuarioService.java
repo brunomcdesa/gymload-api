@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.*;
@@ -74,8 +75,12 @@ public class UsuarioService {
     public void editar(UUID uuid, UsuarioRequest usuarioRequest, MultipartFile imagem, Usuario usuarioAutenticado) {
         var usuario = this.findByUuid(uuid);
         validarUsuarioAlteracao(usuario.getId(), usuarioAutenticado, "alterar suas informações");
+        var email = new Email(usuarioRequest.email());
+        if (!Objects.equals(email.getValor(), usuario.getEmail().getValor())) {
+            validarUsuarioExistentePorEmail(email);
+        }
 
-        usuarioMapper.editar(usuarioRequest, usuario);
+        usuarioMapper.editar(usuarioRequest, email, usuario);
         if (imagem != null) {
             this.realizarUploadImagemPerfil(usuario, imagem);
         }
