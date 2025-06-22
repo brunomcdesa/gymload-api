@@ -74,16 +74,21 @@ public class UsuarioService {
 
     public void editar(UUID uuid, UsuarioRequest usuarioRequest, MultipartFile imagem, Usuario usuarioAutenticado) {
         var usuario = this.findByUuid(uuid);
+        log.info("Editando usuario: {}", usuario);
         validarUsuarioAlteracao(usuario.getId(), usuarioAutenticado, "alterar suas informações");
+        log.info("Usuario pode alterar seus dados.");
         var email = new Email(usuarioRequest.email());
         if (!Objects.equals(email.getValor(), usuario.getEmail().getValor())) {
             validarUsuarioExistentePorEmail(email);
         }
+        log.info("Email valido e nenhum usuario possui ele.");
 
+        log.info("Usuario antes da atualizadao: {}", usuario);
         usuarioMapper.editar(usuarioRequest, email, usuario);
         if (imagem != null) {
             this.realizarUploadImagemPerfil(usuario, imagem);
         }
+        log.info("usuario apos a atualizacao: {}", usuario);
 
         this.salvarComHistorico(usuario, usuarioAutenticado, EDICAO);
     }
@@ -137,5 +142,6 @@ public class UsuarioService {
     private void salvarComHistorico(Usuario usuario, Usuario usuarioAutenticado, EAcao acao) {
         repository.save(usuario);
         usuarioHistoricoService.salvar(usuario, usuarioAutenticado, acao);
+        log.info("Usuario salvo com sucesso: {}", usuario);
     }
 }
