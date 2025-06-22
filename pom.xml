@@ -11,7 +11,7 @@
 
     <groupId>br.com</groupId>
     <artifactId>gymload-api</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
     <name>gymload-api</name>
     <description>GymLoad API</description>
 
