@@ -28,7 +28,7 @@ public class ExercicioRepositoryImpl implements ExercicioRepositoryCustom {
     public List<Exercicio> buscarExerciciosPorTreino(Integer treinoId) {
         return new JPAQueryFactory(entityManager)
             .selectFrom(exercicio)
-            .innerJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
+            .leftJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
             .leftJoin(exercicio.treinos).fetchJoin()
             .where(exercicio.treinos.any().id.eq(treinoId))
             .fetch();

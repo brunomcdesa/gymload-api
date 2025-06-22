@@ -29,7 +29,9 @@ public class ExercicioRepositoryTest {
         var exercicios = repository.buscarExerciciosPorTreino(1);
         assertAll(
             () -> assertEquals(1, exercicios.getFirst().getId()),
-            () -> assertEquals("SUPINO RETO", exercicios.getFirst().getNome())
+            () -> assertEquals("SUPINO RETO", exercicios.getFirst().getNome()),
+            () -> assertEquals(2, exercicios.getLast().getId()),
+            () -> assertEquals("ESTEIRA", exercicios.getLast().getNome())
         );
     }
 }
