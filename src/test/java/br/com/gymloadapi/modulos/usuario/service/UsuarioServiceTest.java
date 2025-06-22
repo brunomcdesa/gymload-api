@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static br.com.gymloadapi.helper.TestsHelper.umMockMultipartFile;
-import static br.com.gymloadapi.modulos.comum.enums.EAcao.ALTERACAO_SENHA;
-import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
+import static br.com.gymloadapi.modulos.comum.enums.EAcao.*;
 import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmail;
 import static br.com.gymloadapi.modulos.comum.helper.ComumHelper.umEmailAdmin;
 import static br.com.gymloadapi.modulos.usuario.enums.EUserRole.ADMIN;
@@ -262,6 +261,7 @@ class UsuarioServiceTest {
 
         verify(repository).findByUuid(USUARIO_ADMIN_UUID);
         verify(repository).save(captor.capture());
+        verify(usuarioHistoricoService).salvar(any(Usuario.class), any(Usuario.class), eq(EDICAO));
         verifyNoInteractions(backBlazeService);
 
         var usuarioSalvo = captor.getValue();
@@ -276,6 +276,7 @@ class UsuarioServiceTest {
     void editar_deveLancarException_quandoEmailDiferenteDoAtualEJaExistirUsuarioComOMesmoEmail() {
         var usuario = umUsuario();
         when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(usuario));
+        when(repository.existsByUsername(anyString())).thenReturn(false);
         when(repository.existsByEmail(any(Email.class))).thenReturn(true);
 
         var exception = assertThrowsExactly(
@@ -285,13 +286,53 @@ class UsuarioServiceTest {
         assertEquals("Já existe um usuário com este Email.", exception.getMessage());
 
         verify(repository).findByUuid(USUARIO_ADMIN_UUID);
+        verify(repository).existsByUsername(anyString());
         verify(repository).existsByEmail(any(Email.class));
         verifyNoMoreInteractions(repository);
+        verifyNoInteractions(usuarioHistoricoService);
     }
 
     @Test
     void editar_naoDeveLancarException_quandoEmailIgualAoAtual() {
         var usuario = umUsuario();
+
+        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(usuario));
+        when(repository.existsByUsername(anyString())).thenReturn(false);
+
+        assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha("teste@teste.com"),
+            null, usuario));
+
+        verify(repository).findByUuid(USUARIO_ADMIN_UUID);
+        verify(repository).existsByUsername(anyString());
+        verify(repository).save(any(Usuario.class));
+        verifyNoMoreInteractions(repository);
+        verify(usuarioHistoricoService).salvar(any(Usuario.class), any(Usuario.class), eq(EDICAO));
+    }
+
+    @Test
+    void editar_deveLancarException_quandoUsernameDiferenteDoAtualEUsernameJaExistirCOmAlgumOutroUsuario() {
+        var usuario = umUsuario();
+
+        when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(usuario));
+        when(repository.existsByUsername(anyString())).thenReturn(true);
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha("email@teste.com"), null, usuario)
+        );
+        assertEquals("Já existe um usuário com este username.", exception.getMessage());
+
+        verify(repository).findByUuid(USUARIO_ADMIN_UUID);
+        verify(repository).existsByUsername(anyString());
+        verifyNoMoreInteractions(repository);
+        verifyNoInteractions(usuarioHistoricoService);
+    }
+
+    @Test
+    void editar_naoDeveLancarException_quandoUsernameIgualAoAtual() {
+        var usuario = umUsuario();
+        usuario.setUsername("usernameEdicao");
+
         when(repository.findByUuid(USUARIO_ADMIN_UUID)).thenReturn(Optional.of(usuario));
 
         assertDoesNotThrow(() -> service.editar(USUARIO_ADMIN_UUID, umUsuarioRequestSemSenha("teste@teste.com"),
@@ -299,6 +340,7 @@ class UsuarioServiceTest {
 
         verify(repository).findByUuid(USUARIO_ADMIN_UUID);
         verify(repository).save(any(Usuario.class));
+        verify(usuarioHistoricoService).salvar(any(Usuario.class), any(Usuario.class), eq(EDICAO));
         verifyNoMoreInteractions(repository);
     }
 

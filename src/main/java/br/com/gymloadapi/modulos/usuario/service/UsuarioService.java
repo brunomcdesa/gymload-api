@@ -15,10 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.*;
@@ -72,19 +72,14 @@ public class UsuarioService {
             .toList();
     }
 
-    public void editar(UUID uuid, UsuarioRequest usuarioRequest, MultipartFile imagem, Usuario usuarioAutenticado) {
+    @Transactional
+    public void editar(UUID uuid, UsuarioRequest request, MultipartFile imagem, Usuario usuarioAutenticado) {
         var usuario = this.findByUuid(uuid);
-        log.info("Editando usuario: {}", usuario);
-        validarUsuarioAlteracao(usuario.getId(), usuarioAutenticado, "alterar suas informações");
-        log.info("Usuario pode alterar seus dados.");
-        var email = new Email(usuarioRequest.email());
-        if (!Objects.equals(email.getValor(), usuario.getEmail().getValor())) {
-            validarUsuarioExistentePorEmail(email);
-        }
-        log.info("Email valido e nenhum usuario possui ele.");
+        var email = new Email(request.email());
 
-        log.info("Usuario antes da atualizadao: {}", usuario);
-        usuarioMapper.editar(usuarioRequest, email, usuario);
+        this.validarEdicaoDeUsuario(request, usuario, usuarioAutenticado, email);
+
+        usuarioMapper.editar(request, email, usuario);
         if (imagem != null) {
             this.realizarUploadImagemPerfil(usuario, imagem);
         }
@@ -124,7 +119,6 @@ public class UsuarioService {
     private void validarUsuarioExistente(UsuarioRequest request, Email email) {
         this.validarUsuarioExistentePorUsername(request.username());
         this.validarUsuarioExistentePorEmail(email);
-
     }
 
     private void validarUsuarioExistentePorUsername(String username) {
@@ -143,5 +137,15 @@ public class UsuarioService {
         repository.save(usuario);
         usuarioHistoricoService.salvar(usuario, usuarioAutenticado, acao);
         log.info("Usuario salvo com sucesso: {}", usuario);
+    }
+
+    private void validarEdicaoDeUsuario(UsuarioRequest request, Usuario usuario, Usuario usuarioAutenticado, Email email) {
+        validarUsuarioAlteracao(usuario.getId(), usuarioAutenticado, "alterar suas informações");
+        if (!StringUtils.equals(request.username(), usuario.getUsername())) {
+            this.validarUsuarioExistentePorUsername(request.username());
+        }
+        if (!StringUtils.equals(email.getValor(), usuario.getEmail().getValor())) {
+            validarUsuarioExistentePorEmail(email);
+        }
     }
 }
