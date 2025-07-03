@@ -30,7 +30,7 @@ public class Exercicio {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
+    @Column
     private String descricao;
 
     @Column
