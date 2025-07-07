@@ -52,7 +52,7 @@ public class ExercicioService {
         this.saveComHistorico(exercicio, usuarioId, CADASTRO);
     }
 
-    @Cacheable(value = CACHE_TODOS_EXERCICIOS_FILTRO, key = "#filtro")
+    @Cacheable(value = CACHE_TODOS_EXERCICIOS_FILTRO, key = "#filtro.tipoExercicio() && #filtro.grupoMuscularId()")
     public List<ExercicioResponse> buscarTodos(ExercicioFiltro filtro) {
         filtro.aplicarGroupValidators();
         return repository.findAllCompleteByPredicate(filtro.toPredicate()).stream()
