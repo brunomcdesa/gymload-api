@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Map;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.CALISTENIA;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -86,7 +87,6 @@ class ExercicioControllerTest {
         verifyNoInteractions(service);
     }
 
-    @EmptySource
     @WithMockUser
     @ParameterizedTest
     @ValueSource(strings = {"/select", "/treino/1"})
@@ -94,10 +94,28 @@ class ExercicioControllerTest {
         isOk(get(URL + endpoint), mockMvc);
 
         Map.<String, Runnable>of(
-            "", () -> verify(service).buscarTodos(umExercicioFiltroVazio()),
             "/select", () -> verify(service).buscarTodosSelect(),
             "/treino/1", () -> verify(service).buscarExerciciosPorTreino(1)
         ).get(endpoint).run();
+    }
+
+    @Test
+    @WithMockUser
+    void buscarTodos_deveRetornarBadRequest_quandoFiltrosObrigatoriosInvalidos() {
+        isBadRequest(get(URL), mockMvc, "O campo tipoExercicio é obrigatório.");
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser
+    void buscarTodos_deveRetornarOk_quandoFiltrosObrigatoriosValidos() {
+        isOk(get(URL)
+                .param("tipoExercicio", CALISTENIA.name())
+                .param("grupoMuscularId", "2"),
+            mockMvc);
+
+        verify(service).buscarTodos(umExercicioFiltro());
     }
 
     @Test

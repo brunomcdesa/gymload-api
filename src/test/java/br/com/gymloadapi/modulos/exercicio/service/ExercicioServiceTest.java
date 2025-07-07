@@ -124,14 +124,14 @@ class ExercicioServiceTest {
     void salvar_deveRemoverTodosOsCachesDeExercicios_quandoSalvarUmNovoExercicio() {
         service.buscarTodosSelect();
         service.buscarExerciciosPorTreino(1);
-        service.buscarTodos(umExercicioFiltroVazio());
+        service.buscarTodos(umExercicioFiltro());
         service.findByIdIn(List.of(1));
 
         service.salvar(umExercicioAerobicoRequest(), 1);
 
         service.buscarTodosSelect();
         service.buscarExerciciosPorTreino(1);
-        service.buscarTodos(umExercicioFiltroVazio());
+        service.buscarTodos(umExercicioFiltro());
         service.findByIdIn(List.of(1));
 
         verify(repository, times(2)).findAllComplete();
@@ -171,7 +171,7 @@ class ExercicioServiceTest {
     void buscarTodos_deveRetornarTodosOsExercicios_quandoSolicitado() {
         when(repository.findAllCompleteByPredicate(any(Predicate.class))).thenReturn(umaListaDeExercicios());
 
-        var responses = service.buscarTodos(umExercicioFiltroVazio());
+        var responses = service.buscarTodos(umExercicioFiltro());
 
         assertAll(
             () -> assertEquals(1, responses.getFirst().id()),
@@ -187,9 +187,9 @@ class ExercicioServiceTest {
     void buscarTodos_deveRetornarDadosDoCache_quandoSolicitadoVariasVezesSeguidas() {
         when(repository.findAllCompleteByPredicate(any(Predicate.class))).thenReturn(emptyList());
 
-        service.buscarTodos(umExercicioFiltroVazio());
-        service.buscarTodos(umExercicioFiltroVazio());
-        service.buscarTodos(umExercicioFiltroVazio());
+        service.buscarTodos(umExercicioFiltro());
+        service.buscarTodos(umExercicioFiltro());
+        service.buscarTodos(umExercicioFiltro());
 
         verify(repository).findAllCompleteByPredicate(any(Predicate.class));
     }
@@ -413,7 +413,7 @@ class ExercicioServiceTest {
 
         service.buscarTodosSelect();
         service.buscarExerciciosPorTreino(1);
-        service.buscarTodos(umExercicioFiltroVazio());
+        service.buscarTodos(umExercicioFiltro());
         service.findByIdIn(List.of(1));
         service.findById(2);
 
@@ -421,7 +421,7 @@ class ExercicioServiceTest {
 
         service.buscarTodosSelect();
         service.buscarExerciciosPorTreino(1);
-        service.buscarTodos(umExercicioFiltroVazio());
+        service.buscarTodos(umExercicioFiltro());
         service.findByIdIn(List.of(1));
         service.findById(2);
 

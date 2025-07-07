@@ -94,10 +94,10 @@ public class ExercicioHelper {
     }
 
     public static ExercicioFiltro umExercicioFiltroVazio() {
-        return new ExercicioFiltro(null);
+        return new ExercicioFiltro(null, null);
     }
 
     public static ExercicioFiltro umExercicioFiltro() {
-        return new ExercicioFiltro(2);
+        return new ExercicioFiltro(CALISTENIA, 2);
     }
 }

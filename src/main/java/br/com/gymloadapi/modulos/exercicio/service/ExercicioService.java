@@ -23,6 +23,7 @@ import java.util.List;
 import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.*;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.EDICAO;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.deveConterGrupoMuscular;
 import static br.com.gymloadapi.modulos.comum.utils.MapUtils.mapNullBoolean;
 
 @Service
@@ -44,7 +45,8 @@ public class ExercicioService {
         request.aplicarGroupValidators();
         var exercicio = exercicioMapper.mapToModel(
             request,
-            mapNullBoolean(request.deveConterGrupoMuscular(), () -> grupoMuscularService.findById(request.grupoMuscularId()))
+            mapNullBoolean(deveConterGrupoMuscular(request.tipoExercicio()),
+                () -> grupoMuscularService.findById(request.grupoMuscularId()))
         );
 
         this.saveComHistorico(exercicio, usuarioId, CADASTRO);
@@ -52,6 +54,7 @@ public class ExercicioService {
 
     @Cacheable(value = CACHE_TODOS_EXERCICIOS_FILTRO)
     public List<ExercicioResponse> buscarTodos(ExercicioFiltro filtro) {
+        filtro.aplicarGroupValidators();
         return repository.findAllCompleteByPredicate(filtro.toPredicate()).stream()
             .map(exercicioMapper::mapModelToResponse)
             .toList();
@@ -95,7 +98,8 @@ public class ExercicioService {
         request.aplicarGroupValidators();
 
         exercicioMapper.editar(request,
-            mapNullBoolean(request.deveConterGrupoMuscular(), () -> grupoMuscularService.findById(request.grupoMuscularId())),
+            mapNullBoolean(deveConterGrupoMuscular(request.tipoExercicio()),
+                () -> grupoMuscularService.findById(request.grupoMuscularId())),
             exercicio);
         this.saveComHistorico(exercicio, usuarioId, EDICAO);
     }

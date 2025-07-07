@@ -27,4 +27,8 @@ public enum ETipoExercicio {
     public static List<ETipoExercicio> getTiposExerciciosQuePossuemGrupoMuscular() {
         return List.of(MUSCULACAO, CALISTENIA);
     }
+
+    public static boolean deveConterGrupoMuscular(ETipoExercicio tipoExercicio) {
+        return getTiposExerciciosQuePossuemGrupoMuscular().contains(tipoExercicio);
+    }
 }

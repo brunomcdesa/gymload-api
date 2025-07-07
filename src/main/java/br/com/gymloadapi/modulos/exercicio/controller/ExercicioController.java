@@ -30,7 +30,7 @@ public class ExercicioController {
     }
 
     @GetMapping
-    public List<ExercicioResponse> buscarTodos(ExercicioFiltro filtros) {
+    public List<ExercicioResponse> buscarTodos(@Valid ExercicioFiltro filtros) {
         return service.buscarTodos(filtros);
     }
 

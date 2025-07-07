@@ -11,8 +11,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 
-import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.getTiposExerciciosQuePossuemGrupoMuscular;
-
 public record ExercicioRequest(
     @NotBlank
     String nome,
@@ -33,9 +31,5 @@ public record ExercicioRequest(
 
     public void aplicarGroupValidators() {
         ValidacaoUtils.aplicarValidacoes(this, this.tipoExercicio.getGroupValidator());
-    }
-
-    public boolean deveConterGrupoMuscular() {
-        return getTiposExerciciosQuePossuemGrupoMuscular().contains(this.tipoExercicio);
     }
 }
