@@ -54,6 +54,7 @@ class TokenServiceTest {
             () -> assertEquals("Usuario", decodedJWT.getClaim("usuarioNome").asString()),
             () -> assertArrayEquals(new String[]{"ROLE_USER"}, decodedJWT.getClaim("usuarioRoles").asArray(String.class)),
             () -> assertEquals("http://teste.s3/usuarios-images/123-Usuario.png", decodedJWT.getClaim("imagemPerfilUrl").asString()),
+            () -> assertEquals("MASCULINO", decodedJWT.getClaim("sexo").asString()),
             () -> assertNotNull(decodedJWT.getExpiresAt())
         );
     }

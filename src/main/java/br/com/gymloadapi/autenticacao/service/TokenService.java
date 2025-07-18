@@ -40,6 +40,7 @@ public class TokenService {
                 .withClaim("username", usuario.getUsername())
                 .withClaim("uuid", usuario.getUuid().toString())
                 .withClaim("imagemPerfilUrl", imagemPerfilUrl)
+                .withClaim("sexo", usuario.getSexo().name())
                 .withExpiresAt(this.getExpirationDate())
                 .sign(this.getAlgorithm());
         } catch (JWTCreationException exception) {

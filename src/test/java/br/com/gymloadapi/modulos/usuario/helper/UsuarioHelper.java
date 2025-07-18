@@ -64,6 +64,7 @@ public class UsuarioHelper {
             .imagemPerfil("802421c7-f8fd-454e-ab59-9ea346a2a444-Usuario.png")
             .senha(encodePassword("123456"))
             .email(umEmail())
+            .sexo(MASCULINO)
             .build();
     }
 
