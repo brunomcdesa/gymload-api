@@ -278,4 +278,40 @@ class RegistroMusculacaoServiceTest {
         verify(repository).findLastByExercicioIdAndUsuarioId(1, 1);
         verifyNoMoreInteractions(repository);
     }
+
+    @Test
+    void repetirRegistro_deveRepetirRegistro_quandoEncontrarRegistro() {
+        when(repository.findById(1)).thenReturn(Optional.of(umRegistroMusculacao()));
+
+        service.repetirRegistro(1);
+
+        verify(repository).findById(1);
+        verify(repository).save(registroMusculacaoCaptor.capture());
+
+        var registroMusculacao = registroMusculacaoCaptor.getValue();
+        assertAll(
+            () -> assertEquals(22.5, registroMusculacao.getPeso()),
+            () -> assertEquals(KG, registroMusculacao.getUnidadePeso()),
+            () -> assertEquals(12, registroMusculacao.getQtdRepeticoes()),
+            () -> assertEquals(4, registroMusculacao.getQtdSeries()),
+            () -> assertEquals("SUPINO RETO", registroMusculacao.getExercicio().getNome()),
+            () -> assertEquals("Usuario Admin", registroMusculacao.getUsuario().getNome()),
+            () -> assertEquals(SUPINADA, registroMusculacao.getTipoPegada())
+        );
+    }
+
+    @Test
+    void repetirRegistro_deveLancarException_quandoNaoEncontrarRegistro() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.repetirRegistro(1)
+        );
+        assertEquals("Registro de musculação não encontrado.",
+            exception.getMessage());
+
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+    }
 }

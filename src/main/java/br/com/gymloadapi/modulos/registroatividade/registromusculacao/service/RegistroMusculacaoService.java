@@ -80,6 +80,14 @@ public class RegistroMusculacaoService implements IRegistroAtividadeStrategy {
             });
     }
 
+    @Override
+    public void repetirRegistro(Integer registroId) {
+        var registroMusculacao = this.findById(registroId);
+
+        var novoRegistroMusculacao = registroAtividadeMapper.copiarRegistroMusculacao(registroMusculacao);
+        repository.save(novoRegistroMusculacao);
+    }
+
     private List<RegistroMusculacao> getAllByExercicioId(Integer exercicioId, Integer usuarioId) {
         return repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId);
     }

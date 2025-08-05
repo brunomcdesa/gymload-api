@@ -80,6 +80,14 @@ public class RegistroAerobicoService implements IRegistroAtividadeStrategy {
             });
     }
 
+    @Override
+    public void repetirRegistro(Integer registroId) {
+        var registroAerobico = this.findById(registroId);
+
+        var novoRegistroAerobico = registroAtividadeMapper.copiarRegistroAerobico(registroAerobico);
+        repository.save(novoRegistroAerobico);
+    }
+
     private List<RegistroAerobico> getAllByExercicioId(Integer exercicioId, Integer usuarioId) {
         return repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId);
     }

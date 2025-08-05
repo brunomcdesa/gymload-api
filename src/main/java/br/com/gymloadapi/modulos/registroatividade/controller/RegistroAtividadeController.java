@@ -59,4 +59,10 @@ public class RegistroAtividadeController {
     public void repetirUltimoRegistro(@PathVariable Integer exercicioId, @AuthenticationPrincipal Usuario usuario) {
         service.repetirUltimoRegistro(exercicioId, usuario);
     }
+
+    @ResponseStatus(CREATED)
+    @PostMapping("exercicio/{exercicioId}/repetir-registro/{registroId}")
+    public void repetirRegistro(@PathVariable Integer exercicioId, @PathVariable Integer registroId) {
+        service.repetirRegistro(exercicioId, registroId);
+    }
 }

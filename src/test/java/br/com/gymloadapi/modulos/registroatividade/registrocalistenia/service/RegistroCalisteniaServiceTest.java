@@ -271,4 +271,39 @@ class RegistroCalisteniaServiceTest {
         verify(repository).findLastByExercicioIdAndUsuarioId(3, 1);
         verifyNoMoreInteractions(repository);
     }
+
+    @Test
+    void repetirRegistro_deveRepetirRegistro_quandoEncontrarRegistro() {
+        when(repository.findById(1)).thenReturn(Optional.of(umRegistroCalistenia()));
+
+        service.repetirRegistro(1);
+
+        verify(repository).findById(1);
+        verify(repository).save(registroCalisteniaCaptor.capture());
+
+        var registroCalistenia = registroCalisteniaCaptor.getValue();
+        assertAll(
+            () -> assertNull(registroCalistenia.getPesoAdicional()),
+            () -> assertNull(registroCalistenia.getUnidadePeso()),
+            () -> assertEquals(30, registroCalistenia.getQtdRepeticoes()),
+            () -> assertEquals(4, registroCalistenia.getQtdSeries()),
+            () -> assertEquals("Abdominal Supra", registroCalistenia.getExercicio().getNome()),
+            () -> assertEquals("Usuario Admin", registroCalistenia.getUsuario().getNome())
+        );
+    }
+
+    @Test
+    void repetirRegistro_deveLancarException_quandoNaoEncontrarRegistro() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.repetirRegistro(1)
+        );
+        assertEquals("Registro de calistenia não encontrado.",
+            exception.getMessage());
+
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+    }
 }

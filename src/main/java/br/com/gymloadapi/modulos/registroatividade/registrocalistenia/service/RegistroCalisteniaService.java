@@ -81,6 +81,14 @@ public class RegistroCalisteniaService implements IRegistroAtividadeStrategy {
             });
     }
 
+    @Override
+    public void repetirRegistro(Integer registroId) {
+        var registroCalistenia = this.findById(registroId);
+
+        var novoRegistroCalistenia = registroAtividadeMapper.copiarRegistroCalistenia(registroCalistenia);
+        repository.save(novoRegistroCalistenia);
+    }
+
     private List<RegistroCalistenia> getAllByExercicioId(Integer exercicioId, Integer usuarioId) {
         return repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId);
     }

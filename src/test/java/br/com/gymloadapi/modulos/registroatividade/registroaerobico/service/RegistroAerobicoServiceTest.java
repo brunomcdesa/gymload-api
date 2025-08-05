@@ -243,4 +243,37 @@ class RegistroAerobicoServiceTest {
         verify(repository).findLastByExercicioIdAndUsuarioId(2, 1);
         verifyNoMoreInteractions(repository);
     }
+
+    @Test
+    void repetirRegistro_deveRepetirRegistro_quandoEncontrarRegistro() {
+        when(repository.findById(1)).thenReturn(Optional.of(umRegistroAerobico()));
+
+        service.repetirRegistro(1);
+
+        verify(repository).findById(1);
+        verify(repository).save(registroAerobicoCaptor.capture());
+
+        var registroAerobico = registroAerobicoCaptor.getValue();
+        assertAll(
+            () -> assertEquals(22.6, registroAerobico.getDistancia()),
+            () -> assertEquals(1.33, registroAerobico.getDuracao()),
+            () -> assertEquals("Esteira", registroAerobico.getExercicio().getNome()),
+            () -> assertEquals("Usuario", registroAerobico.getUsuario().getNome())
+        );
+    }
+
+    @Test
+    void repetirRegistro_deveLancarException_quandoNaoEncontrarRegistro() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.repetirRegistro(1)
+        );
+        assertEquals("Registro de aeróbico não encontrado.",
+            exception.getMessage());
+
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+    }
 }

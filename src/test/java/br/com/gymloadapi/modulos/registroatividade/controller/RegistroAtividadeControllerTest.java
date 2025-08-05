@@ -44,7 +44,7 @@ class RegistroAtividadeControllerTest {
     @EmptySource
     @WithAnonymousUser
     @ParameterizedTest
-    @ValueSource(strings = {"/exercicio/1/repetir-ultimo-registro"})
+    @ValueSource(strings = {"/exercicio/1/repetir-ultimo-registro", "/exercicio/1/repetir-registro/1"})
     void posts_devemRetornarUnauthorized_quandoUsuarioNaoAutenticado(String endpoint) {
         isUnauthorized(post(URL + endpoint), mockMvc);
         verifyNoInteractions(service);
@@ -136,11 +136,15 @@ class RegistroAtividadeControllerTest {
         verify(service).excluir(1, 1, umUsuarioAdmin());
     }
 
-    @Test
     @WithUserDetails
-    void repetirUltimoRegistro_deveRetornarCreated_quandoUsuarioAutenticado() {
-        isCreated(post(URL + "/exercicio/1/repetir-ultimo-registro"), mockMvc);
+    @ParameterizedTest
+    @ValueSource(strings = {"/exercicio/1/repetir-ultimo-registro", "/exercicio/1/repetir-registro/1"})
+    void posts_devemRetornarCreated_quandoUsuarioAutenticado(String endpoint) {
+        isCreated(post(URL + endpoint), mockMvc);
 
-        verify(service).repetirUltimoRegistro(1, umUsuarioAdmin());
+        Map.<String, Runnable>of(
+            "/exercicio/1/repetir-ultimo-registro", () -> verify(service).repetirUltimoRegistro(1, umUsuarioAdmin()),
+            "/exercicio/1/repetir-registro/1", () -> verify(service).repetirRegistro(1, 1)
+        ).get(endpoint).run();
     }
 }

@@ -83,6 +83,13 @@ public class RegistroAtividadeService {
             .repetirUltimoRegistro(exercicio, usuario);
     }
 
+    public void repetirRegistro(Integer exercicioId, Integer registroId) {
+        var exercicio = this.findExercicioById(exercicioId);
+
+        this.getStrategyByTipoExercicio(exercicio.getTipoExercicio())
+            .repetirRegistro(registroId);
+    }
+
     private Exercicio findExercicioById(Integer exercicioId) {
         return exercicioService.findById(exercicioId);
     }

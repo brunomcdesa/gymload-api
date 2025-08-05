@@ -329,4 +329,43 @@ class RegistroAtividadeServiceTest {
         verify(registroCalisteniaService).repetirUltimoRegistro(exercicio, usuario);
         verifyNoInteractions(registroMusculacaoService, registroAerobicoService);
     }
+
+    @Test
+    void repetirRegistro_deveChamarMetodoRepetirRegistro_quandoSolicitadoComIdDeExercicioDeMusculacao() {
+        var exercicio = umExercicioMusculacao(1);
+
+        when(exercicioService.findById(1)).thenReturn(exercicio);
+
+        service.repetirRegistro(1, 1);
+
+        verify(exercicioService).findById(1);
+        verify(registroMusculacaoService).repetirRegistro(1);
+        verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
+    }
+
+    @Test
+    void repetirRegistro_deveChamarMetodoRepetirRegistro_quandoSolicitadoComIdDeExercicioDeAerobico() {
+        var exercicio = umExercicioAerobico(2);
+
+        when(exercicioService.findById(2)).thenReturn(exercicio);
+
+        service.repetirRegistro(2, 2);
+
+        verify(exercicioService).findById(2);
+        verify(registroAerobicoService).repetirRegistro(2);
+        verifyNoInteractions(registroMusculacaoService, registroCalisteniaService);
+    }
+
+    @Test
+    void repetirRegistro_deveChamarMetodoRepetirRegistro_quandoSolicitadoComIdDeExercicioDeCalistenia() {
+        var exercicio = umExercicioCalistenia(3);
+
+        when(exercicioService.findById(3)).thenReturn(exercicio);
+
+        service.repetirRegistro(3, 3);
+
+        verify(exercicioService).findById(3);
+        verify(registroCalisteniaService).repetirRegistro(3);
+        verifyNoInteractions(registroMusculacaoService, registroAerobicoService);
+    }
 }

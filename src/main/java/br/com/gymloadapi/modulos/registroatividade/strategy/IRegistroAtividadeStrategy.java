@@ -21,4 +21,6 @@ public interface IRegistroAtividadeStrategy {
     void excluirRegistro(Integer registroAtividadeId, Usuario usuario);
 
     void repetirUltimoRegistro(Exercicio exercicio, Usuario usuario);
+
+    void repetirRegistro(Integer registroId);
 }
