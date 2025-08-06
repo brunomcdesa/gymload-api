@@ -11,6 +11,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import jakarta.validation.ConstraintViolationException;
 
+import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.ANILHA;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.BARRA;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.MISTA;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
@@ -24,7 +26,7 @@ class RegistroAtividadeRequestTest {
     @Test
     void aplicarGroupValidators_deveAplicarValidacoesDeMusculacao_quandoReceberRequestComCamposInvalidos() {
         var request = new RegistroAtividadeRequest(null, null, null, null, null,
-            null, 20.5, 10.2, null);
+            null, 20.5, 10.2, null, BARRA);
 
         var exception = assertThrowsExactly(
             ConstraintViolationException.class,
@@ -37,7 +39,8 @@ class RegistroAtividadeRequestTest {
                 "peso: é obrigatório.",
                 "duracao: deve ser nulo",
                 "distancia: deve ser nulo",
-                "tipoPegada: é obrigatório.");
+                "tipoPegada: é obrigatório.",
+                "tipoEquipamento: deve ser nulo");
     }
 
     @Test
@@ -48,7 +51,7 @@ class RegistroAtividadeRequestTest {
     @Test
     void aplicarGroupValidators_deveAplicarValidacoesDeAerobico_quandoReceberRequestComCamposInvalidos() {
         var request = new RegistroAtividadeRequest(null, null, 20.3, KG, 20,
-            4, null, null, PRONADA);
+            4, null, null, PRONADA, ANILHA);
 
         var exception = assertThrowsExactly(
             ConstraintViolationException.class,
@@ -61,7 +64,8 @@ class RegistroAtividadeRequestTest {
                 "peso: deve ser nulo",
                 "duracao: é obrigatório.",
                 "distancia: é obrigatório.",
-                "tipoPegada: deve ser nulo");
+                "tipoPegada: deve ser nulo",
+                "tipoEquipamento: deve ser nulo");
     }
 
     @Test
@@ -72,7 +76,7 @@ class RegistroAtividadeRequestTest {
     @Test
     void aplicarGroupValidators_deveAplicarValidacoesDeCalistenia_quandoReceberRequestComCamposInvalidos() {
         var request = new RegistroAtividadeRequest(null, null, null, null, null,
-            null, 20.5, 10.2, MISTA);
+            null, 20.5, 10.2, MISTA, null);
 
         var exception = assertThrowsExactly(
             ConstraintViolationException.class,

@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.exercicio.model;
 
-import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
 import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
 import br.com.gymloadapi.modulos.treino.model.Treino;
@@ -9,6 +8,7 @@ import lombok.*;
 import jakarta.persistence.*;
 import java.util.List;
 
+import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.SEQUENCE;
@@ -35,11 +35,10 @@ public class Exercicio {
 
     @Column
     @Enumerated(STRING)
-    private ETipoEquipamento tipoEquipamento;  // REMOVER
+    private ETipoExercicio tipoExercicio;
 
     @Column
-    @Enumerated(STRING)
-    private ETipoExercicio tipoExercicio;
+    private Boolean possuiVariacao;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "FK_GRUPO_MUSCULAR", referencedColumnName = "ID",
@@ -55,7 +54,7 @@ public class Exercicio {
             foreignKey = @ForeignKey(name = "FK_TREINO"))})
     private List<Treino> treinos;
 
-    public String getNomeComTipoEquipamento() {
-        return this.nome + (this.tipoEquipamento != null ? " (" + this.tipoEquipamento.name() + ")" : "");
+    public boolean isExercicioMusculacao() {
+        return this.tipoExercicio == MUSCULACAO;
     }
 }

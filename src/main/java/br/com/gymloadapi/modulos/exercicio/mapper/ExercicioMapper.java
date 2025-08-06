@@ -14,13 +14,14 @@ import org.mapstruct.*;
 
 import java.time.LocalDateTime;
 
-@Mapper(componentModel = "spring", imports = LocalDateTime.class)
+@Mapper(componentModel = "spring", imports = {LocalDateTime.class, Boolean.class})
 public interface ExercicioMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "treinos", ignore = true)
     @Mapping(target = "nome", source = "request.nome")
     @Mapping(target = "grupoMuscular", source = "grupoMuscular")
+    @Mapping(target = "possuiVariacao", expression = "java(Boolean.valueOf(request.possuiVariacao()))")
     Exercicio mapToModel(ExercicioRequest request, GrupoMuscular grupoMuscular);
 
     @Mapping(target = "grupoMuscularId", source = "exercicio.grupoMuscular.id")
@@ -28,12 +29,13 @@ public interface ExercicioMapper {
     ExercicioResponse mapModelToResponse(Exercicio exercicio);
 
     @Mapping(target = "value", source = "exercicio.id")
-    @Mapping(target = "label", expression = "java(exercicio.getNomeComTipoEquipamento())")
+    @Mapping(target = "label", source = "exercicio.nome")
     SelectResponse mapToSelectResponse(Exercicio exercicio);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "nome", source = "request.nome")
     @Mapping(target = "grupoMuscular", source = "grupoMuscular")
+    @Mapping(target = "possuiVariacao", expression = "java(Boolean.valueOf(request.possuiVariacao()))")
     @BeanMapping(
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)

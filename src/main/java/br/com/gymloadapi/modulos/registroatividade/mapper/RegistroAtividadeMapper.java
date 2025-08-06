@@ -30,13 +30,14 @@ public interface RegistroAtividadeMapper {
     @Mapping(target = "usuario", source = "usuario")
     @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
     @Mapping(target = "pesoAdicional", source = "request.peso")
+    @Mapping(target = "tipoEquipamentoPesoAdicional", source = "request.tipoEquipamento")
     RegistroCalistenia mapToRegistroCalistenia(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
 
     @Mapping(target = "duracao", ignore = true)
     @Mapping(target = "distancia", ignore = true)
     @Mapping(target = "velocidadeMedia", ignore = true)
+    @Mapping(target = "tipoEquipamento", ignore = true)
     @Mapping(target = "exercicioNome", source = "registroMusculacao.exercicio.nome")
-    @Mapping(target = "tipoEquipamento", source = "registroMusculacao.exercicio.tipoEquipamento")
     @Mapping(target = "grupoMuscularNome", source = "registroMusculacao.exercicio.grupoMuscular.nome")
     @Mapping(target = "carga", expression = "java(registroMusculacao.getPesoComUnidadePeso())")
     HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeMusculacaoResponse(RegistroMusculacao registroMusculacao);
@@ -57,7 +58,7 @@ public interface RegistroAtividadeMapper {
     @Mapping(target = "velocidadeMedia", ignore = true)
     @Mapping(target = "peso", source = "registroCalistenia.pesoAdicional")
     @Mapping(target = "exercicioNome", source = "registroCalistenia.exercicio.nome")
-    @Mapping(target = "tipoEquipamento", source = "registroCalistenia.exercicio.tipoEquipamento")
+    @Mapping(target = "tipoEquipamento", source = "registroCalistenia.tipoEquipamentoPesoAdicional")
     @Mapping(target = "carga", expression = "java(registroCalistenia.getPesoComUnidadePeso())")
     @Mapping(target = "grupoMuscularNome", source = "registroCalistenia.exercicio.grupoMuscular.nome")
     HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeCalisteniaResponse(RegistroCalistenia registroCalistenia);

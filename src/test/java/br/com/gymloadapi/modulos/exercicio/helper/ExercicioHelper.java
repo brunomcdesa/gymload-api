@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.exercicio.helper;
 
+import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioFiltro;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioVariacaoRequest;
@@ -13,29 +14,31 @@ import java.util.List;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.*;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.*;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
 
 @UtilityClass
 public class ExercicioHelper {
 
     public static ExercicioRequest umExercicioMusculacaoRequest() {
-        return new ExercicioRequest("SUPINO RETO", MUSCULACAO, "Supino Reto", 1, HALTER);
+        return new ExercicioRequest("SUPINO RETO", MUSCULACAO, "Supino Reto", 1, true);
     }
 
     public static ExercicioRequest umExercicioAerobicoRequest() {
-        return new ExercicioRequest("ESCADA", AEROBICO, "Escada", null, null);
+        return new ExercicioRequest("ESCADA", AEROBICO, "Escada", null, false);
     }
 
     public static ExercicioRequest umExercicioRequestComCamposInvalidos(String nome) {
-        return new ExercicioRequest(nome, null, null, null, null);
+        return new ExercicioRequest(nome, null, null, null, false);
     }
 
     public static ExercicioRequest umExercicioRequestMusculacaoComCamposInvalidos(String nome) {
-        return new ExercicioRequest(nome, MUSCULACAO, null, null, null);
+        return new ExercicioRequest(nome, MUSCULACAO, null, null, false);
     }
 
     public static ExercicioRequest umExercicioRequestAerobicoComCamposInvalidos(String nome) {
-        return new ExercicioRequest(nome, AEROBICO, null, 1, HALTER);
+        return new ExercicioRequest(nome, AEROBICO, null, 1, false);
     }
 
     public static Exercicio umExercicioMusculacao(Integer id) {
@@ -43,10 +46,10 @@ public class ExercicioHelper {
             .id(id)
             .nome("SUPINO RETO")
             .descricao("Supino Reto")
-            .tipoEquipamento(HALTER)
             .tipoExercicio(MUSCULACAO)
             .grupoMuscular(umGrupoMuscularPeitoral())
             .treinos(emptyList())
+            .possuiVariacao(TRUE)
             .build();
     }
 
@@ -55,10 +58,10 @@ public class ExercicioHelper {
             .id(id)
             .nome("PUXADA ALTA")
             .descricao("Puxada Alta")
-            .tipoEquipamento(MAQUINA)
             .tipoExercicio(MUSCULACAO)
             .grupoMuscular(umGrupoMuscularCostas())
             .treinos(emptyList())
+            .possuiVariacao(FALSE)
             .build();
     }
 
@@ -69,6 +72,7 @@ public class ExercicioHelper {
             .descricao("ESTEIRA")
             .tipoExercicio(AEROBICO)
             .treinos(emptyList())
+            .possuiVariacao(FALSE)
             .build();
     }
 
@@ -80,6 +84,7 @@ public class ExercicioHelper {
             .tipoExercicio(CALISTENIA)
             .treinos(emptyList())
             .grupoMuscular(umGrupoMuscularAbdomen())
+            .possuiVariacao(FALSE)
             .build();
     }
 
@@ -104,11 +109,20 @@ public class ExercicioHelper {
     }
 
     public static ExercicioVariacaoRequest umExercicioVariacaoRequestComCamposInvalidos() {
-        return new ExercicioVariacaoRequest(null, null);
+        return new ExercicioVariacaoRequest(null, null, null);
     }
 
-    public static ExercicioVariacaoRequest umExercicioVariacaoRequest() {
-        return new ExercicioVariacaoRequest(1, HALTER);
+    public static ExercicioVariacaoRequest umExercicioVariacaoComTipoEquipaentoRequest() {
+        return new ExercicioVariacaoRequest(1, null, HALTER);
+    }
+
+    public static ExercicioVariacaoRequest umExercicioVariacaoSemTipoEquipaentoRequest() {
+        return new ExercicioVariacaoRequest(1, "Abdominal Supra", null);
+    }
+
+    public static ExercicioVariacaoRequest umExercicioVariacaoRequest(Integer exercicioBaseId, String nome,
+                                                                      ETipoEquipamento tipoEquipamento) {
+        return new ExercicioVariacaoRequest(exercicioBaseId, nome, tipoEquipamento);
     }
 
     public static ExercicioVariacao umExercicioVariacao() {

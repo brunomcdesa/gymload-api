@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.exercicio.dto;
 
-import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
 import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
 import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Aerobico;
 import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Calistenia;
@@ -24,9 +23,7 @@ public record ExercicioRequest(
     @NotNull(groups = {Musculacao.class, Calistenia.class})
     Integer grupoMuscularId,
 
-    @Null(groups = {Aerobico.class, Calistenia.class})
-    @NotNull(groups = Musculacao.class)
-    ETipoEquipamento tipoEquipamento
+    boolean possuiVariacao
 ) {
 
     public void aplicarGroupValidators() {

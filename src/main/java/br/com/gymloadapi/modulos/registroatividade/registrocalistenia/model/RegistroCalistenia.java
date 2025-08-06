@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.registroatividade.registrocalistenia.model;
 
+import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
 import br.com.gymloadapi.modulos.comum.enums.EUnidadePeso;
 import br.com.gymloadapi.modulos.registroatividade.model.RegistroAtividade;
 import lombok.AllArgsConstructor;
@@ -37,6 +38,9 @@ public class RegistroCalistenia extends RegistroAtividade {
 
     @Column
     private Double pesoAdicional;
+
+    @Column
+    private ETipoEquipamento tipoEquipamentoPesoAdicional;
 
     @Column
     @Enumerated(STRING)

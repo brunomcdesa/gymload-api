@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.MISTA;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
@@ -86,13 +85,13 @@ class RegistroAtividadeMapperTest {
             () -> assertEquals("22.5 (KG)", historicoRegistroAtividadeResponse.carga()),
             () -> assertEquals(22.5, historicoRegistroAtividadeResponse.peso()),
             () -> assertEquals(KG, historicoRegistroAtividadeResponse.unidadePeso()),
-            () -> assertEquals(HALTER, historicoRegistroAtividadeResponse.tipoEquipamento()),
             () -> assertEquals("Peitoral", historicoRegistroAtividadeResponse.grupoMuscularNome()),
             () -> assertEquals(12, historicoRegistroAtividadeResponse.qtdRepeticoes()),
             () -> assertEquals(4, historicoRegistroAtividadeResponse.qtdSeries()),
             () -> assertNull(historicoRegistroAtividadeResponse.distancia()),
             () -> assertNull(historicoRegistroAtividadeResponse.duracao()),
-            () -> assertNull(historicoRegistroAtividadeResponse.velocidadeMedia())
+            () -> assertNull(historicoRegistroAtividadeResponse.velocidadeMedia()),
+            () -> assertNull(historicoRegistroAtividadeResponse.tipoEquipamento())
         );
     }
 

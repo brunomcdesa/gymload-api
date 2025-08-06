@@ -27,8 +27,8 @@ public class ExercicioVariacao {
     @Column(nullable = false)
     private String nome;
 
+    @Column
     @Enumerated(STRING)
-    @Column(nullable = false)
     private ETipoEquipamento tipoEquipamento;
 
     @Column(nullable = false)

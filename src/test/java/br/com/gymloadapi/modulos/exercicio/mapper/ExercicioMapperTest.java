@@ -8,8 +8,7 @@ import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.POLIA;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ExercicioMapperTest {
 
@@ -22,9 +21,9 @@ class ExercicioMapperTest {
         assertAll(
             () -> assertEquals("SUPINO RETO", model.getNome()),
             () -> assertEquals("Supino Reto", model.getDescricao()),
-            () -> assertEquals(HALTER, model.getTipoEquipamento()),
             () -> assertEquals(1, model.getGrupoMuscular().getId()),
-            () -> assertEquals("Peitoral", model.getGrupoMuscular().getNome())
+            () -> assertEquals("Peitoral", model.getGrupoMuscular().getNome()),
+            () -> assertTrue(model.getPossuiVariacao())
         );
     }
 
@@ -48,7 +47,7 @@ class ExercicioMapperTest {
 
         assertAll(
             () -> assertEquals(1, selectResponse.value()),
-            () -> assertEquals("SUPINO RETO (HALTER)", selectResponse.label())
+            () -> assertEquals("SUPINO RETO", selectResponse.label())
         );
     }
 
@@ -60,9 +59,9 @@ class ExercicioMapperTest {
         assertAll(
             () -> assertEquals("SUPINO RETO", exercicio.getNome()),
             () -> assertEquals("Supino Reto", exercicio.getDescricao()),
-            () -> assertEquals(HALTER, exercicio.getTipoEquipamento()),
             () -> assertEquals(1, exercicio.getGrupoMuscular().getId()),
-            () -> assertEquals("Peitoral", exercicio.getGrupoMuscular().getNome())
+            () -> assertEquals("Peitoral", exercicio.getGrupoMuscular().getNome()),
+            () -> assertTrue(exercicio.getPossuiVariacao())
         );
     }
 

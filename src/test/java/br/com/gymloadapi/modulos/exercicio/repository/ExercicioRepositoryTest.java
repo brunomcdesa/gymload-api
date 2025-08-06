@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class ExercicioRepositoryTest {
+class ExercicioRepositoryTest {
 
     @Autowired
     private ExercicioRepository repository;
@@ -29,7 +29,7 @@ public class ExercicioRepositoryTest {
             () -> assertEquals(3, exercicios.get(2).getId()),
             () -> assertEquals("PUXADA ALTA", exercicios.get(2).getNome()),
             () -> assertEquals(4, exercicios.get(3).getId()),
-            () -> assertEquals("ABDOMINAL SUPRA", exercicios.get(3).getNome()),
+            () -> assertEquals("ABDOMINAL", exercicios.get(3).getNome()),
             () -> assertEquals(5, exercicios.getLast().getId()),
             () -> assertEquals("PULL UP", exercicios.getLast().getNome())
         );
@@ -47,7 +47,7 @@ public class ExercicioRepositoryTest {
             () -> assertEquals(3, exercicios.get(2).getId()),
             () -> assertEquals("PUXADA ALTA", exercicios.get(2).getNome()),
             () -> assertEquals(4, exercicios.get(3).getId()),
-            () -> assertEquals("ABDOMINAL SUPRA", exercicios.get(3).getNome()),
+            () -> assertEquals("ABDOMINAL", exercicios.get(3).getNome()),
             () -> assertEquals(5, exercicios.getLast().getId()),
             () -> assertEquals("PULL UP", exercicios.getLast().getNome())
         );

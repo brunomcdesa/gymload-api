@@ -18,7 +18,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioVariacaoRequest;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioVariacaoComTipoEquipaentoRequest;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioVariacaoRequestComCamposInvalidos;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -56,8 +56,7 @@ class ExercicioVariacaoControllerTest {
     void salvar_deveRetornarBadRequest_quandoUsuarioAdminECamposObrigatoriosInvalidos() {
         var request = umExercicioVariacaoRequestComCamposInvalidos();
         isBadRequest(post(URL), mockMvc, request,
-            "O campo exercicioBaseId é obrigatório.",
-            "O campo tipoEquipamento é obrigatório.");
+            "O campo exercicioBaseId é obrigatório.");
 
         verifyNoInteractions(service);
     }
@@ -65,7 +64,7 @@ class ExercicioVariacaoControllerTest {
     @Test
     @WithUserDetails
     void salvar_deveRetornarCreated_quandoUsuarioAdminECamposObrigatoriosValidos() {
-        var request = umExercicioVariacaoRequest();
+        var request = umExercicioVariacaoComTipoEquipaentoRequest();
         isCreated(post(URL), mockMvc, request);
 
         verify(service).salvar(request, 1);
