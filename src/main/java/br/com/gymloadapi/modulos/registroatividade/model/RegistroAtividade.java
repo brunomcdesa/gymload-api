@@ -11,6 +11,8 @@ import lombok.experimental.SuperBuilder;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Getter
 @Setter
 @SuperBuilder
@@ -25,12 +27,12 @@ public abstract class RegistroAtividade {
     @Column(length = 150)
     protected String observacao;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "FK_EXERCICIO", referencedColumnName = "ID",
         foreignKey = @ForeignKey(name = "FK_EXERCICIO"), nullable = false)
     protected Exercicio exercicio;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "FK_USUARIO", referencedColumnName = "ID",
         foreignKey = @ForeignKey(name = "FK_USUARIO"), nullable = false)
     protected Usuario usuario;

@@ -56,9 +56,9 @@ class ExercicioControllerTest {
         verifyNoInteractions(service);
     }
 
+    @WithUserDetails
     @ParameterizedTest
     @NullAndEmptySource
-    @WithMockUser(roles = "ADMIN")
     @ValueSource(strings = {"    "})
     void salvar_deveRetornarBadRequest_quandoUsuarioAdminECamposObrigatoriosInvalidos(String exercicioNome) {
         var request = umExercicioRequestComCamposInvalidos(exercicioNome);
@@ -132,9 +132,9 @@ class ExercicioControllerTest {
         verifyNoInteractions(service);
     }
 
+    @WithUserDetails
     @ParameterizedTest
     @NullAndEmptySource
-    @WithMockUser(roles = "ADMIN")
     @ValueSource(strings = {"    "})
     void editar_deveRetornarBadRequest_quandoUsuarioAdminECamposObrigatoriosInvalidos(String exercicioNome) {
         var request = umExercicioRequestComCamposInvalidos(exercicioNome);

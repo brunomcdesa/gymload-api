@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.POLIA;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
@@ -74,6 +75,30 @@ class ExercicioMapperTest {
             () -> assertEquals(1, historico.getExercicio().getId()),
             () -> assertEquals(CADASTRO, historico.getAcao()),
             () -> assertEquals(1, historico.getUsuarioCadastroId())
+        );
+    }
+
+    @Test
+    void mapToExercicioVariacao_deveRetornarExercicioVariacao_quandoSolicitado() {
+        var variacao = mapper.mapToExercicioVariacao(umExercicioMusculacao(1), 2,
+            POLIA, "SUPINO RETO - Polia");
+
+        assertAll(
+            () -> assertEquals("SUPINO RETO - Polia", variacao.getNome()),
+            () -> assertEquals(1, variacao.getExercicio().getId()),
+            () -> assertEquals(POLIA, variacao.getTipoEquipamento()),
+            () -> assertEquals(2, variacao.getUsuarioCadastroId())
+        );
+    }
+
+    @Test
+    void mapToExercicioVariacaoResponse_deveRetornarExercicioVariacaoResponse_quandoSolicitado() {
+        var response = mapper.mapToExercicioVariacaoResponse(umExercicioVariacao());
+
+        assertAll(
+            () -> assertEquals(1, response.id()),
+            () -> assertEquals("SUPINO RETO - Halter", response.nome()),
+            () -> assertEquals(HALTER, response.tipoEquipamento())
         );
     }
 }

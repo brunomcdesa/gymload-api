@@ -35,7 +35,7 @@ public class Exercicio {
 
     @Column
     @Enumerated(STRING)
-    private ETipoEquipamento tipoEquipamento;
+    private ETipoEquipamento tipoEquipamento;  // REMOVER
 
     @Column
     @Enumerated(STRING)

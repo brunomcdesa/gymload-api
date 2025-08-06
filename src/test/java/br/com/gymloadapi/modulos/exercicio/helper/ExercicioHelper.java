@@ -2,13 +2,15 @@ package br.com.gymloadapi.modulos.exercicio.helper;
 
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioFiltro;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
+import br.com.gymloadapi.modulos.exercicio.dto.ExercicioVariacaoRequest;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
+import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import lombok.experimental.UtilityClass;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.MAQUINA;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.*;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.*;
 import static java.util.Collections.emptyList;
@@ -99,5 +101,39 @@ public class ExercicioHelper {
 
     public static ExercicioFiltro umExercicioFiltro() {
         return new ExercicioFiltro(CALISTENIA, 2);
+    }
+
+    public static ExercicioVariacaoRequest umExercicioVariacaoRequestComCamposInvalidos() {
+        return new ExercicioVariacaoRequest(null, null);
+    }
+
+    public static ExercicioVariacaoRequest umExercicioVariacaoRequest() {
+        return new ExercicioVariacaoRequest(1, HALTER);
+    }
+
+    public static ExercicioVariacao umExercicioVariacao() {
+        return ExercicioVariacao.builder()
+            .id(1)
+            .usuarioCadastroId(1)
+            .dataCadastro(LocalDateTime.of(2025, 8, 6, 10, 30))
+            .exercicio(umExercicioMusculacao(1))
+            .nome("SUPINO RETO - Halter")
+            .tipoEquipamento(HALTER)
+            .build();
+    }
+
+    public static ExercicioVariacao outroExercicioVariacao() {
+        return ExercicioVariacao.builder()
+            .id(2)
+            .usuarioCadastroId(1)
+            .dataCadastro(LocalDateTime.of(2025, 8, 6, 11, 30))
+            .exercicio(umExercicioMusculacao(1))
+            .nome("SUPINO RETO - Barra")
+            .tipoEquipamento(BARRA)
+            .build();
+    }
+
+    public static List<ExercicioVariacao> umaListaExercicioVariacao() {
+        return List.of(umExercicioVariacao(), outroExercicioVariacao());
     }
 }

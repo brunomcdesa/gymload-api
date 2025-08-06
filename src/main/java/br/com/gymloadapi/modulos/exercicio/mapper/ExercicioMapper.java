@@ -2,10 +2,13 @@ package br.com.gymloadapi.modulos.exercicio.mapper;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
 import br.com.gymloadapi.modulos.comum.enums.EAcao;
+import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioResponse;
+import br.com.gymloadapi.modulos.exercicio.dto.ExercicioVariacaoResponse;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.exercicio.model.ExercicioHistorico;
+import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
 import org.mapstruct.*;
 
@@ -41,4 +44,15 @@ public interface ExercicioMapper {
     @Mapping(target = "usuarioCadastroId", source = "usuarioId")
     @Mapping(target = "dataCadastro", expression = "java(LocalDateTime.now())")
     ExercicioHistorico mapToHistorico(Exercicio exercicio, Integer usuarioId, EAcao acao);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "nome", source = "nomeVariacao")
+    @Mapping(target = "exercicio", source = "exercicio")
+    @Mapping(target = "tipoEquipamento", source = "tipoEquipamento")
+    @Mapping(target = "usuarioCadastroId", source = "usuarioAutenticadoId")
+    @Mapping(target = "dataCadastro", expression = "java(LocalDateTime.now())")
+    ExercicioVariacao mapToExercicioVariacao(Exercicio exercicio, Integer usuarioAutenticadoId,
+                                             ETipoEquipamento tipoEquipamento, String nomeVariacao);
+
+    ExercicioVariacaoResponse mapToExercicioVariacaoResponse(ExercicioVariacao exercicioVariacao);
 }
