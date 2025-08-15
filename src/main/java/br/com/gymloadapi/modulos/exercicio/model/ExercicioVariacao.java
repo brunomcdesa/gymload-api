@@ -41,4 +41,12 @@ public class ExercicioVariacao {
     @JoinColumn(name = "FK_EXERCICIO", referencedColumnName = "ID",
         foreignKey = @ForeignKey(name = "FK_EXERCICIO"), nullable = false)
     private Exercicio exercicio;
+
+    public boolean isVariacaoDeExercicioMusculacao() {
+        return this.exercicio.isExercicioMusculacao();
+    }
+
+    public String getExercicioNome() {
+        return this.exercicio.getNome();
+    }
 }

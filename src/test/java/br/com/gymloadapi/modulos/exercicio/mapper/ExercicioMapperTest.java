@@ -3,8 +3,8 @@ package br.com.gymloadapi.modulos.exercicio.mapper;
 import org.junit.jupiter.api.Test;
 
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.POLIA;
+import static br.com.gymloadapi.modulos.comum.enums.EAcao.EDICAO;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.*;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
@@ -52,9 +52,9 @@ class ExercicioMapperTest {
     }
 
     @Test
-    void editar_deveAlterarOsDados_quandoSolicitado() {
+    void editarExercicio_deveAlterarOsDados_quandoSolicitado() {
         var exercicio = outroExercicioMusculacao(1);
-        mapper.editar(umExercicioMusculacaoRequest(), umGrupoMuscularPeitoral(), exercicio);
+        mapper.editarExercicio(umExercicioMusculacaoRequest(), umGrupoMuscularPeitoral(), exercicio);
 
         assertAll(
             () -> assertEquals("SUPINO RETO", exercicio.getNome()),
@@ -98,6 +98,30 @@ class ExercicioMapperTest {
             () -> assertEquals(1, response.id()),
             () -> assertEquals("SUPINO RETO - Halter", response.nome()),
             () -> assertEquals(HALTER, response.tipoEquipamento())
+        );
+    }
+
+    @Test
+    void editarVariacao_deveEditarVariacaoDeExercicio_quandoSolicitado() {
+        var variacao = umExercicioVariacao();
+        mapper.editarVariacao(BOLA,"editado", variacao);
+
+        assertAll(
+            () -> assertEquals(1, variacao.getId()),
+            () -> assertEquals("editado", variacao.getNome()),
+            () -> assertEquals(BOLA, variacao.getTipoEquipamento())
+        );
+    }
+
+    @Test
+    void mapToVariacaoHistorico_deveGerarHistoricoDeVariacaoDeExercicio_quandoSolicitado() {
+        var historico = mapper.mapToVariacaoHistorico(umExercicioVariacao(), 1, EDICAO);
+
+        assertAll(
+            () -> assertEquals("SUPINO RETO - Halter", historico.getExercicioVariacao().getNome()),
+            () -> assertEquals(1, historico.getExercicioVariacao().getId()),
+            () -> assertEquals(EDICAO, historico.getAcao()),
+            () -> assertEquals(1, historico.getUsuarioCadastroId())
         );
     }
 }

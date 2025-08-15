@@ -9,6 +9,7 @@ import br.com.gymloadapi.modulos.exercicio.dto.ExercicioVariacaoResponse;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.exercicio.model.ExercicioHistorico;
 import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
+import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacaoHistorico;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
 import org.mapstruct.*;
 
@@ -39,7 +40,7 @@ public interface ExercicioMapper {
     @BeanMapping(
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
-    void editar(ExercicioRequest request, GrupoMuscular grupoMuscular, @MappingTarget Exercicio exercicio);
+    void editarExercicio(ExercicioRequest request, GrupoMuscular grupoMuscular, @MappingTarget Exercicio exercicio);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "acao", source = "acao")
@@ -57,4 +58,19 @@ public interface ExercicioMapper {
                                              ETipoEquipamento tipoEquipamento, String nomeVariacao);
 
     ExercicioVariacaoResponse mapToExercicioVariacaoResponse(ExercicioVariacao exercicioVariacao);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "nome", source = "nomeVariacao")
+    @Mapping(target = "tipoEquipamento", source = "tipoEquipamento")
+    @BeanMapping(
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
+    void editarVariacao(ETipoEquipamento tipoEquipamento, String nomeVariacao,
+                        @MappingTarget ExercicioVariacao exercicioVariacao);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "acao", source = "acao")
+    @Mapping(target = "usuarioCadastroId", source = "usuarioId")
+    @Mapping(target = "dataCadastro", expression = "java(LocalDateTime.now())")
+    ExercicioVariacaoHistorico mapToVariacaoHistorico(ExercicioVariacao exercicioVariacao, Integer usuarioId, EAcao acao);
 }

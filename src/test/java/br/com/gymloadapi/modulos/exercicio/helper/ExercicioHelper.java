@@ -125,6 +125,10 @@ public class ExercicioHelper {
         return new ExercicioVariacaoRequest(exercicioBaseId, nome, tipoEquipamento);
     }
 
+    public static ExercicioVariacaoRequest umExercicioVariacaoRequestComDados() {
+        return new ExercicioVariacaoRequest(1, "Abdominal Supra", KETLLEBEL);
+    }
+
     public static ExercicioVariacao umExercicioVariacao() {
         return ExercicioVariacao.builder()
             .id(1)

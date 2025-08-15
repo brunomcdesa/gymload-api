@@ -18,12 +18,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioVariacaoComTipoEquipaentoRequest;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioVariacaoRequestComCamposInvalidos;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
+import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(ExercicioVariacaoController.class)
 @MockitoBean(types = {UsuarioService.class, BackBlazeService.class})
@@ -82,5 +81,40 @@ class ExercicioVariacaoControllerTest {
     void buscarVariacoesDoExercicio_deveRetornarOk_quandoUsuarioAutenticado() {
         isOk(get(URL + "/1"), mockMvc);
         verify(service).buscarVariacoesDoExercicio(1);
+    }
+
+    @Test
+    @WithAnonymousUser
+    void editarVariacao_deveRetornarUnauthorized_quandoUsuarioNaoAutenticado() {
+        isUnauthorized(put(URL + "/1/editar"), mockMvc);
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser
+    void editarVariacao_deveRetornarForbidden_quandoUsuarioNaoForAdmin() {
+        isForbidden(put(URL + "/1/editar"), mockMvc);
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithUserDetails
+    void editarVariacao_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos() {
+        var request = umExercicioVariacaoRequest(1, null, null);
+
+        isBadRequest(put(URL + "/1/editar"), mockMvc, request,
+            "O campo exercicioBaseId deve ser nulo");
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithUserDetails
+    void editarVariacao_deveRetornarNoContent_quandoCamposObrigatoriosValidos() {
+        var request = umExercicioVariacaoRequest(null, null, null);
+
+        isNoContent(put(URL + "/1/editar"), mockMvc, request);
+
+        verify(service).editarVariacao(1, request, umUsuarioAdmin());
     }
 }

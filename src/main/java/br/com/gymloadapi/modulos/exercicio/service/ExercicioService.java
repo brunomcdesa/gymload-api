@@ -97,7 +97,7 @@ public class ExercicioService {
         this.validarAlteracaoTipoExercicio(exercicio, request.tipoExercicio());
         request.aplicarGroupValidators();
 
-        exercicioMapper.editar(request,
+        exercicioMapper.editarExercicio(request,
             mapNullBoolean(deveConterGrupoMuscular(request.tipoExercicio()),
                 () -> grupoMuscularService.findById(request.grupoMuscularId())),
             exercicio);
