@@ -22,6 +22,8 @@ public class CacheUtils {
     public static final String CACHE_GRUPO_MUSCULAR_POR_ID = "todosGrupoMuscularPorId";
     public static final String CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO = "todosTreinosAtivosDoUsuario";
     public static final String CACHE_TODOS_TREINOS_DO_USUARIO = "todosTreinosDoUsuario";
+    public static final String CACHE_TODOS_TIPOS_VARIACOES = "todosTiposVariacoes";
+    public static final String CACHE_TODOS_TIPOS_VARIACOES_SELECT = "todosTiposVariacoesSelect";
 
     public static List<String> getCachesExercicio() {
         return List.of(CACHE_TODOS_EXERCICIOS_FILTRO, CACHE_TODOS_EXERCICIOS_SELECT, CACHE_EXERCICIOS_POR_IDS,
@@ -34,5 +36,9 @@ public class CacheUtils {
 
     public static List<String> getCachesTreinos() {
         return List.of(CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO, CACHE_TODOS_TREINOS_DO_USUARIO);
+    }
+
+    public static List<String> getCachesTiposVariacoes() {
+        return List.of(CACHE_TODOS_TIPOS_VARIACOES, CACHE_TODOS_TIPOS_VARIACOES_SELECT);
     }
 }

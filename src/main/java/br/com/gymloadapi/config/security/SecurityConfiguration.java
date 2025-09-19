@@ -33,6 +33,7 @@ public class SecurityConfiguration {
 
     @Bean
     @SneakyThrows
+    @SuppressWarnings("MethodLength")
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
         return httpSecurity
             .csrf(AbstractHttpConfigurer::disable)
@@ -58,6 +59,10 @@ public class SecurityConfiguration {
                 .requestMatchers(GET, "/api/usuarios/detalhar")
                 .hasAnyRole(ADMIN.name(), USER.name())
                 .requestMatchers("/api/usuarios/**")
+                .hasRole(ADMIN.name())
+                .requestMatchers(GET, "/api/tipos-variacoes/select")
+                .authenticated()
+                .requestMatchers("/api/tipos-variacoes/**")
                 .hasRole(ADMIN.name())
                 .anyRequest().authenticated()
             )
