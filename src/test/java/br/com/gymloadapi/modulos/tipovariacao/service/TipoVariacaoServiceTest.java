@@ -1,6 +1,8 @@
 package br.com.gymloadapi.modulos.tipovariacao.service;
 
 import br.com.gymloadapi.modulos.cache.config.CacheConfig;
+import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
+import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.tipovariacao.dto.TipoVariacaoResponse;
 import br.com.gymloadapi.modulos.tipovariacao.mapper.TipoVariacaoMapper;
@@ -24,9 +26,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.getCachesTiposVariacoes;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
+import static br.com.gymloadapi.modulos.comum.enums.EAcao.EDICAO;
 import static br.com.gymloadapi.modulos.tipovariacao.helper.TipoVariacaoHelper.umTipoVariacao;
 import static br.com.gymloadapi.modulos.tipovariacao.helper.TipoVariacaoHelper.umTipoVariacaoRequest;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
@@ -158,10 +162,109 @@ class TipoVariacaoServiceTest {
     }
 
     @Test
-    void editar() {
+    void editar_deveLancarException_quandoPossuirOutroTipoDeVariacaoComOMesmoNome() {
+        when(repository.existsByNomeIgnoreCase("Halter")).thenReturn(true);
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.editar(1, umTipoVariacaoRequest(), umUsuarioAdmin())
+        );
+        assertEquals("Já existe uma variação com este nome.", exception.getMessage());
+
+        verify(repository).existsByNomeIgnoreCase("Halter");
+        verifyNoMoreInteractions(repository);
+        verifyNoInteractions(historicoService);
     }
 
     @Test
-    void getSelect() {
+    void editar_deveLancarException_quandoNaoEncontrarTipoVariacaoComMesmoId() {
+        when(repository.existsByNomeIgnoreCase("Halter")).thenReturn(false);
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.editar(1, umTipoVariacaoRequest(), umUsuarioAdmin())
+        );
+        assertEquals("Tipo de Variação não encontrado.", exception.getMessage());
+
+        verify(repository).existsByNomeIgnoreCase("Halter");
+        verify(repository).findById(1);
+        verifyNoMoreInteractions(repository);
+        verifyNoInteractions(historicoService);
+    }
+
+    @Test
+    void editar_deveEditarTipoDeVariacao_quandoNaoExistirOutroTipoVariacaoComMesmoNome() {
+        var tipoVariacao = umTipoVariacao();
+        tipoVariacao.setNome("Barra");
+
+        when(repository.existsByNomeIgnoreCase("Halter")).thenReturn(false);
+        when(repository.findById(1)).thenReturn(Optional.of(tipoVariacao));
+
+        assertDoesNotThrow(() -> service.editar(1, umTipoVariacaoRequest(), umUsuarioAdmin()));
+
+        assertAll(
+            () -> assertEquals("Halter", tipoVariacao.getNome()),
+            () -> assertEquals(1, tipoVariacao.getUsuarioCadastroId()),
+            () -> assertEquals("Usuario Admin", tipoVariacao.getUsuarioCadastroNome()),
+            () -> assertNotNull(tipoVariacao.getDataCadastro())
+        );
+
+        verify(repository).existsByNomeIgnoreCase("Halter");
+        verify(repository).findById(1);
+        verify(repository).save(tipoVariacao);
+        verify(historicoService).salvar(any(TipoVariacao.class), eq(1), eq(EDICAO));
+    }
+
+    @Test
+    void editar_deveLimparTodosOsCachesDeTiposDeVariacao_quandoEditarUmTipoDeVariacao() {
+        when(repository.findById(1)).thenReturn(Optional.of(umTipoVariacao()));
+        when(repository.existsByNomeIgnoreCase(anyString())).thenReturn(false);
+
+        service.buscarTodos();
+        service.getSelect();
+
+        service.editar(1, umTipoVariacaoRequest(), umUsuarioAdmin());
+
+        service.buscarTodos();
+        service.getSelect();
+
+        verify(repository, times(4)).findAll();
+        verify(repository).existsByNomeIgnoreCase(anyString());
+        verify(repository).findById(1);
+        verify(repository).save(any(TipoVariacao.class));
+        verify(historicoService).salvar(any(TipoVariacao.class), eq(1), eq(EDICAO));
+    }
+
+    @Test
+    void getSelect_deveRetornarUmaListaVazia_quandoNaoPossuirTiposDeVariacoesCadastradas() {
+        when(repository.findAll()).thenReturn(emptyList());
+
+        assertTrue(service.getSelect().isEmpty());
+
+        verify(repository).findAll();
+    }
+
+    @Test
+    void getSelect_deveRetornarUmaListaDeTiposDeVariacao_quandoPossuirTiposDeVariacoesCadastradas() {
+        when(repository.findAll()).thenReturn(List.of(umTipoVariacao()));
+
+        assertThat(service.getSelect())
+            .extracting(SelectResponse::value, SelectResponse::label)
+            .containsExactly(tuple(1, "Halter"));
+
+        verify(repository).findAll();
+    }
+
+    @Test
+    void getSelect_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
+        when(repository.findAll()).thenReturn(emptyList());
+
+        service.getSelect();
+        service.getSelect();
+        service.getSelect();
+        service.getSelect();
+
+        verify(repository).findAll();
     }
 }
