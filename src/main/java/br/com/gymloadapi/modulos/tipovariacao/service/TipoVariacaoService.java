@@ -1,14 +1,14 @@
-package br.com.gymloadapi.modulos.tipoVariacao.service;
+package br.com.gymloadapi.modulos.tipovariacao.service;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
 import br.com.gymloadapi.modulos.comum.enums.EAcao;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
-import br.com.gymloadapi.modulos.tipoVariacao.dto.TipoVariacaoRequest;
-import br.com.gymloadapi.modulos.tipoVariacao.dto.TipoVariacaoResponse;
-import br.com.gymloadapi.modulos.tipoVariacao.mapper.TipoVariacaoMapper;
-import br.com.gymloadapi.modulos.tipoVariacao.model.TipoVariacao;
-import br.com.gymloadapi.modulos.tipoVariacao.repository.TipoVariacaoRepository;
+import br.com.gymloadapi.modulos.tipovariacao.dto.TipoVariacaoRequest;
+import br.com.gymloadapi.modulos.tipovariacao.dto.TipoVariacaoResponse;
+import br.com.gymloadapi.modulos.tipovariacao.mapper.TipoVariacaoMapper;
+import br.com.gymloadapi.modulos.tipovariacao.model.TipoVariacao;
+import br.com.gymloadapi.modulos.tipovariacao.repository.TipoVariacaoRepository;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;

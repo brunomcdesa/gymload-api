@@ -1,25 +1,17 @@
-package br.com.gymloadapi.modulos.tipoVariacao.service;
+package br.com.gymloadapi.modulos.tipovariacao.service;
 
 import br.com.gymloadapi.modulos.cache.config.CacheConfig;
-import br.com.gymloadapi.modulos.comum.enums.EAcao;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
-import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
-import br.com.gymloadapi.modulos.tipoVariacao.dto.TipoVariacaoResponse;
-import br.com.gymloadapi.modulos.tipoVariacao.helper.TipoVariacaoHelper;
-import br.com.gymloadapi.modulos.tipoVariacao.mapper.TipoVariacaoMapper;
-import br.com.gymloadapi.modulos.tipoVariacao.mapper.TipoVariacaoMapperImpl;
-import br.com.gymloadapi.modulos.tipoVariacao.model.TipoVariacao;
-import br.com.gymloadapi.modulos.tipoVariacao.repository.TipoVariacaoRepository;
-import br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper;
-import com.querydsl.core.types.Predicate;
-import org.assertj.core.groups.Tuple;
-import org.junit.jupiter.api.Assertions;
+import br.com.gymloadapi.modulos.tipovariacao.dto.TipoVariacaoResponse;
+import br.com.gymloadapi.modulos.tipovariacao.mapper.TipoVariacaoMapper;
+import br.com.gymloadapi.modulos.tipovariacao.mapper.TipoVariacaoMapperImpl;
+import br.com.gymloadapi.modulos.tipovariacao.model.TipoVariacao;
+import br.com.gymloadapi.modulos.tipovariacao.repository.TipoVariacaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.Cache;
@@ -29,18 +21,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.getCachesTiposVariacoes;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioAerobicoRequest;
-import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioFiltro;
-import static br.com.gymloadapi.modulos.tipoVariacao.helper.TipoVariacaoHelper.umTipoVariacao;
-import static br.com.gymloadapi.modulos.tipoVariacao.helper.TipoVariacaoHelper.umTipoVariacaoRequest;
+import static br.com.gymloadapi.modulos.tipovariacao.helper.TipoVariacaoHelper.umTipoVariacao;
+import static br.com.gymloadapi.modulos.tipovariacao.helper.TipoVariacaoHelper.umTipoVariacaoRequest;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -168,7 +156,6 @@ class TipoVariacaoServiceTest {
 
         verify(repository).findAll();
     }
-
 
     @Test
     void editar() {

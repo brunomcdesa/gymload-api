@@ -1,4 +1,4 @@
-package br.com.gymloadapi.modulos.tipoVariacao.model;
+package br.com.gymloadapi.modulos.tipovariacao.model;
 
 import br.com.gymloadapi.modulos.comum.base.HistoricoBase;
 import lombok.AllArgsConstructor;

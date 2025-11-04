@@ -1,6 +1,6 @@
-package br.com.gymloadapi.modulos.tipoVariacao.repository;
+package br.com.gymloadapi.modulos.tipovariacao.repository;
 
-import br.com.gymloadapi.modulos.tipoVariacao.model.TipoVariacaoHistorico;
+import br.com.gymloadapi.modulos.tipovariacao.model.TipoVariacaoHistorico;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;

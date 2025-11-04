@@ -1,11 +1,8 @@
-package br.com.gymloadapi.modulos.tipoVariacao.model;
-
-import jakarta.persistence.*;
-
-import jakarta.validation.constraints.Null;
+package br.com.gymloadapi.modulos.tipovariacao.model;
 
 import lombok.*;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 import static jakarta.persistence.GenerationType.SEQUENCE;

@@ -1,17 +1,15 @@
-package br.com.gymloadapi.modulos.tipoVariacao.controller;
+package br.com.gymloadapi.modulos.tipovariacao.controller;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
-import br.com.gymloadapi.modulos.tipoVariacao.dto.TipoVariacaoRequest;
-import br.com.gymloadapi.modulos.tipoVariacao.dto.TipoVariacaoResponse;
-import br.com.gymloadapi.modulos.tipoVariacao.service.TipoVariacaoService;
+import br.com.gymloadapi.modulos.tipovariacao.dto.TipoVariacaoRequest;
+import br.com.gymloadapi.modulos.tipovariacao.dto.TipoVariacaoResponse;
+import br.com.gymloadapi.modulos.tipovariacao.service.TipoVariacaoService;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;

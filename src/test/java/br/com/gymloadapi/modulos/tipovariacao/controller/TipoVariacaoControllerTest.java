@@ -1,13 +1,11 @@
-package br.com.gymloadapi.modulos.tipoVariacao.controller;
+package br.com.gymloadapi.modulos.tipovariacao.controller;
 
 import br.com.gymloadapi.autenticacao.service.TokenService;
 import br.com.gymloadapi.config.TestSecurityConfiguration;
 import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
-import br.com.gymloadapi.modulos.tipoVariacao.helper.TipoVariacaoHelper;
-import br.com.gymloadapi.modulos.tipoVariacao.service.TipoVariacaoService;
-import br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper;
+import br.com.gymloadapi.modulos.tipovariacao.service.TipoVariacaoService;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,10 +21,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
-import static br.com.gymloadapi.modulos.tipoVariacao.helper.TipoVariacaoHelper.umTipoVariacaoRequest;
-import static br.com.gymloadapi.modulos.tipoVariacao.helper.TipoVariacaoHelper.umTipoVariacaoRequestComCamposInvalidos;
+import static br.com.gymloadapi.modulos.tipovariacao.helper.TipoVariacaoHelper.umTipoVariacaoRequest;
+import static br.com.gymloadapi.modulos.tipovariacao.helper.TipoVariacaoHelper.umTipoVariacaoRequestComCamposInvalidos;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(TipoVariacaoController.class)
@@ -129,7 +128,6 @@ class TipoVariacaoControllerTest {
 
         verify(service).editar(1, request, umUsuarioAdmin());
     }
-
 
     @Test
     @WithMockUser

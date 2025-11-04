@@ -1,7 +1,7 @@
-package br.com.gymloadapi.modulos.tipoVariacao.helper;
+package br.com.gymloadapi.modulos.tipovariacao.helper;
 
-import br.com.gymloadapi.modulos.tipoVariacao.dto.TipoVariacaoRequest;
-import br.com.gymloadapi.modulos.tipoVariacao.model.TipoVariacao;
+import br.com.gymloadapi.modulos.tipovariacao.dto.TipoVariacaoRequest;
+import br.com.gymloadapi.modulos.tipovariacao.model.TipoVariacao;
 import lombok.experimental.UtilityClass;
 
 import java.time.LocalDateTime;

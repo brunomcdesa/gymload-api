@@ -1,11 +1,11 @@
-package br.com.gymloadapi.modulos.tipoVariacao.mapper;
+package br.com.gymloadapi.modulos.tipovariacao.mapper;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
 import br.com.gymloadapi.modulos.comum.enums.EAcao;
-import br.com.gymloadapi.modulos.tipoVariacao.dto.TipoVariacaoRequest;
-import br.com.gymloadapi.modulos.tipoVariacao.dto.TipoVariacaoResponse;
-import br.com.gymloadapi.modulos.tipoVariacao.model.TipoVariacao;
-import br.com.gymloadapi.modulos.tipoVariacao.model.TipoVariacaoHistorico;
+import br.com.gymloadapi.modulos.tipovariacao.dto.TipoVariacaoRequest;
+import br.com.gymloadapi.modulos.tipovariacao.dto.TipoVariacaoResponse;
+import br.com.gymloadapi.modulos.tipovariacao.model.TipoVariacao;
+import br.com.gymloadapi.modulos.tipovariacao.model.TipoVariacaoHistorico;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import org.mapstruct.*;
 

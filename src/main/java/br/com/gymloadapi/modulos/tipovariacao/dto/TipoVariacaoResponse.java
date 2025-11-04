@@ -1,4 +1,4 @@
-package br.com.gymloadapi.modulos.tipoVariacao.dto;
+package br.com.gymloadapi.modulos.tipovariacao.dto;
 
 import java.time.LocalDateTime;
 
