@@ -1,10 +1,10 @@
 package br.com.gymloadapi.modulos.exercicio.dto;
 
-import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
+import br.com.gymloadapi.modulos.tipovariacao.dto.TipoVariacaoResponse;
 
 public record ExercicioVariacaoResponse(
     Integer id,
     String nome,
-    ETipoEquipamento tipoEquipamento
+    TipoVariacaoResponse tipoVariacao
 ) {
 }

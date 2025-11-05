@@ -63,7 +63,7 @@ class ExercicioVariacaoControllerTest {
     @Test
     @WithUserDetails
     void salvar_deveRetornarCreated_quandoUsuarioAdminECamposObrigatoriosValidos() {
-        var request = umExercicioVariacaoComTipoEquipaentoRequest();
+        var request = umExercicioVariacaoRequestComTipoVariacao();
         isCreated(post(URL), mockMvc, request);
 
         verify(service).salvar(request, 1);

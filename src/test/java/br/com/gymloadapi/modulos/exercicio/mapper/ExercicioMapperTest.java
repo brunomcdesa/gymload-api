@@ -4,10 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.EDICAO;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.*;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.MUSCULACAO;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.umGrupoMuscularPeitoral;
+import static br.com.gymloadapi.modulos.tipovariacao.helper.TipoVariacaoHelper.outroTipoVariacao;
+import static br.com.gymloadapi.modulos.tipovariacao.helper.TipoVariacaoHelper.umTipoVariacao;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ExercicioMapperTest {
@@ -79,14 +80,14 @@ class ExercicioMapperTest {
 
     @Test
     void mapToExercicioVariacao_deveRetornarExercicioVariacao_quandoSolicitado() {
-        var variacao = mapper.mapToExercicioVariacao(umExercicioMusculacao(1), 2,
-            POLIA, "SUPINO RETO - Polia");
+        var exercicioVariacao = mapper.mapToExercicioVariacao(umExercicioMusculacao(1), 2,
+            umTipoVariacao(), "SUPINO RETO - Polia");
 
         assertAll(
-            () -> assertEquals("SUPINO RETO - Polia", variacao.getNome()),
-            () -> assertEquals(1, variacao.getExercicio().getId()),
-            () -> assertEquals(POLIA, variacao.getTipoEquipamento()),
-            () -> assertEquals(2, variacao.getUsuarioCadastroId())
+            () -> assertEquals("SUPINO RETO - Polia", exercicioVariacao.getNome()),
+            () -> assertEquals(1, exercicioVariacao.getExercicio().getId()),
+            () -> assertEquals(1, exercicioVariacao.getTipoVariacao().getId()),
+            () -> assertEquals(2, exercicioVariacao.getUsuarioCadastroId())
         );
     }
 
@@ -97,19 +98,19 @@ class ExercicioMapperTest {
         assertAll(
             () -> assertEquals(1, response.id()),
             () -> assertEquals("SUPINO RETO - Halter", response.nome()),
-            () -> assertEquals(HALTER, response.tipoEquipamento())
+            () -> assertEquals(1, response.tipoVariacao().id())
         );
     }
 
     @Test
     void editarVariacao_deveEditarVariacaoDeExercicio_quandoSolicitado() {
         var variacao = umExercicioVariacao();
-        mapper.editarVariacao(BOLA,"editado", variacao);
+        mapper.editarVariacao(outroTipoVariacao(),"editado", variacao);
 
         assertAll(
             () -> assertEquals(1, variacao.getId()),
             () -> assertEquals("editado", variacao.getNome()),
-            () -> assertEquals(BOLA, variacao.getTipoEquipamento())
+            () -> assertEquals(2, variacao.getTipoVariacao().getId())
         );
     }
 

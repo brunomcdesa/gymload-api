@@ -223,15 +223,17 @@ class TipoVariacaoServiceTest {
 
         service.buscarTodos();
         service.getSelect();
+        service.buscarPorId(1);
 
         service.editar(1, umTipoVariacaoRequest(), umUsuarioAdmin());
 
         service.buscarTodos();
         service.getSelect();
+        service.buscarPorId(1);
 
         verify(repository, times(4)).findAll();
         verify(repository).existsByNomeIgnoreCase(anyString());
-        verify(repository).findById(1);
+        verify(repository, times(3)).findById(1);
         verify(repository).save(any(TipoVariacao.class));
         verify(historicoService).salvar(any(TipoVariacao.class), eq(1), eq(EDICAO));
     }
@@ -266,5 +268,45 @@ class TipoVariacaoServiceTest {
         service.getSelect();
 
         verify(repository).findAll();
+    }
+
+    @Test
+    void buscarPorId_deveRetornarTipoVariacao_quandoEncontrarTipoDeVariacao() {
+        when(repository.findById(1)).thenReturn(Optional.of(umTipoVariacao()));
+
+        var tipoVariacao = service.buscarPorId(1);
+        assertAll(
+            () -> assertEquals("Halter", tipoVariacao.getNome()),
+            () -> assertEquals(1, tipoVariacao.getUsuarioCadastroId()),
+            () -> assertEquals("Usuario Admin", tipoVariacao.getUsuarioCadastroNome()),
+            () -> assertNotNull(tipoVariacao.getDataCadastro())
+        );
+
+        verify(repository).findById(1);
+    }
+
+    @Test
+    void buscarPorId_deveLancarException_quandoNaoEncontrarTipoDeVariacao() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.buscarPorId(1)
+        );
+        assertEquals("Tipo de Variação não encontrado.", exception.getMessage());
+
+        verify(repository).findById(1);
+    }
+
+    @Test
+    void buscarPorId_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
+        when(repository.findById(1)).thenReturn(Optional.of(umTipoVariacao()));
+
+        service.buscarPorId(1);
+        service.buscarPorId(1);
+        service.buscarPorId(1);
+        service.buscarPorId(1);
+
+        verify(repository).findById(1);
     }
 }

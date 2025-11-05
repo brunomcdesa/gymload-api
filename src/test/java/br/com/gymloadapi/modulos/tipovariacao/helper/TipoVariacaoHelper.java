@@ -26,4 +26,14 @@ public class TipoVariacaoHelper {
             .usuarioCadastroNome("Usuario Admin")
             .build();
     }
+
+    public static TipoVariacao outroTipoVariacao() {
+        return TipoVariacao.builder()
+            .id(2)
+            .nome("Barra")
+            .dataCadastro(LocalDateTime.of(2025, 8, 21, 10, 30))
+            .usuarioCadastroId(1)
+            .usuarioCadastroNome("Usuario Admin")
+            .build();
+    }
 }

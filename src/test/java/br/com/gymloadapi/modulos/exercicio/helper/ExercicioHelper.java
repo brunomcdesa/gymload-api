@@ -1,6 +1,5 @@
 package br.com.gymloadapi.modulos.exercicio.helper;
 
-import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioFiltro;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioVariacaoRequest;
@@ -11,9 +10,10 @@ import lombok.experimental.UtilityClass;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.*;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.*;
 import static br.com.gymloadapi.modulos.grupomuscular.helper.GrupoMuscularHelper.*;
+import static br.com.gymloadapi.modulos.tipovariacao.helper.TipoVariacaoHelper.outroTipoVariacao;
+import static br.com.gymloadapi.modulos.tipovariacao.helper.TipoVariacaoHelper.umTipoVariacao;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
@@ -112,21 +112,21 @@ public class ExercicioHelper {
         return new ExercicioVariacaoRequest(null, null, null);
     }
 
-    public static ExercicioVariacaoRequest umExercicioVariacaoComTipoEquipaentoRequest() {
-        return new ExercicioVariacaoRequest(1, null, HALTER);
+    public static ExercicioVariacaoRequest umExercicioVariacaoRequestComTipoVariacao() {
+        return new ExercicioVariacaoRequest(1, null, 1);
     }
 
-    public static ExercicioVariacaoRequest umExercicioVariacaoSemTipoEquipaentoRequest() {
+    public static ExercicioVariacaoRequest umExercicioVariacaoRequestSemTipoVariacao() {
         return new ExercicioVariacaoRequest(1, "Abdominal Supra", null);
     }
 
     public static ExercicioVariacaoRequest umExercicioVariacaoRequest(Integer exercicioBaseId, String nome,
-                                                                      ETipoEquipamento tipoEquipamento) {
-        return new ExercicioVariacaoRequest(exercicioBaseId, nome, tipoEquipamento);
+                                                                      Integer tipoVariacaoId) {
+        return new ExercicioVariacaoRequest(exercicioBaseId, nome, tipoVariacaoId);
     }
 
     public static ExercicioVariacaoRequest umExercicioVariacaoRequestComDados() {
-        return new ExercicioVariacaoRequest(1, "Abdominal Supra", KETLLEBEL);
+        return new ExercicioVariacaoRequest(1, "Abdominal Supra", 4);
     }
 
     public static ExercicioVariacao umExercicioVariacao() {
@@ -136,7 +136,7 @@ public class ExercicioHelper {
             .dataCadastro(LocalDateTime.of(2025, 8, 6, 10, 30))
             .exercicio(umExercicioMusculacao(1))
             .nome("SUPINO RETO - Halter")
-            .tipoEquipamento(HALTER)
+            .tipoVariacao(umTipoVariacao())
             .build();
     }
 
@@ -147,7 +147,7 @@ public class ExercicioHelper {
             .dataCadastro(LocalDateTime.of(2025, 8, 6, 11, 30))
             .exercicio(umExercicioMusculacao(1))
             .nome("SUPINO RETO - Barra")
-            .tipoEquipamento(BARRA)
+            .tipoVariacao(outroTipoVariacao())
             .build();
     }
 

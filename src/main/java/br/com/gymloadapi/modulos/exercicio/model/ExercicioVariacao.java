@@ -1,12 +1,11 @@
 package br.com.gymloadapi.modulos.exercicio.model;
 
-import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
+import br.com.gymloadapi.modulos.tipovariacao.model.TipoVariacao;
 import lombok.*;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.SEQUENCE;
 
@@ -27,10 +26,6 @@ public class ExercicioVariacao {
     @Column(nullable = false)
     private String nome;
 
-    @Column
-    @Enumerated(STRING)
-    private ETipoEquipamento tipoEquipamento;
-
     @Column(nullable = false)
     private LocalDateTime dataCadastro;
 
@@ -42,9 +37,10 @@ public class ExercicioVariacao {
         foreignKey = @ForeignKey(name = "FK_EXERCICIO"), nullable = false)
     private Exercicio exercicio;
 
-    public boolean isVariacaoDeExercicioMusculacao() {
-        return this.exercicio.isExercicioMusculacao();
-    }
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "FK_TIPO_VARIACAO", referencedColumnName = "ID",
+        foreignKey = @ForeignKey(name = "FK_TIPO_VARIACAO"))
+    private TipoVariacao tipoVariacao;
 
     public String getExercicioNome() {
         return this.exercicio.getNome();

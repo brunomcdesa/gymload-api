@@ -51,10 +51,11 @@ public class TipoVariacaoService {
     @Caching(evict = {
         @CacheEvict(value = CACHE_TODOS_TIPOS_VARIACOES, allEntries = true),
         @CacheEvict(value = CACHE_TODOS_TIPOS_VARIACOES_SELECT, allEntries = true),
+        @CacheEvict(value = CACHE_TIPO_VARIACAO_POR_ID, key = "#id"),
     })
     public void editar(Integer id, TipoVariacaoRequest request, Usuario usuarioAutenticado) {
         this.validarTipoVariacaoMesmoNome(request.nome());
-        var tipoVariacao = this.findById(id);
+        var tipoVariacao = this.buscarPorId(id);
 
         tipoVariacaoMapper.editarTipoVariacao(request, tipoVariacao);
 
@@ -68,6 +69,12 @@ public class TipoVariacaoService {
             .toList();
     }
 
+    @Cacheable(value = CACHE_TIPO_VARIACAO_POR_ID, key = "#id")
+    public TipoVariacao buscarPorId(Integer id) {
+        return repository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Tipo de Variação não encontrado."));
+    }
+
     private void validarTipoVariacaoMesmoNome(String nome) {
         if (repository.existsByNomeIgnoreCase(nome)) {
             throw new ValidacaoException("Já existe uma variação com este nome.");
@@ -77,10 +84,5 @@ public class TipoVariacaoService {
     private void saveComHistorico(TipoVariacao tipoVariacao, Usuario usuarioAutenticado, EAcao acao) {
         repository.save(tipoVariacao);
         historicoService.salvar(tipoVariacao, usuarioAutenticado.getId(), acao);
-    }
-
-    private TipoVariacao findById(Integer id) {
-        return repository.findById(id)
-            .orElseThrow(() -> new NotFoundException("Tipo de Variação não encontrado."));
     }
 }

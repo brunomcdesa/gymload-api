@@ -8,15 +8,19 @@ import java.util.function.Supplier;
 @UtilityClass
 public class MapUtils {
 
+    public static <T, C> C mapNull(T value, Supplier<C> function) {
+        return (value != null) ? function.get() : null;
+    }
+
+    public static <T, C> C mapNull(T value, Function<T, C> function) {
+        return (value != null) ? function.apply(value) : null;
+    }
+
     public static <C> C mapNullBoolean(boolean value, Supplier<C> function) {
         return value ? function.get() : null;
     }
 
     public static <T, C> C mapNullWithBackup(T value, Function<T, C> function, C backup) {
         return (value != null) ? function.apply(value) : backup;
-    }
-
-    public static <T, C> C mapNull(T value, Supplier<C> function) {
-        return (value != null) ? function.get() : null;
     }
 }

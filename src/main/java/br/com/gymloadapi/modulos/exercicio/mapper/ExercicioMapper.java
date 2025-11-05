@@ -2,7 +2,6 @@ package br.com.gymloadapi.modulos.exercicio.mapper;
 
 import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
 import br.com.gymloadapi.modulos.comum.enums.EAcao;
-import br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioResponse;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioVariacaoResponse;
@@ -11,6 +10,7 @@ import br.com.gymloadapi.modulos.exercicio.model.ExercicioHistorico;
 import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacaoHistorico;
 import br.com.gymloadapi.modulos.grupomuscular.model.GrupoMuscular;
+import br.com.gymloadapi.modulos.tipovariacao.model.TipoVariacao;
 import org.mapstruct.*;
 
 import java.time.LocalDateTime;
@@ -51,21 +51,21 @@ public interface ExercicioMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "nome", source = "nomeVariacao")
     @Mapping(target = "exercicio", source = "exercicio")
-    @Mapping(target = "tipoEquipamento", source = "tipoEquipamento")
+    @Mapping(target = "tipoVariacao", source = "tipoVariacao")
     @Mapping(target = "usuarioCadastroId", source = "usuarioAutenticadoId")
     @Mapping(target = "dataCadastro", expression = "java(LocalDateTime.now())")
     ExercicioVariacao mapToExercicioVariacao(Exercicio exercicio, Integer usuarioAutenticadoId,
-                                             ETipoEquipamento tipoEquipamento, String nomeVariacao);
+                                             TipoVariacao tipoVariacao, String nomeVariacao);
 
     ExercicioVariacaoResponse mapToExercicioVariacaoResponse(ExercicioVariacao exercicioVariacao);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "nome", source = "nomeVariacao")
-    @Mapping(target = "tipoEquipamento", source = "tipoEquipamento")
+    @Mapping(target = "tipoVariacao", source = "tipoVariacao")
     @BeanMapping(
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
-    void editarVariacao(ETipoEquipamento tipoEquipamento, String nomeVariacao,
+    void editarVariacao(TipoVariacao tipoVariacao, String nomeVariacao,
                         @MappingTarget ExercicioVariacao exercicioVariacao);
 
     @Mapping(target = "id", ignore = true)

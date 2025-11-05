@@ -1,15 +1,12 @@
 package br.com.gymloadapi.modulos.exercicio.dto;
 
 import org.junit.jupiter.api.Test;
-
-import jakarta.validation.ConstraintViolationException;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.BARRA;
-import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
+import jakarta.validation.ConstraintViolationException;
+
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -19,14 +16,14 @@ class ExercicioVariacaoRequestTest {
 
     @Test
     void aplicarGroupValidators_deveLancarException_quandoTipoExercicioAerobicoECamposInvalidos() {
-        var request = new ExercicioVariacaoRequest(1, "teste", BARRA);
+        var request = new ExercicioVariacaoRequest(1, "teste", 2);
 
         var exception = assertThrowsExactly(
             ConstraintViolationException.class,
             () -> request.aplicarGroupValidators(AEROBICO)
         );
         assertThat(exception.getMessage())
-            .contains("tipoEquipamento: deve ser nulo",
+            .contains("tipoVariacaoId: deve ser nulo",
                 "nome: deve ser nulo");
     }
 
@@ -40,14 +37,14 @@ class ExercicioVariacaoRequestTest {
     @NullAndEmptySource
     @ValueSource(strings = "   ")
     void aplicarGroupValidators_deveLancarException_quandoTipoExercicioCalisteniaECamposInvalidos(String nomeInvalido) {
-        var request = new ExercicioVariacaoRequest(null, nomeInvalido, BARRA);
+        var request = new ExercicioVariacaoRequest(null, nomeInvalido, 1);
 
         var exception = assertThrowsExactly(
             ConstraintViolationException.class,
             () -> request.aplicarGroupValidators(CALISTENIA)
         );
         assertThat(exception.getMessage())
-            .contains("tipoEquipamento: deve ser nulo",
+            .contains("tipoVariacaoId: deve ser nulo",
                 "nome: é obrigatório.");
     }
 
@@ -66,13 +63,13 @@ class ExercicioVariacaoRequestTest {
             () -> request.aplicarGroupValidators(MUSCULACAO)
         );
         assertThat(exception.getMessage())
-            .contains("tipoEquipamento: é obrigatório.",
+            .contains("tipoVariacaoId: é obrigatório.",
                 "nome: deve ser nulo");
     }
 
     @Test
     void aplicarGroupValidators_naoDeveLancarException_quandoTipoExercicioMusculacaoECamposValidos() {
-        var request = new ExercicioVariacaoRequest(1, null, HALTER);
+        var request = new ExercicioVariacaoRequest(1, null, 2);
         assertDoesNotThrow(() -> request.aplicarGroupValidators(MUSCULACAO));
     }
 }
