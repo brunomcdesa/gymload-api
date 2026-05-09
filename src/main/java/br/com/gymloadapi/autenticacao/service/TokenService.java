@@ -1,5 +1,6 @@
 package br.com.gymloadapi.autenticacao.service;
 
+import br.com.gymloadapi.modulos.comum.enums.ESexo;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+
+import static br.com.gymloadapi.modulos.comum.utils.MapUtils.mapNull;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +43,7 @@ public class TokenService {
                 .withClaim("username", usuario.getUsername())
                 .withClaim("uuid", usuario.getUuid().toString())
                 .withClaim("imagemPerfilUrl", imagemPerfilUrl)
-                .withClaim("sexo", usuario.getSexo().name())
+                .withClaim("sexo", mapNull(usuario.getSexo(), ESexo::name))
                 .withExpiresAt(this.getExpirationDate())
                 .sign(this.getAlgorithm());
         } catch (JWTCreationException exception) {
