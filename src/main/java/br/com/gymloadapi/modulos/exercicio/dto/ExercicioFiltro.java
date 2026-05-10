@@ -12,14 +12,13 @@ import jakarta.validation.constraints.NotNull;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.deveConterGrupoMuscular;
 
 public record ExercicioFiltro(
-    @NotNull
     ETipoExercicio tipoExercicio,
     @NotNull(groups = {Calistenia.class, Musculacao.class})
     Integer grupoMuscularId
 ) {
 
     public void aplicarGroupValidators() {
-        if (deveConterGrupoMuscular(this.tipoExercicio)) {
+        if (tipoExercicio != null && deveConterGrupoMuscular(this.tipoExercicio)) {
             ValidacaoUtils.aplicarValidacoes(this, this.tipoExercicio.getGroupValidator());
         }
     }

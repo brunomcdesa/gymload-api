@@ -101,10 +101,10 @@ class ExercicioControllerTest {
 
     @Test
     @WithMockUser
-    void buscarTodos_deveRetornarBadRequest_quandoFiltrosObrigatoriosInvalidos() {
-        isBadRequest(get(URL), mockMvc, "O campo tipoExercicio é obrigatório.");
+    void buscarTodos_deveRetornarOk_quandoTipoExercicioNaoInformado() {
+        isOk(get(URL), mockMvc);
 
-        verifyNoInteractions(service);
+        verify(service).buscarTodos(umExercicioFiltroVazio());
     }
 
     @Test
