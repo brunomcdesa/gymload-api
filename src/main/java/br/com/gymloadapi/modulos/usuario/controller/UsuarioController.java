@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.usuario.controller;
 
 import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Alteracao;
 import br.com.gymloadapi.modulos.comum.groupvalidations.IGroupValidators.Cadastro;
+import br.com.gymloadapi.modulos.usuario.dto.AlterarSenhaRequest;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioRequest;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioResponse;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
@@ -12,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,5 +66,12 @@ public class UsuarioController {
     @GetMapping("detalhar")
     public UsuarioResponse detalharDadosProprios(@AuthenticationPrincipal Usuario usuario) {
         return service.buscarPorUuid(usuario.getUuid());
+    }
+
+    @PutMapping("alterar-senha")
+    @ResponseStatus(NO_CONTENT)
+    public void alterarSenhaUsuarioLogado(@RequestBody @Valid AlterarSenhaRequest request,
+                                          @AuthenticationPrincipal Usuario usuario) {
+        service.alterarSenhaUsuarioLogado(usuario, request);
     }
 }

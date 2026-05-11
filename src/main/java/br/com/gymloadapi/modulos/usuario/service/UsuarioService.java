@@ -5,6 +5,7 @@ import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import br.com.gymloadapi.modulos.comum.types.Email;
+import br.com.gymloadapi.modulos.usuario.dto.AlterarSenhaRequest;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioRequest;
 import br.com.gymloadapi.modulos.usuario.dto.UsuarioResponse;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapper;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.*;
 import static br.com.gymloadapi.modulos.comum.utils.PasswordUtils.encodePassword;
+import static br.com.gymloadapi.modulos.comum.utils.PasswordUtils.isPasswordEquals;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_ADMIN;
 import static br.com.gymloadapi.modulos.comum.utils.RolesUtils.ROLES_USER;
 import static br.com.gymloadapi.modulos.comum.utils.ValidacaoUtils.validarUsuarioAlteracao;
@@ -91,6 +93,16 @@ public class UsuarioService {
     public void atualizarSenha(Usuario usuario, String senha) {
         usuario.alterarSenha(senha);
         this.salvarComHistorico(usuario, null, ALTERACAO_SENHA);
+    }
+
+    public void alterarSenhaUsuarioLogado(Usuario usuario, AlterarSenhaRequest request) {
+        if (!isPasswordEquals(request.senhaAtual(), usuario.getPassword())) {
+            throw new ValidacaoException("Senha atual incorreta.");
+        }
+        if (isPasswordEquals(request.novaSenha(), usuario.getPassword())) {
+            throw new ValidacaoException("A nova senha deve ser diferente da senha atual.");
+        }
+        this.atualizarSenha(usuario, encodePassword(request.novaSenha()));
     }
 
     public UsuarioResponse buscarPorUuid(UUID uuid) {

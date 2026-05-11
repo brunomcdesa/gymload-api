@@ -5,6 +5,7 @@ import br.com.gymloadapi.modulos.comum.exception.PermissaoException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import br.com.gymloadapi.modulos.comum.types.Email;
+import br.com.gymloadapi.modulos.usuario.dto.AlterarSenhaRequest;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapper;
 import br.com.gymloadapi.modulos.usuario.mapper.UsuarioMapperImpl;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
@@ -352,6 +353,46 @@ class UsuarioServiceTest {
 
         verify(repository).save(usuario);
         verify(usuarioHistoricoService).salvar(usuario, null, ALTERACAO_SENHA);
+    }
+
+    @Test
+    void alterarSenhaUsuarioLogado_deveAlterarSenha_quandoSenhaAtualValida() {
+        var usuario = umUsuario();
+        var request = new AlterarSenhaRequest("123456", "novaSenha123");
+
+        assertDoesNotThrow(() -> service.alterarSenhaUsuarioLogado(usuario, request));
+
+        verify(repository).save(usuario);
+        verify(usuarioHistoricoService).salvar(usuario, null, ALTERACAO_SENHA);
+        assertTrue(usuario.getSenha().startsWith("$2a$"));
+    }
+
+    @Test
+    void alterarSenhaUsuarioLogado_deveLancarValidacaoException_quandoSenhaAtualIncorreta() {
+        var usuario = umUsuario();
+        var request = new AlterarSenhaRequest("senhaErrada", "novaSenha123");
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.alterarSenhaUsuarioLogado(usuario, request)
+        );
+        assertEquals("Senha atual incorreta.", exception.getMessage());
+
+        verifyNoInteractions(repository, usuarioHistoricoService);
+    }
+
+    @Test
+    void alterarSenhaUsuarioLogado_deveLancarValidacaoException_quandoNovaSenhaIgualAtual() {
+        var usuario = umUsuario();
+        var request = new AlterarSenhaRequest("123456", "123456");
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.alterarSenhaUsuarioLogado(usuario, request)
+        );
+        assertEquals("A nova senha deve ser diferente da senha atual.", exception.getMessage());
+
+        verifyNoInteractions(repository, usuarioHistoricoService);
     }
 
     @Test

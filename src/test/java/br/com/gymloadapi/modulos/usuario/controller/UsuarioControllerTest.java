@@ -5,6 +5,7 @@ import br.com.gymloadapi.config.TestSecurityConfiguration;
 import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
+import br.com.gymloadapi.modulos.usuario.dto.AlterarSenhaRequest;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -176,5 +177,34 @@ class UsuarioControllerTest {
             "/url-imagem-perfil", () -> verify(service).buscarUrlImagemPerfil(umUsuarioAdmin()),
                 "/detalhar", () -> verify(service).buscarPorUuid(UUID.fromString("c2d83d78-e1b2-4f7f-b79d-1b83f3c435f9"))
         ).get(endpoint).run();
+    }
+
+    @Test
+    @WithAnonymousUser
+    void alterarSenhaUsuarioLogado_deveRetornarUnauthorized_quandoUsuarioNaoAutenticado() {
+        isUnauthorized(put(URL + "/alterar-senha"), mockMvc);
+        verifyNoInteractions(service);
+    }
+
+    @WithUserDetails
+    @ParameterizedTest
+    @CsvSource(value = {"NULL,NULL", "'',''", "'  ','  '"}, nullValues = "NULL")
+    void alterarSenhaUsuarioLogado_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos(String senhaAtual,
+                                                                                            String novaSenha) {
+        var request = new AlterarSenhaRequest(senhaAtual, novaSenha);
+        isBadRequest(put(URL + "/alterar-senha"), mockMvc, request,
+            "O campo senhaAtual é obrigatório.",
+            "O campo novaSenha é obrigatório."
+        );
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithUserDetails
+    void alterarSenhaUsuarioLogado_deveRetornarNoContent_quandoCamposObrigatoriosValidos() {
+        var request = new AlterarSenhaRequest("senhaAtual", "novaSenhaForte");
+        isNoContent(put(URL + "/alterar-senha"), mockMvc, request);
+
+        verify(service).alterarSenhaUsuarioLogado(umUsuarioAdmin(), request);
     }
 }
