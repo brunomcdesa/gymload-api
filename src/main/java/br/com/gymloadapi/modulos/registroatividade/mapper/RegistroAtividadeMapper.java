@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.registroatividade.mapper;
 
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
+import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
@@ -16,22 +17,28 @@ public interface RegistroAtividadeMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "exercicio", source = "exercicio")
     @Mapping(target = "usuario", source = "usuario")
+    @Mapping(target = "exercicioVariacao", source = "exercicioVariacao")
     @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
-    RegistroMusculacao mapToRegistroMusculacao(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
+    RegistroMusculacao mapToRegistroMusculacao(RegistroAtividadeRequest request, Exercicio exercicio,
+                                               ExercicioVariacao exercicioVariacao, Usuario usuario);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "exercicio", source = "exercicio")
     @Mapping(target = "usuario", source = "usuario")
+    @Mapping(target = "exercicioVariacao", source = "exercicioVariacao")
     @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
-    RegistroAerobico mapToRegistroAerobico(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
+    RegistroAerobico mapToRegistroAerobico(RegistroAtividadeRequest request, Exercicio exercicio,
+                                           ExercicioVariacao exercicioVariacao, Usuario usuario);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "exercicio", source = "exercicio")
     @Mapping(target = "usuario", source = "usuario")
+    @Mapping(target = "exercicioVariacao", source = "exercicioVariacao")
     @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")
     @Mapping(target = "pesoAdicional", source = "request.peso")
     @Mapping(target = "tipoEquipamentoPesoAdicional", source = "request.tipoEquipamento")
-    RegistroCalistenia mapToRegistroCalistenia(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
+    RegistroCalistenia mapToRegistroCalistenia(RegistroAtividadeRequest request, Exercicio exercicio,
+                                               ExercicioVariacao exercicioVariacao, Usuario usuario);
 
     @Mapping(target = "duracao", ignore = true)
     @Mapping(target = "distancia", ignore = true)
@@ -40,7 +47,8 @@ public interface RegistroAtividadeMapper {
     @Mapping(target = "exercicioNome", source = "registroMusculacao.exercicio.nome")
     @Mapping(target = "grupoMuscularNome", source = "registroMusculacao.exercicio.grupoMuscular.nome")
     @Mapping(target = "carga", expression = "java(registroMusculacao.getPesoComUnidadePeso())")
-    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeMusculacaoResponse(RegistroMusculacao registroMusculacao);
+    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeMusculacaoResponse(
+        RegistroMusculacao registroMusculacao);
 
     @Mapping(target = "peso", ignore = true)
     @Mapping(target = "carga", ignore = true)
@@ -51,7 +59,8 @@ public interface RegistroAtividadeMapper {
     @Mapping(target = "grupoMuscularNome", ignore = true)
     @Mapping(target = "exercicioNome", source = "registroAerobico.exercicio.nome")
     @Mapping(target = "velocidadeMedia", expression = "java(registroAerobico.getVelocidadeMedia())")
-    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeAerobicoResponse(RegistroAerobico registroAerobico);
+    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeAerobicoResponse(
+        RegistroAerobico registroAerobico);
 
     @Mapping(target = "duracao", ignore = true)
     @Mapping(target = "distancia", ignore = true)
@@ -61,7 +70,8 @@ public interface RegistroAtividadeMapper {
     @Mapping(target = "tipoEquipamento", source = "registroCalistenia.tipoEquipamentoPesoAdicional")
     @Mapping(target = "carga", expression = "java(registroCalistenia.getPesoComUnidadePeso())")
     @Mapping(target = "grupoMuscularNome", source = "registroCalistenia.exercicio.grupoMuscular.nome")
-    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeCalisteniaResponse(RegistroCalistenia registroCalistenia);
+    HistoricoRegistroAtividadeResponse mapToHistoricoRegistroAtividadeCalisteniaResponse(
+        RegistroCalistenia registroCalistenia);
 
     @BeanMapping(
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
@@ -78,10 +88,12 @@ public interface RegistroAtividadeMapper {
     @BeanMapping(
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
-    void editarRegistroCalistenia(RegistroAtividadeRequest request, @MappingTarget RegistroCalistenia registroCalistenia);
+    void editarRegistroCalistenia(RegistroAtividadeRequest request,
+                                  @MappingTarget RegistroCalistenia registroCalistenia);
 
     RegistroAtividadeResponse mapToRegistroAtividadeResponse(Integer exercicioId, String destaque, String ultimoPeso,
-                                                             String ultimaDistancia, Integer ultimaQtdMaxRepeticoes);
+                                                             String ultimaDistancia,
+                                                             Integer ultimaQtdMaxRepeticoes);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "dataCadastro", expression = "java(LocalDate.now())")

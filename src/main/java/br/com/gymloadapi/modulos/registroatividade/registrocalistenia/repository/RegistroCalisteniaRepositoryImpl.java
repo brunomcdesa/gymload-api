@@ -26,6 +26,22 @@ public class RegistroCalisteniaRepositoryImpl implements RegistroCalisteniaRepos
             .innerJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
             .innerJoin(registroCalistenia.usuario, usuario).fetchJoin()
             .where(registroCalistenia.exercicio.id.eq(exercicioId)
+                .and(registroCalistenia.exercicioVariacao.isNull())
+                .and(registroCalistenia.usuario.id.eq(usuarioId)))
+            .fetch();
+    }
+
+    @Override
+    public List<RegistroCalistenia> findAllByExercicioIdAndVariacaoIdAndUsuarioId(Integer exercicioId,
+                                                                                   Integer variacaoId,
+                                                                                   Integer usuarioId) {
+        return new JPAQueryFactory(entityManager)
+            .selectFrom(registroCalistenia)
+            .innerJoin(registroCalistenia.exercicio, exercicio).fetchJoin()
+            .innerJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
+            .innerJoin(registroCalistenia.usuario, usuario).fetchJoin()
+            .where(registroCalistenia.exercicio.id.eq(exercicioId)
+                .and(registroCalistenia.exercicioVariacao.id.eq(variacaoId))
                 .and(registroCalistenia.usuario.id.eq(usuarioId)))
             .fetch();
     }

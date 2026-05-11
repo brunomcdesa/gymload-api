@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.registroatividade.strategy;
 
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
+import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
@@ -10,11 +11,13 @@ import java.util.List;
 
 public interface IRegistroAtividadeStrategy {
 
-    void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario);
+    void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio, ExercicioVariacao exercicioVariacao,
+                        Usuario usuario);
 
     RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId);
 
-    List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer usuarioId);
+    List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer variacaoId,
+                                                                              Integer usuarioId);
 
     void editarRegistro(Integer registroAtividadeId, RegistroAtividadeRequest request, Usuario usuario);
 

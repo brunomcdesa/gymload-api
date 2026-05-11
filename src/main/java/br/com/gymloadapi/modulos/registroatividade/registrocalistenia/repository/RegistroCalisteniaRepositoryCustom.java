@@ -9,6 +9,8 @@ public interface RegistroCalisteniaRepositoryCustom {
 
     List<RegistroCalistenia> findAllByExercicioIdAndUsuarioId(Integer exercicioId, Integer usuarioId);
 
-    Optional<RegistroCalistenia> findLastByExercicioIdAndUsuarioId(Integer exercicioId, Integer usuarioId);
+    List<RegistroCalistenia> findAllByExercicioIdAndVariacaoIdAndUsuarioId(Integer exercicioId, Integer variacaoId,
+                                                                           Integer usuarioId);
 
+    Optional<RegistroCalistenia> findLastByExercicioIdAndUsuarioId(Integer exercicioId, Integer usuarioId);
 }

@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.registroatividade.registroaerobico.service;
 
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
+import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
@@ -29,24 +30,32 @@ public class RegistroAerobicoService implements IRegistroAtividadeStrategy {
     private final RegistroAtividadeMapper registroAtividadeMapper;
 
     @Override
-    public void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario) {
-        var registroAerobico = registroAtividadeMapper.mapToRegistroAerobico(request, exercicio, usuario);
+    public void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio,
+                               ExercicioVariacao exercicioVariacao, Usuario usuario) {
+        var registroAerobico = registroAtividadeMapper.mapToRegistroAerobico(request, exercicio,
+            exercicioVariacao, usuario);
         repository.save(registroAerobico);
     }
 
     @Override
     public RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId) {
-        var registrosAerobico = this.getAllByExercicioId(exercicioId, usuarioId);
+        var registrosAerobico = this.getAllByExercicioIdSemVariacao(exercicioId, usuarioId);
         var destaqueRegistro = this.getDestaqueDoRegistro(registrosAerobico);
         var ultimoRegistro = this.getUltimoResgistro(registrosAerobico);
 
-        return registroAtividadeMapper.mapToRegistroAtividadeResponse(exercicioId, destaqueRegistro , null,
+        return registroAtividadeMapper.mapToRegistroAtividadeResponse(exercicioId, destaqueRegistro, null,
             ultimoRegistro, null);
     }
 
     @Override
-    public List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer usuarioId) {
-        return this.getAllByExercicioId(exercicioId, usuarioId).stream()
+    public List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId,
+                                                                                    Integer variacaoId,
+                                                                                    Integer usuarioId) {
+        var registros = variacaoId != null
+            ? repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(exercicioId, variacaoId, usuarioId)
+            : this.getAllByExercicioIdSemVariacao(exercicioId, usuarioId);
+
+        return registros.stream()
             .sorted(comparing(RegistroAerobico::getDataCadastro).reversed())
             .map(registroAtividadeMapper::mapToHistoricoRegistroAtividadeAerobicoResponse)
             .toList();
@@ -88,7 +97,7 @@ public class RegistroAerobicoService implements IRegistroAtividadeStrategy {
         repository.save(novoRegistroAerobico);
     }
 
-    private List<RegistroAerobico> getAllByExercicioId(Integer exercicioId, Integer usuarioId) {
+    private List<RegistroAerobico> getAllByExercicioIdSemVariacao(Integer exercicioId, Integer usuarioId) {
         return repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId);
     }
 

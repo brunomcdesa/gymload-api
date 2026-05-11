@@ -16,6 +16,8 @@ public record RegistroAtividadeRequest(
     @NotNull
     Integer exercicioId,
 
+    Integer variacaoId,
+
     String observacao,
 
     @Null(groups = Aerobico.class)

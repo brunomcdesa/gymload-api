@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.registroatividade.registromusculacao.service;
 
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
+import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
@@ -29,13 +30,14 @@ public class RegistroMusculacaoService implements IRegistroAtividadeStrategy {
     private final RegistroAtividadeMapper registroAtividadeMapper;
 
     @Override
-    public void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario) {
-        repository.save(registroAtividadeMapper.mapToRegistroMusculacao(request, exercicio, usuario));
+    public void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio,
+                               ExercicioVariacao exercicioVariacao, Usuario usuario) {
+        repository.save(registroAtividadeMapper.mapToRegistroMusculacao(request, exercicio, exercicioVariacao, usuario));
     }
 
     @Override
     public RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId) {
-        var registrosMusculacao = this.getAllByExercicioId(exercicioId, usuarioId);
+        var registrosMusculacao = this.getAllByExercicioIdSemVariacao(exercicioId, usuarioId);
         var destaqueRegistro = this.getDestaqueDoRegistro(registrosMusculacao);
         var ultimoRegistro = this.getUltimoRegistro(registrosMusculacao);
 
@@ -44,8 +46,14 @@ public class RegistroMusculacaoService implements IRegistroAtividadeStrategy {
     }
 
     @Override
-    public List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer usuarioId) {
-        return this.getAllByExercicioId(exercicioId, usuarioId).stream()
+    public List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId,
+                                                                                    Integer variacaoId,
+                                                                                    Integer usuarioId) {
+        var registros = variacaoId != null
+            ? repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(exercicioId, variacaoId, usuarioId)
+            : this.getAllByExercicioIdSemVariacao(exercicioId, usuarioId);
+
+        return registros.stream()
             .sorted(comparing(RegistroMusculacao::getDataCadastro).reversed())
             .map(registroAtividadeMapper::mapToHistoricoRegistroAtividadeMusculacaoResponse)
             .toList();
@@ -88,7 +96,7 @@ public class RegistroMusculacaoService implements IRegistroAtividadeStrategy {
         repository.save(novoRegistroMusculacao);
     }
 
-    private List<RegistroMusculacao> getAllByExercicioId(Integer exercicioId, Integer usuarioId) {
+    private List<RegistroMusculacao> getAllByExercicioIdSemVariacao(Integer exercicioId, Integer usuarioId) {
         return repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId);
     }
 

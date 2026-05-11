@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ExercicioVariacaoRepository extends JpaRepository<ExercicioVariacao, Integer>,
     QuerydslPredicateExecutor<ExercicioVariacao>, ExercicioVariacaoRepositoryCustom {
@@ -12,4 +14,6 @@ public interface ExercicioVariacaoRepository extends JpaRepository<ExercicioVari
     boolean existsByTipoVariacao_IdAndExercicio_Id(Integer tipoVariacaoId, Integer exercicioId);
 
     boolean existsByNomeIgnoreCase(String nome);
+
+    Optional<ExercicioVariacao> findByIdAndExercicio_Id(Integer id, Integer exercicioId);
 }

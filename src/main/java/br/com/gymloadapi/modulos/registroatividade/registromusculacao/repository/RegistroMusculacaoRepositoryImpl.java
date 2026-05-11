@@ -26,6 +26,22 @@ public class RegistroMusculacaoRepositoryImpl implements RegistroMusculacaoRepos
             .innerJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
             .innerJoin(registroMusculacao.usuario, usuario).fetchJoin()
             .where(registroMusculacao.exercicio.id.eq(exercicioId)
+                .and(registroMusculacao.exercicioVariacao.isNull())
+                .and(registroMusculacao.usuario.id.eq(usuarioId)))
+            .fetch();
+    }
+
+    @Override
+    public List<RegistroMusculacao> findAllByExercicioIdAndVariacaoIdAndUsuarioId(Integer exercicioId,
+                                                                                   Integer variacaoId,
+                                                                                   Integer usuarioId) {
+        return new JPAQueryFactory(entityManager)
+            .selectFrom(registroMusculacao)
+            .innerJoin(registroMusculacao.exercicio, exercicio).fetchJoin()
+            .innerJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
+            .innerJoin(registroMusculacao.usuario, usuario).fetchJoin()
+            .where(registroMusculacao.exercicio.id.eq(exercicioId)
+                .and(registroMusculacao.exercicioVariacao.id.eq(variacaoId))
                 .and(registroMusculacao.usuario.id.eq(usuarioId)))
             .fetch();
     }

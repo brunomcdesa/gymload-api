@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.registroatividade.registrocalistenia.service;
 
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
+import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
@@ -29,24 +30,31 @@ public class RegistroCalisteniaService implements IRegistroAtividadeStrategy {
     private final RegistroAtividadeMapper registroAtividadeMapper;
 
     @Override
-    public void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio, Usuario usuario) {
+    public void salvarRegistro(RegistroAtividadeRequest request, Exercicio exercicio,
+                               ExercicioVariacao exercicioVariacao, Usuario usuario) {
         request.validarPesoEUnidadePeso();
-        repository.save(registroAtividadeMapper.mapToRegistroCalistenia(request, exercicio, usuario));
+        repository.save(registroAtividadeMapper.mapToRegistroCalistenia(request, exercicio, exercicioVariacao, usuario));
     }
 
     @Override
     public RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId) {
-        var registrosCalistenia = this.getAllByExercicioId(exercicioId, usuarioId);
+        var registrosCalistenia = this.getAllByExercicioIdSemVariacao(exercicioId, usuarioId);
         var destaqueRegistro = this.getDestaqueDoRegistro(registrosCalistenia);
         var ultimoRegistro = this.getUltimoRegistro(registrosCalistenia);
 
         return registroAtividadeMapper.mapToRegistroAtividadeResponse(exercicioId, destaqueRegistro, null,
-            null, ultimoRegistro ) ;
+            null, ultimoRegistro);
     }
 
     @Override
-    public List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer usuarioId) {
-        return this.getAllByExercicioId(exercicioId, usuarioId).stream()
+    public List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId,
+                                                                                    Integer variacaoId,
+                                                                                    Integer usuarioId) {
+        var registros = variacaoId != null
+            ? repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(exercicioId, variacaoId, usuarioId)
+            : this.getAllByExercicioIdSemVariacao(exercicioId, usuarioId);
+
+        return registros.stream()
             .sorted(comparing(RegistroCalistenia::getDataCadastro).reversed())
             .map(registroAtividadeMapper::mapToHistoricoRegistroAtividadeCalisteniaResponse)
             .toList();
@@ -89,7 +97,7 @@ public class RegistroCalisteniaService implements IRegistroAtividadeStrategy {
         repository.save(novoRegistroCalistenia);
     }
 
-    private List<RegistroCalistenia> getAllByExercicioId(Integer exercicioId, Integer usuarioId) {
+    private List<RegistroCalistenia> getAllByExercicioIdSemVariacao(Integer exercicioId, Integer usuarioId) {
         return repository.findAllByExercicioIdAndUsuarioId(exercicioId, usuarioId);
     }
 

@@ -1,7 +1,10 @@
 package br.com.gymloadapi.modulos.registroatividade.service;
 
 import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
+import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
+import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
+import br.com.gymloadapi.modulos.exercicio.repository.ExercicioVariacaoRepository;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeFiltros;
@@ -22,6 +25,7 @@ import java.util.*;
 public class RegistroAtividadeService {
 
     private final ExercicioService exercicioService;
+    private final ExercicioVariacaoRepository exercicioVariacaoRepository;
     private final ApplicationContext applicationContext;
     private final Map<ETipoExercicio, IRegistroAtividadeStrategy> strategies = new EnumMap<>(ETipoExercicio.class);
 
@@ -34,10 +38,11 @@ public class RegistroAtividadeService {
 
     public void salvar(RegistroAtividadeRequest request, Usuario usuario) {
         var exercicio = this.findExercicioById(request.exercicioId());
+        var exercicioVariacao = this.validarEBuscarVariacao(request, exercicio);
         request.aplicarGroupValidators(exercicio.getTipoExercicio().getGroupValidator());
 
         this.getStrategyByTipoExercicio(exercicio.getTipoExercicio())
-            .salvarRegistro(request, exercicio, usuario);
+            .salvarRegistro(request, exercicio, exercicioVariacao, usuario);
     }
 
     @Transactional(readOnly = true)
@@ -46,19 +51,29 @@ public class RegistroAtividadeService {
         var responses = new ArrayList<RegistroAtividadeResponse>();
 
         exercicios.forEach(exercicio -> {
-            var response = this.getStrategyByTipoExercicio(exercicio.getTipoExercicio())
-                .buscarDestaque(exercicio.getId(), usuarioId);
-            responses.add(response);
+            if (Boolean.TRUE.equals(exercicio.getPossuiVariacao())) {
+                responses.add(new RegistroAtividadeResponse(exercicio.getId(), null, null, null, null));
+            } else {
+                var response = this.getStrategyByTipoExercicio(exercicio.getTipoExercicio())
+                    .buscarDestaque(exercicio.getId(), usuarioId);
+                responses.add(response);
+            }
         });
 
         return responses;
     }
 
-    public List<HistoricoRegistroAtividadeResponse> buscarRegistroAtividadeCompleto(Integer exercicioId, Integer usuarioId) {
+    public List<HistoricoRegistroAtividadeResponse> buscarRegistroAtividadeCompleto(Integer exercicioId,
+                                                                                     Integer variacaoId,
+                                                                                     Integer usuarioId) {
         var exercicio = this.findExercicioById(exercicioId);
 
+        if (Boolean.TRUE.equals(exercicio.getPossuiVariacao()) && variacaoId == null) {
+            return List.of();
+        }
+
         return this.getStrategyByTipoExercicio(exercicio.getTipoExercicio())
-            .buscarHistoricoRegistroCompleto(exercicioId, usuarioId);
+            .buscarHistoricoRegistroCompleto(exercicioId, variacaoId, usuarioId);
     }
 
     public void editar(Integer registroAtividadeId, RegistroAtividadeRequest request, Usuario usuario) {
@@ -88,6 +103,20 @@ public class RegistroAtividadeService {
 
         this.getStrategyByTipoExercicio(exercicio.getTipoExercicio())
             .repetirRegistro(registroId);
+    }
+
+    private ExercicioVariacao validarEBuscarVariacao(RegistroAtividadeRequest request, Exercicio exercicio) {
+        if (Boolean.TRUE.equals(exercicio.getPossuiVariacao())) {
+            if (request.variacaoId() == null) {
+                throw new ValidacaoException("Este exercício possui variações. Informe a variação para registrar a atividade.");
+            }
+            return exercicioVariacaoRepository.findByIdAndExercicio_Id(request.variacaoId(), exercicio.getId())
+                .orElseThrow(() -> new ValidacaoException("A variação informada não pertence a este exercício."));
+        }
+        if (request.variacaoId() != null) {
+            throw new ValidacaoException("Este exercício não possui variações. Não informe uma variação ao registrar a atividade.");
+        }
+        return null;
     }
 
     private Exercicio findExercicioById(Integer exercicioId) {

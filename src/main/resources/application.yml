@@ -2,10 +2,15 @@ spring:
   application:
     name: gymload-api
 
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
