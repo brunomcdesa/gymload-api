@@ -6,10 +6,10 @@ import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
-import br.com.gymloadapi.modulos.registroatividade.strategy.IRegistroAtividadeStrategy;
 import br.com.gymloadapi.modulos.registroatividade.mapper.RegistroAtividadeMapper;
 import br.com.gymloadapi.modulos.registroatividade.registromusculacao.model.RegistroMusculacao;
 import br.com.gymloadapi.modulos.registroatividade.registromusculacao.repository.RegistroMusculacaoRepository;
+import br.com.gymloadapi.modulos.registroatividade.strategy.IRegistroAtividadeStrategy;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,19 @@ public class RegistroMusculacaoService implements IRegistroAtividadeStrategy {
     @Override
     public RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId) {
         var registrosMusculacao = this.getAllByExercicioIdSemVariacao(exercicioId, usuarioId);
+        return this.montarResponseDestaque(exercicioId, registrosMusculacao);
+    }
+
+    @Override
+    public RegistroAtividadeResponse buscarDestaquePorVariacao(Integer exercicioId, Integer variacaoId,
+                                                               Integer usuarioId) {
+        var registrosMusculacao = repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(exercicioId, variacaoId,
+            usuarioId);
+        return this.montarResponseDestaque(exercicioId, registrosMusculacao);
+    }
+
+    private RegistroAtividadeResponse montarResponseDestaque(Integer exercicioId,
+                                                             List<RegistroMusculacao> registrosMusculacao) {
         var destaqueRegistro = this.getDestaqueDoRegistro(registrosMusculacao);
         var ultimoRegistro = this.getUltimoRegistro(registrosMusculacao);
 
@@ -108,10 +121,10 @@ public class RegistroMusculacaoService implements IRegistroAtividadeStrategy {
 
         return optionalMaiorPeso.isPresent()
             ? registrosMusculacao.stream()
-            .filter(registro -> registro.getPeso() == optionalMaiorPeso.getAsDouble())
-            .map(RegistroMusculacao::getPesoComUnidadePeso)
-            .findFirst()
-            .orElse(null)
+              .filter(registro -> registro.getPeso() == optionalMaiorPeso.getAsDouble())
+              .map(RegistroMusculacao::getPesoComUnidadePeso)
+              .findFirst()
+              .orElse(null)
             : "-";
     }
 

@@ -1,5 +1,7 @@
 package br.com.gymloadapi.modulos.registroatividade.service;
 
+import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
+import br.com.gymloadapi.modulos.exercicio.repository.ExercicioVariacaoRepository;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.registroatividade.registroaerobico.service.RegistroAerobicoService;
 import br.com.gymloadapi.modulos.registroatividade.registrocalistenia.service.RegistroCalisteniaService;
@@ -15,6 +17,7 @@ import org.springframework.context.ApplicationContext;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
@@ -32,6 +35,8 @@ class RegistroAtividadeServiceTest {
     private ApplicationContext applicationContext;
     @Mock
     private ExercicioService exercicioService;
+    @Mock
+    private ExercicioVariacaoRepository exercicioVariacaoRepository;
     @Mock
     private RegistroMusculacaoService registroMusculacaoService;
     @Mock
@@ -58,8 +63,84 @@ class RegistroAtividadeServiceTest {
         service.salvar(request, usuario);
 
         verify(exercicioService).findById(1);
-        verify(registroMusculacaoService).salvarRegistro(request, exercicio, usuario);
+        verify(registroMusculacaoService).salvarRegistro(request, exercicio, null, usuario);
         verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
+    }
+
+    @Test
+    void salvar_deveChamarMetodoSalvarComVariacao_quandoExercicioPossuiVariacaoEVariacaoIdValido() {
+        var request = umRegistroAtividadeRequestParaMusculacaoComVariacao();
+        var usuario = umUsuario();
+        var exercicio = umExercicioMusculacaoComVariacao(1);
+        var variacao = umExercicioVariacao();
+
+        when(exercicioService.findById(1)).thenReturn(exercicio);
+        when(exercicioVariacaoRepository.findByIdAndExercicio_Id(10, 1)).thenReturn(Optional.of(variacao));
+
+        service.salvar(request, usuario);
+
+        verify(exercicioService).findById(1);
+        verify(exercicioVariacaoRepository).findByIdAndExercicio_Id(10, 1);
+        verify(registroMusculacaoService).salvarRegistro(request, exercicio, variacao, usuario);
+        verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
+    }
+
+    @Test
+    void salvar_deveLancarException_quandoExercicioPossuiVariacaoEVariacaoIdNull() {
+        var request = umRegistroAtividadeRequestParaMusculacao();
+        var usuario = umUsuario();
+        var exercicio = umExercicioMusculacaoComVariacao(1);
+
+        when(exercicioService.findById(1)).thenReturn(exercicio);
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.salvar(request, usuario)
+        );
+        assertEquals("Este exercício possui variações. Informe a variação para registrar a atividade.",
+            exception.getMessage());
+
+        verify(exercicioService).findById(1);
+        verifyNoInteractions(registroMusculacaoService, registroAerobicoService, registroCalisteniaService);
+    }
+
+    @Test
+    void salvar_deveLancarException_quandoVariacaoNaoPertenceAoExercicio() {
+        var request = umRegistroAtividadeRequestParaMusculacaoComVariacao();
+        var usuario = umUsuario();
+        var exercicio = umExercicioMusculacaoComVariacao(1);
+
+        when(exercicioService.findById(1)).thenReturn(exercicio);
+        when(exercicioVariacaoRepository.findByIdAndExercicio_Id(10, 1)).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.salvar(request, usuario)
+        );
+        assertEquals("A variação informada não pertence a este exercício.", exception.getMessage());
+
+        verify(exercicioService).findById(1);
+        verify(exercicioVariacaoRepository).findByIdAndExercicio_Id(10, 1);
+        verifyNoInteractions(registroMusculacaoService, registroAerobicoService, registroCalisteniaService);
+    }
+
+    @Test
+    void salvar_deveLancarException_quandoExercicioNaoPossuiVariacaoMasVariacaoIdInformado() {
+        var request = umRegistroAtividadeRequestParaMusculacaoComVariacao();
+        var usuario = umUsuario();
+        var exercicio = umExercicioMusculacao(1);
+
+        when(exercicioService.findById(1)).thenReturn(exercicio);
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.salvar(request, usuario)
+        );
+        assertEquals("Este exercício não possui variações. Não informe uma variação ao registrar a atividade.",
+            exception.getMessage());
+
+        verify(exercicioService).findById(1);
+        verifyNoInteractions(registroMusculacaoService, registroAerobicoService, registroCalisteniaService);
     }
 
     @Test
@@ -73,7 +154,7 @@ class RegistroAtividadeServiceTest {
         service.salvar(request, usuario);
 
         verify(exercicioService).findById(3);
-        verify(registroAerobicoService).salvarRegistro(request, exercicio, usuario);
+        verify(registroAerobicoService).salvarRegistro(request, exercicio, null, usuario);
         verifyNoInteractions(registroMusculacaoService, registroCalisteniaService);
     }
 
@@ -88,7 +169,7 @@ class RegistroAtividadeServiceTest {
         service.salvar(request, usuario);
 
         verify(exercicioService).findById(4);
-        verify(registroCalisteniaService).salvarRegistro(request, exercicio, usuario);
+        verify(registroCalisteniaService).salvarRegistro(request, exercicio, null, usuario);
         verifyNoInteractions(registroMusculacaoService, registroAerobicoService);
     }
 
@@ -135,15 +216,34 @@ class RegistroAtividadeServiceTest {
     }
 
     @Test
+    void buscarDestaques_deveRetornarResponseSemDados_quandoExercicioPossuirVariacoes() {
+        var exercicioMusculacaoComVariacao = umExercicioMusculacaoComVariacao(1);
+        when(exercicioService.findByIdIn(List.of(1, 2, 3))).thenReturn(List.of(exercicioMusculacaoComVariacao));
+
+        var responses = service.buscarDestaques(umRegistroAtividadeFiltros(), 1);
+
+        assertAll(
+            () -> assertEquals(1, responses.getFirst().exercicioId()),
+            () -> assertNull(responses.getFirst().destaque()),
+            () -> assertNull(responses.getFirst().ultimoPeso()),
+            () -> assertNull(responses.getFirst().ultimaDistancia()),
+            () -> assertNull(responses.getFirst().ultimaQtdMaxRepeticoes())
+        );
+
+        verify(exercicioService).findByIdIn(List.of(1, 2, 3));
+        verifyNoInteractions(registroMusculacaoService, registroAerobicoService, registroCalisteniaService);
+    }
+
+    @Test
     @SuppressWarnings("LineLength")
     void buscarRegistroAtividadeCompleto_deveChamarMetodoBuscarRegistroAtividadeCompletoDoRegistroMusculacaoService_quandoSolicitadoComExercicioDeMusculacao() {
         var exercicio = umExercicioMusculacao(1);
 
         when(exercicioService.findById(1)).thenReturn(exercicio);
-        when(registroMusculacaoService.buscarHistoricoRegistroCompleto(1, 2))
+        when(registroMusculacaoService.buscarHistoricoRegistroCompleto(1, null, 2))
             .thenReturn(List.of(umHistoricoRegistroAtividadeResponseDeMusculacao()));
 
-        var response = service.buscarRegistroAtividadeCompleto(1, 2);
+        var response = service.buscarRegistroAtividadeCompleto(1, null, 2);
         assertAll(
             () -> assertEquals(1, response.getFirst().id()),
             () -> assertEquals("SUPINO RETO", response.getFirst().exercicioNome()),
@@ -156,8 +256,36 @@ class RegistroAtividadeServiceTest {
         );
 
         verify(exercicioService).findById(1);
-        verify(registroMusculacaoService).buscarHistoricoRegistroCompleto(1, 2);
+        verify(registroMusculacaoService).buscarHistoricoRegistroCompleto(1, null, 2);
         verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
+    }
+
+    @Test
+    void buscarRegistroAtividadeCompleto_deveChamarStrategyComVariacaoId_quandoVariacaoIdInformado() {
+        var exercicio = umExercicioMusculacaoComVariacao(1);
+
+        when(exercicioService.findById(1)).thenReturn(exercicio);
+        when(registroMusculacaoService.buscarHistoricoRegistroCompleto(1, 10, 2))
+            .thenReturn(List.of(umHistoricoRegistroAtividadeResponseDeMusculacao()));
+
+        var response = service.buscarRegistroAtividadeCompleto(1, 10, 2);
+        assertEquals(1, response.size());
+
+        verify(exercicioService).findById(1);
+        verify(registroMusculacaoService).buscarHistoricoRegistroCompleto(1, 10, 2);
+        verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
+    }
+
+    @Test
+    void buscarRegistroAtividadeCompleto_deveRetornarListaVazia_quandoExercicioPossuiVariacaoEVariacaoIdNull() {
+        var exercicio = umExercicioMusculacaoComVariacao(1);
+
+        when(exercicioService.findById(1)).thenReturn(exercicio);
+
+        assertTrue(service.buscarRegistroAtividadeCompleto(1, null, 2).isEmpty());
+
+        verify(exercicioService).findById(1);
+        verifyNoInteractions(registroMusculacaoService, registroAerobicoService, registroCalisteniaService);
     }
 
     @Test
@@ -166,10 +294,10 @@ class RegistroAtividadeServiceTest {
         var exercicio = umExercicioAerobico(2);
 
         when(exercicioService.findById(2)).thenReturn(exercicio);
-        when(registroAerobicoService.buscarHistoricoRegistroCompleto(2, 2))
+        when(registroAerobicoService.buscarHistoricoRegistroCompleto(2, null, 2))
             .thenReturn(List.of(umHistoricoRegistroAtividadeResponseDeAerobico()));
 
-        var response = service.buscarRegistroAtividadeCompleto(2, 2);
+        var response = service.buscarRegistroAtividadeCompleto(2, null, 2);
         assertAll(
             () -> assertEquals(2, response.getFirst().id()),
             () -> assertEquals("ESTEIRA", response.getFirst().exercicioNome()),
@@ -179,7 +307,7 @@ class RegistroAtividadeServiceTest {
         );
 
         verify(exercicioService).findById(2);
-        verify(registroAerobicoService).buscarHistoricoRegistroCompleto(2, 2);
+        verify(registroAerobicoService).buscarHistoricoRegistroCompleto(2, null, 2);
         verifyNoInteractions(registroMusculacaoService, registroCalisteniaService);
     }
 
@@ -189,10 +317,10 @@ class RegistroAtividadeServiceTest {
         var exercicio = umExercicioCalistenia(3);
 
         when(exercicioService.findById(3)).thenReturn(exercicio);
-        when(registroCalisteniaService.buscarHistoricoRegistroCompleto(3, 2))
+        when(registroCalisteniaService.buscarHistoricoRegistroCompleto(3, null, 2))
             .thenReturn(List.of(umHistoricoRegistroAtividadeResponseDeCalistenia()));
 
-        var response = service.buscarRegistroAtividadeCompleto(3, 2);
+        var response = service.buscarRegistroAtividadeCompleto(3, null, 2);
         assertAll(
             () -> assertEquals(3, response.getFirst().id()),
             () -> assertEquals("Abdominal Supra", response.getFirst().exercicioNome()),
@@ -203,7 +331,7 @@ class RegistroAtividadeServiceTest {
         );
 
         verify(exercicioService).findById(3);
-        verify(registroCalisteniaService).buscarHistoricoRegistroCompleto(3, 2);
+        verify(registroCalisteniaService).buscarHistoricoRegistroCompleto(3, null, 2);
         verifyNoInteractions(registroAerobicoService, registroMusculacaoService);
     }
 

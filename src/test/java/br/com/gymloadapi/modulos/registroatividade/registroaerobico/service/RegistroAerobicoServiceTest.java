@@ -44,7 +44,7 @@ class RegistroAerobicoServiceTest {
 
     @Test
     void salvarRegistro_deveSalvarRegistro_quandoSolicitado() {
-        service.salvarRegistro(umRegistroAtividadeRequestParaAerobico(), umExercicioAerobico(1), umUsuario());
+        service.salvarRegistro(umRegistroAtividadeRequestParaAerobico(), umExercicioAerobico(1), null, umUsuario());
 
         verify(repository).save(registroAerobicoCaptor.capture());
 
@@ -92,7 +92,7 @@ class RegistroAerobicoServiceTest {
     void buscarHistoricoRegistroCompleto_deveRetornarListaVazia_quandoNaoEncontrarRegistrosParaOExercicio() {
         when(repository.findAllByExercicioIdAndUsuarioId(1, 1)).thenReturn(emptyList());
 
-        assertTrue(service.buscarHistoricoRegistroCompleto(1, 1).isEmpty());
+        assertTrue(service.buscarHistoricoRegistroCompleto(1, null, 1).isEmpty());
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, 1);
     }
@@ -101,7 +101,7 @@ class RegistroAerobicoServiceTest {
     void buscarHistoricoRegistroCompleto_deveRetornarDadosPreenchidos_quandoEcontrarRegistrosParaOExercicio() {
         when(repository.findAllByExercicioIdAndUsuarioId(1, 1)).thenReturn(umaListaDeRegistrosAerobicos());
 
-        var response = service.buscarHistoricoRegistroCompleto(1, 1);
+        var response = service.buscarHistoricoRegistroCompleto(1, null, 1);
         assertAll(
             () -> assertEquals(1, response.getFirst().id()),
             () -> assertEquals("Esteira", response.getFirst().exercicioNome()),

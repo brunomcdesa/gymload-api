@@ -49,10 +49,10 @@ class RegistroMusculacaoRepositoryTest {
         var ultimoRegistro = repository.findLastByExercicioIdAndUsuarioId(1, 1).get();
 
         assertAll(
-            () -> assertEquals(2, ultimoRegistro.getId()),
-            () -> assertEquals(25.0, ultimoRegistro.getPeso()),
+            () -> assertEquals(4, ultimoRegistro.getId()),
+            () -> assertEquals(30.0, ultimoRegistro.getPeso()),
             () -> assertEquals(8, ultimoRegistro.getQtdRepeticoes()),
-            () -> assertEquals(3, ultimoRegistro.getQtdSeries()),
+            () -> assertEquals(4, ultimoRegistro.getQtdSeries()),
             () -> assertEquals(1, ultimoRegistro.getExercicio().getId()),
             () -> assertEquals(1, ultimoRegistro.getUsuario().getId())
         );

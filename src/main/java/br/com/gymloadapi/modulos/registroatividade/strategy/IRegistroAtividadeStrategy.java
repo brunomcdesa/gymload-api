@@ -16,6 +16,8 @@ public interface IRegistroAtividadeStrategy {
 
     RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId);
 
+    RegistroAtividadeResponse buscarDestaquePorVariacao(Integer exercicioId, Integer variacaoId, Integer usuarioId);
+
     List<HistoricoRegistroAtividadeResponse> buscarHistoricoRegistroCompleto(Integer exercicioId, Integer variacaoId,
                                                                               Integer usuarioId);
 

@@ -92,17 +92,6 @@ class ExercicioMapperTest {
     }
 
     @Test
-    void mapToExercicioVariacaoResponse_deveRetornarExercicioVariacaoResponse_quandoSolicitado() {
-        var response = mapper.mapToExercicioVariacaoResponse(umExercicioVariacao());
-
-        assertAll(
-            () -> assertEquals(1, response.id()),
-            () -> assertEquals("SUPINO RETO - Halter", response.nome()),
-            () -> assertEquals(1, response.tipoVariacao().id())
-        );
-    }
-
-    @Test
     void editarVariacao_deveEditarVariacaoDeExercicio_quandoSolicitado() {
         var variacao = umExercicioVariacao();
         mapper.editarVariacao(outroTipoVariacao(),"editado", variacao);

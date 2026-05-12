@@ -4,7 +4,6 @@ import br.com.gymloadapi.modulos.comum.dto.SelectResponse;
 import br.com.gymloadapi.modulos.comum.enums.EAcao;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioRequest;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioResponse;
-import br.com.gymloadapi.modulos.exercicio.dto.ExercicioVariacaoResponse;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.exercicio.model.ExercicioHistorico;
 import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
@@ -56,8 +55,6 @@ public interface ExercicioMapper {
     @Mapping(target = "dataCadastro", expression = "java(LocalDateTime.now())")
     ExercicioVariacao mapToExercicioVariacao(Exercicio exercicio, Integer usuarioAutenticadoId,
                                              TipoVariacao tipoVariacao, String nomeVariacao);
-
-    ExercicioVariacaoResponse mapToExercicioVariacaoResponse(ExercicioVariacao exercicioVariacao);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "nome", source = "nomeVariacao")

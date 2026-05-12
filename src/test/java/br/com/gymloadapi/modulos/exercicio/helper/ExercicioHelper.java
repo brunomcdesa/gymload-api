@@ -49,6 +49,18 @@ public class ExercicioHelper {
             .tipoExercicio(MUSCULACAO)
             .grupoMuscular(umGrupoMuscularPeitoral())
             .treinos(emptyList())
+            .possuiVariacao(FALSE)
+            .build();
+    }
+
+    public static Exercicio umExercicioMusculacaoComVariacao(Integer id) {
+        return Exercicio.builder()
+            .id(id)
+            .nome("SUPINO RETO")
+            .descricao("Supino Reto")
+            .tipoExercicio(MUSCULACAO)
+            .grupoMuscular(umGrupoMuscularPeitoral())
+            .treinos(emptyList())
             .possuiVariacao(TRUE)
             .build();
     }
@@ -134,7 +146,7 @@ public class ExercicioHelper {
             .id(1)
             .usuarioCadastroId(1)
             .dataCadastro(LocalDateTime.of(2025, 8, 6, 10, 30))
-            .exercicio(umExercicioMusculacao(1))
+            .exercicio(umExercicioMusculacaoComVariacao(1))
             .nome("SUPINO RETO - Halter")
             .tipoVariacao(umTipoVariacao())
             .build();
@@ -145,7 +157,7 @@ public class ExercicioHelper {
             .id(2)
             .usuarioCadastroId(1)
             .dataCadastro(LocalDateTime.of(2025, 8, 6, 11, 30))
-            .exercicio(umExercicioMusculacao(1))
+            .exercicio(umExercicioMusculacaoComVariacao(1))
             .nome("SUPINO RETO - Barra")
             .tipoVariacao(outroTipoVariacao())
             .build();

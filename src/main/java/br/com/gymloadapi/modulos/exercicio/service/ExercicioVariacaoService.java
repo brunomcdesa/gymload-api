@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.exercicio.service;
 
 import br.com.gymloadapi.modulos.comum.enums.EAcao;
+import br.com.gymloadapi.modulos.comum.enums.ETipoExercicio;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.exercicio.dto.ExercicioVariacaoRequest;
@@ -9,19 +10,26 @@ import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapper;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.exercicio.repository.ExercicioVariacaoRepository;
+import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
+import br.com.gymloadapi.modulos.registroatividade.strategy.IRegistroAtividadeStrategy;
+import br.com.gymloadapi.modulos.tipovariacao.dto.TipoVariacaoResponse;
+import br.com.gymloadapi.modulos.tipovariacao.model.TipoVariacao;
 import br.com.gymloadapi.modulos.tipovariacao.service.TipoVariacaoService;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.CACHE_EXERCICIOS_VARIACOES_POR_EXERCICIO_ID;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.CADASTRO;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.EDICAO;
+import static br.com.gymloadapi.modulos.comum.enums.ETipoExercicio.*;
 import static br.com.gymloadapi.modulos.comum.utils.MapUtils.mapNull;
 import static br.com.gymloadapi.modulos.comum.utils.MapUtils.mapNullWithBackup;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -37,6 +45,7 @@ public class ExercicioVariacaoService {
     private final ExercicioVariacaoRepository repository;
     private final TipoVariacaoService tipoVariacaoService;
     private final ExercicioVariacaoHistoricoService historicoService;
+    private final ApplicationContext applicationContext;
 
     @Caching(evict = {
         @CacheEvict(value = CACHE_EXERCICIOS_VARIACOES_POR_EXERCICIO_ID, allEntries = true)
@@ -55,10 +64,18 @@ public class ExercicioVariacaoService {
         this.saveComHistorico(variacao, usuarioAutenticadoId, CADASTRO);
     }
 
-    @Cacheable(value = CACHE_EXERCICIOS_VARIACOES_POR_EXERCICIO_ID, key = "#exercicioId")
-    public List<ExercicioVariacaoResponse> buscarVariacoesDoExercicio(Integer exercicioId) {
-        return repository.findAllByExercicioId(exercicioId).stream()
-            .map(exercicioMapper::mapToExercicioVariacaoResponse)
+    @Cacheable(value = CACHE_EXERCICIOS_VARIACOES_POR_EXERCICIO_ID, key = "#exercicioId + '-' + #usuarioId")
+    public List<ExercicioVariacaoResponse> buscarVariacoesDoExercicio(Integer exercicioId, Integer usuarioId) {
+        var variacoes = repository.findAllByExercicioId(exercicioId);
+        if (variacoes.isEmpty()) {
+            return List.of();
+        }
+
+        var tipoExercicio = variacoes.getFirst().getExercicio().getTipoExercicio();
+        var strategy = this.getStrategyByTipoExercicio(tipoExercicio);
+
+        return variacoes.stream()
+            .map(variacao -> this.montarResponse(variacao, tipoExercicio, strategy, usuarioId))
             .toList();
     }
 
@@ -77,6 +94,43 @@ public class ExercicioVariacaoService {
         exercicioMapper.editarVariacao(tipoVariacao, nomeVariacao, exercicioVariacao);
 
         this.saveComHistorico(exercicioVariacao, usuarioAutenticado.getId(), EDICAO);
+    }
+
+    private ExercicioVariacaoResponse montarResponse(ExercicioVariacao variacao, ETipoExercicio tipoExercicio,
+                                                     IRegistroAtividadeStrategy strategy, Integer usuarioId) {
+        var destaque = strategy.buscarDestaquePorVariacao(variacao.getExercicio().getId(), variacao.getId(), usuarioId);
+
+        return new ExercicioVariacaoResponse(
+            variacao.getId(),
+            variacao.getNome(),
+            this.mapTipoVariacaoResponse(variacao.getTipoVariacao()),
+            tipoExercicio == MUSCULACAO ? this.getUltimoValor(destaque, RegistroAtividadeResponse::ultimoPeso) : null,
+            tipoExercicio == AEROBICO ? this.getUltimoValor(destaque, RegistroAtividadeResponse::ultimaDistancia) : null,
+            tipoExercicio == CALISTENIA ? this.getUltimaSerie(destaque) : null
+        );
+    }
+
+    private String getUltimoValor(RegistroAtividadeResponse response,
+                                  Function<RegistroAtividadeResponse, String> extrator) {
+        return response == null ? null : extrator.apply(response);
+    }
+
+    private String getUltimaSerie(RegistroAtividadeResponse response) {
+        if (response == null || response.ultimaQtdMaxRepeticoes() == null) {
+            return null;
+        }
+        return response.ultimaQtdMaxRepeticoes() + " reps";
+    }
+
+    private TipoVariacaoResponse mapTipoVariacaoResponse(TipoVariacao tipoVariacao) {
+        if (tipoVariacao == null) {
+            return null;
+        }
+        return new TipoVariacaoResponse(tipoVariacao.getId(), tipoVariacao.getNome(), tipoVariacao.getDataCadastro());
+    }
+
+    private IRegistroAtividadeStrategy getStrategyByTipoExercicio(ETipoExercicio tipoExercicio) {
+        return applicationContext.getBean(tipoExercicio.getServiceClass());
     }
 
     private void saveComHistorico(ExercicioVariacao exercicioVariacao, Integer usuarioId, EAcao acao) {

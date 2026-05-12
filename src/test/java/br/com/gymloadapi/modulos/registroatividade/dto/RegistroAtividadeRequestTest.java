@@ -25,7 +25,7 @@ class RegistroAtividadeRequestTest {
 
     @Test
     void aplicarGroupValidators_deveAplicarValidacoesDeMusculacao_quandoReceberRequestComCamposInvalidos() {
-        var request = new RegistroAtividadeRequest(null, null, null, null, null,
+        var request = new RegistroAtividadeRequest(null, null, null, null, null, null,
             null, 20.5, 10.2, null, BARRA);
 
         var exception = assertThrowsExactly(
@@ -50,7 +50,7 @@ class RegistroAtividadeRequestTest {
 
     @Test
     void aplicarGroupValidators_deveAplicarValidacoesDeAerobico_quandoReceberRequestComCamposInvalidos() {
-        var request = new RegistroAtividadeRequest(null, null, 20.3, KG, 20,
+        var request = new RegistroAtividadeRequest(null, null, null, 20.3, KG, 20,
             4, null, null, PRONADA, ANILHA);
 
         var exception = assertThrowsExactly(
@@ -75,7 +75,7 @@ class RegistroAtividadeRequestTest {
 
     @Test
     void aplicarGroupValidators_deveAplicarValidacoesDeCalistenia_quandoReceberRequestComCamposInvalidos() {
-        var request = new RegistroAtividadeRequest(null, null, null, null, null,
+        var request = new RegistroAtividadeRequest(null, null, null, null, null, null,
             null, 20.5, 10.2, MISTA, null);
 
         var exception = assertThrowsExactly(

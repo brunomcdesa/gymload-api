@@ -19,11 +19,16 @@ import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
 public class RegistroAtividadeHelper {
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestComCamposNull() {
-        return new RegistroAtividadeRequest(null, null, null, null, null, null, null, null, null, null);
+        return new RegistroAtividadeRequest(null, null, null, null, null, null, null, null, null, null, null);
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaMusculacao() {
-        return new RegistroAtividadeRequest(1, "Observacao", 22.5, KG, 12, 4,
+        return new RegistroAtividadeRequest(1, null, "Observacao", 22.5, KG, 12, 4,
+            null, null, PRONADA, null);
+    }
+
+    public static RegistroAtividadeRequest umRegistroAtividadeRequestParaMusculacaoComVariacao() {
+        return new RegistroAtividadeRequest(1, 10, "Observacao", 22.5, KG, 12, 4,
             null, null, PRONADA, null);
     }
 
@@ -32,18 +37,18 @@ public class RegistroAtividadeHelper {
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaAerobico() {
-        return new RegistroAtividadeRequest(3, "Observacao", null, null, null, null,
+        return new RegistroAtividadeRequest(3, null, "Observacao", null, null, null, null,
             20.0, 1.5, null, null);
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestParaCalistenia() {
-        return new RegistroAtividadeRequest(4, "Observacao", null, null, 20, 5,
+        return new RegistroAtividadeRequest(4, null, "Observacao", null, null, 20, 5,
             null, null, null, null);
     }
 
     public static RegistroAtividadeRequest umRegistroAtividadeRequestSomenteComPesoEUnidadePeso(Double peso,
                                                                                                 EUnidadePeso unidadePeso) {
-        return new RegistroAtividadeRequest(null, null, peso, unidadePeso, null, null, null, null, null, BAG);
+        return new RegistroAtividadeRequest(null, null, null, peso, unidadePeso, null, null, null, null, null, BAG);
     }
 
     public static RegistroAtividadeResponse umRegistroAtividadeResponseComDadosDeMusculacao() {

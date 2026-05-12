@@ -44,7 +44,8 @@ class RegistroCalisteniaServiceTest {
 
     @Test
     void salvarRegistro_deveSalvarRegistroDeCalistenia_quandoSolicitado() {
-        service.salvarRegistro(umRegistroAtividadeRequestParaCalistenia(), umExercicioCalistenia(1), umUsuarioAdmin());
+        service.salvarRegistro(umRegistroAtividadeRequestParaCalistenia(), umExercicioCalistenia(1), null,
+            umUsuarioAdmin());
 
         verify(repository).save(registroCalisteniaCaptor.capture());
 
@@ -104,7 +105,7 @@ class RegistroCalisteniaServiceTest {
 
         when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(emptyList());
 
-        assertTrue(service.buscarHistoricoRegistroCompleto(1, usuario.getId()).isEmpty());
+        assertTrue(service.buscarHistoricoRegistroCompleto(1, null, usuario.getId()).isEmpty());
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, usuario.getId());
     }
@@ -116,7 +117,7 @@ class RegistroCalisteniaServiceTest {
         when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId()))
             .thenReturn(umaListaRegistroCalistenia());
 
-        var responses = service.buscarHistoricoRegistroCompleto(1, usuario.getId());
+        var responses = service.buscarHistoricoRegistroCompleto(1, null, usuario.getId());
 
         assertAll(
             () -> assertEquals("15.2 (KG)", responses.getFirst().carga()),

@@ -23,7 +23,7 @@ class RegistroAtividadeMapperTest {
     @Test
     void mapToRegistroMusculacao_deveRetornarRegistroMusculacao_quandoSolicitado() {
         var registroMusculacao = mapper.mapToRegistroMusculacao(umRegistroAtividadeRequestParaMusculacao(),
-            umExercicioMusculacao(1), umUsuario());
+            umExercicioMusculacao(1), null, umUsuario());
 
         assertAll(
             () -> assertNull(registroMusculacao.getId()),
@@ -42,7 +42,7 @@ class RegistroAtividadeMapperTest {
     @Test
     void mapToRegistroAerobico_deveRetornarRegistroAerobico_quandoSolicitado() {
         var registroAerobico = mapper.mapToRegistroAerobico(umRegistroAtividadeRequestParaAerobico(),
-            umExercicioAerobico(2), umUsuario());
+            umExercicioAerobico(2), null, umUsuario());
 
         assertAll(
             () -> assertNull(registroAerobico.getId()),
@@ -58,7 +58,7 @@ class RegistroAtividadeMapperTest {
     @Test
     void mapToRegistroCalistenia_deveRetornarRegistroCalisenia_quandoSolicitado() {
         var registroCalistenia = mapper.mapToRegistroCalistenia(umRegistroAtividadeRequestParaCalistenia(),
-            umExercicioCalistenia(1), umUsuario());
+            umExercicioCalistenia(1), null, umUsuario());
 
         assertAll(
             () -> assertNull(registroCalistenia.getId()),

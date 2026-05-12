@@ -16,10 +16,15 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
+import br.com.gymloadapi.modulos.registroatividade.registroaerobico.service.RegistroAerobicoService;
+import br.com.gymloadapi.modulos.registroatividade.registrocalistenia.service.RegistroCalisteniaService;
+import br.com.gymloadapi.modulos.registroatividade.registromusculacao.service.RegistroMusculacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -38,6 +43,8 @@ import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAd
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -52,12 +59,14 @@ class ExercicioVariacaoServiceTest {
         }
 
         @Bean
+        @SuppressWarnings("ParameterNumber")
         public ExercicioVariacaoService exercicioService(ExercicioMapper exercicioMapper, ExercicioService exercicioService,
                                                          ExercicioVariacaoRepository repository,
                                                          TipoVariacaoService tipoVariacaoService,
-                                                         ExercicioVariacaoHistoricoService exercicioVariacaoHistoricoService) {
+                                                         ExercicioVariacaoHistoricoService exercicioVariacaoHistoricoService,
+                                                         ApplicationContext applicationContext) {
             return new ExercicioVariacaoService(exercicioMapper, exercicioService, repository, tipoVariacaoService,
-                exercicioVariacaoHistoricoService);
+                exercicioVariacaoHistoricoService, applicationContext);
         }
     }
 
@@ -73,6 +82,12 @@ class ExercicioVariacaoServiceTest {
     private ExercicioVariacaoHistoricoService historicoService;
     @MockitoBean
     private TipoVariacaoService tipoVariacaoService;
+    @MockitoBean
+    private RegistroMusculacaoService registroMusculacaoService;
+    @MockitoBean
+    private RegistroAerobicoService registroAerobicoService;
+    @MockitoBean
+    private RegistroCalisteniaService registroCalisteniaService;
     @Captor
     private ArgumentCaptor<ExercicioVariacao> exercicioVariacaoCaptor;
 
@@ -86,7 +101,7 @@ class ExercicioVariacaoServiceTest {
 
     @Test
     void salvar_deveSalvarNovaVariacao_quandoSolicitado() {
-        when(exercicioService.findById(1)).thenReturn(umExercicioMusculacao(1));
+        when(exercicioService.findById(1)).thenReturn(umExercicioMusculacaoComVariacao(1));
         when(repository.existsByTipoVariacao_IdAndExercicio_Id(1, 1)).thenReturn(false);
         when(tipoVariacaoService.buscarPorId(1)).thenReturn(umTipoVariacao());
 
@@ -173,7 +188,7 @@ class ExercicioVariacaoServiceTest {
     void salvar_deveLancarException_quandoAplicarValidacoesEmGruopoParaMusculacao() {
         var request = umExercicioVariacaoRequest(1, "teste", null);
 
-        when(exercicioService.findById(1)).thenReturn(umExercicioMusculacao(1));
+        when(exercicioService.findById(1)).thenReturn(umExercicioMusculacaoComVariacao(1));
 
         var exception = assertThrowsExactly(
             ConstraintViolationException.class,
@@ -207,7 +222,7 @@ class ExercicioVariacaoServiceTest {
     void salvar_deveLancarException_quandoPossuirVariacaoComMesmoTipoExercicio() {
         var request = umExercicioVariacaoRequestComTipoVariacao();
 
-        when(exercicioService.findById(1)).thenReturn(umExercicioMusculacao(1));
+        when(exercicioService.findById(1)).thenReturn(umExercicioMusculacaoComVariacao(1));
         when(repository.existsByTipoVariacao_IdAndExercicio_Id(1, 1)).thenReturn(true);
 
         var exception = assertThrowsExactly(
@@ -242,15 +257,15 @@ class ExercicioVariacaoServiceTest {
 
     @Test
     void salvar_deveLimparOsCaches_quandoExecutado() {
-        when(exercicioService.findById(1)).thenReturn(umExercicioMusculacao(1));
+        when(exercicioService.findById(1)).thenReturn(umExercicioMusculacaoComVariacao(1));
 
-        service.buscarVariacoesDoExercicio(1);
-        service.buscarVariacoesDoExercicio(2);
+        service.buscarVariacoesDoExercicio(1, 1);
+        service.buscarVariacoesDoExercicio(2, 1);
 
         service.salvar(umExercicioVariacaoRequestComTipoVariacao(), 1);
 
-        service.buscarVariacoesDoExercicio(1);
-        service.buscarVariacoesDoExercicio(2);
+        service.buscarVariacoesDoExercicio(1, 1);
+        service.buscarVariacoesDoExercicio(2, 1);
 
         verify(exercicioService).findById(1);
         verify(repository, times(2)).findAllByExercicioId(1);
@@ -261,23 +276,29 @@ class ExercicioVariacaoServiceTest {
     void buscarVariacoesDoExercicio_deveRetornarListaVazia_quandoNaoEncontrarVariacoesDoExercicio() {
         when(repository.findAllByExercicioId(1)).thenReturn(emptyList());
 
-        assertTrue(service.buscarVariacoesDoExercicio(1).isEmpty());
+        assertTrue(service.buscarVariacoesDoExercicio(1, 1).isEmpty());
 
         verify(repository).findAllByExercicioId(1);
     }
 
     @Test
-    void buscarVariacoesDoExercicio_deveRetornarListaDeVariacoes_quandoEncontrarVariacoesDoExercicio() {
+    void buscarVariacoesDoExercicio_deveRetornarListaDeVariacoesComUltimaCarga_quandoExercicioForMusculacao() {
         when(repository.findAllByExercicioId(1)).thenReturn(umaListaExercicioVariacao());
+        when(registroMusculacaoService.buscarDestaquePorVariacao(eq(1), anyInt(), eq(1)))
+            .thenReturn(new RegistroAtividadeResponse(1, "30 (KG)", "25 (KG)", null, null));
 
-        var variacoes = service.buscarVariacoesDoExercicio(1);
+        var variacoes = service.buscarVariacoesDoExercicio(1, 1);
         assertAll(
             () -> assertEquals(1, variacoes.getFirst().id()),
             () -> assertEquals("SUPINO RETO - Halter", variacoes.getFirst().nome()),
             () -> assertEquals(1, variacoes.getFirst().tipoVariacao().id()),
+            () -> assertEquals("25 (KG)", variacoes.getFirst().ultimaCarga()),
+            () -> assertNull(variacoes.getFirst().ultimaDistancia()),
+            () -> assertNull(variacoes.getFirst().ultimaSerie()),
             () -> assertEquals(2, variacoes.getLast().id()),
             () -> assertEquals("SUPINO RETO - Barra", variacoes.getLast().nome()),
-            () -> assertEquals(2, variacoes.getLast().tipoVariacao().id())
+            () -> assertEquals(2, variacoes.getLast().tipoVariacao().id()),
+            () -> assertEquals("25 (KG)", variacoes.getLast().ultimaCarga())
         );
 
         verify(repository).findAllByExercicioId(1);
@@ -285,12 +306,20 @@ class ExercicioVariacaoServiceTest {
 
     @Test
     void buscarVariacoesDoExercicio_deveRetornarDadosDoChace_quandoSolicitadoVariasVezes() {
-        service.buscarVariacoesDoExercicio(1);
-        service.buscarVariacoesDoExercicio(1);
-        service.buscarVariacoesDoExercicio(1);
-        service.buscarVariacoesDoExercicio(1);
+        service.buscarVariacoesDoExercicio(1, 1);
+        service.buscarVariacoesDoExercicio(1, 1);
+        service.buscarVariacoesDoExercicio(1, 1);
+        service.buscarVariacoesDoExercicio(1, 1);
 
         verify(repository).findAllByExercicioId(1);
+    }
+
+    @Test
+    void buscarVariacoesDoExercicio_deveSepararCachePorUsuario_quandoSolicitadoComUsuariosDiferentes() {
+        service.buscarVariacoesDoExercicio(1, 1);
+        service.buscarVariacoesDoExercicio(1, 2);
+
+        verify(repository, times(2)).findAllByExercicioId(1);
     }
 
     @Test
@@ -372,7 +401,7 @@ class ExercicioVariacaoServiceTest {
 
     @Test
     void editarVariacao_deveLancarException_quandoExercicioNaoPuderTerVariacao() {
-        var exercicio = umExercicioMusculacao(1);
+        var exercicio = umExercicioMusculacaoComVariacao(1);
         exercicio.setPossuiVariacao(false);
         var variacao = umExercicioVariacao();
         variacao.setExercicio(exercicio);
@@ -488,13 +517,13 @@ class ExercicioVariacaoServiceTest {
         when(repository.existsByTipoVariacao_IdAndExercicio_Id(2, 1)).thenReturn(false);
         when(tipoVariacaoService.buscarPorId(2)).thenReturn(outroTipoVariacao());
 
-        service.buscarVariacoesDoExercicio(1);
-        service.buscarVariacoesDoExercicio(2);
+        service.buscarVariacoesDoExercicio(1, 1);
+        service.buscarVariacoesDoExercicio(2, 1);
 
         service.editarVariacao(1, umExercicioVariacaoRequest(1, null, 2), umUsuarioAdmin());
 
-        service.buscarVariacoesDoExercicio(1);
-        service.buscarVariacoesDoExercicio(2);
+        service.buscarVariacoesDoExercicio(1, 1);
+        service.buscarVariacoesDoExercicio(2, 1);
 
         verify(repository).findCompleteById(1);
         verify(repository, times(2)).findAllByExercicioId(1);

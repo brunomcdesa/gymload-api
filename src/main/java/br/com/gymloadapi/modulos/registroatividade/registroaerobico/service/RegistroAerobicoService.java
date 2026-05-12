@@ -40,6 +40,19 @@ public class RegistroAerobicoService implements IRegistroAtividadeStrategy {
     @Override
     public RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId) {
         var registrosAerobico = this.getAllByExercicioIdSemVariacao(exercicioId, usuarioId);
+        return this.montarResponseDestaque(exercicioId, registrosAerobico);
+    }
+
+    @Override
+    public RegistroAtividadeResponse buscarDestaquePorVariacao(Integer exercicioId, Integer variacaoId,
+                                                               Integer usuarioId) {
+        var registrosAerobico = repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(exercicioId, variacaoId,
+            usuarioId);
+        return this.montarResponseDestaque(exercicioId, registrosAerobico);
+    }
+
+    private RegistroAtividadeResponse montarResponseDestaque(Integer exercicioId,
+                                                             List<RegistroAerobico> registrosAerobico) {
         var destaqueRegistro = this.getDestaqueDoRegistro(registrosAerobico);
         var ultimoRegistro = this.getUltimoResgistro(registrosAerobico);
 
@@ -114,10 +127,10 @@ public class RegistroAerobicoService implements IRegistroAtividadeStrategy {
 
         return optionalMaiorDistancia.isPresent()
             ? registrosAerobico.stream()
-            .filter(registro -> registro.getDistancia() == optionalMaiorDistancia.getAsDouble())
-            .map(RegistroAerobico::getDistanciaFormatada)
-            .findFirst()
-            .orElse("-")
+              .filter(registro -> registro.getDistancia() == optionalMaiorDistancia.getAsDouble())
+              .map(RegistroAerobico::getDistanciaFormatada)
+              .findFirst()
+              .orElse("-")
             : "-";
     }
 

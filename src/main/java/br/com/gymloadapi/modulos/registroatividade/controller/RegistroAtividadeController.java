@@ -37,8 +37,11 @@ public class RegistroAtividadeController {
 
     @GetMapping("{exercicioId}/completo")
     public List<HistoricoRegistroAtividadeResponse> buscarRegistroAtividadeCompleto(@PathVariable Integer exercicioId,
-                                                                                    @AuthenticationPrincipal Usuario usuario) {
-        return service.buscarRegistroAtividadeCompleto(exercicioId, usuario.getId());
+                                                                                    @RequestParam(required = false)
+                                                                                    Integer variacaoId,
+                                                                                    @AuthenticationPrincipal
+                                                                                    Usuario usuario) {
+        return service.buscarRegistroAtividadeCompleto(exercicioId, variacaoId, usuario.getId());
     }
 
     @ResponseStatus(NO_CONTENT)

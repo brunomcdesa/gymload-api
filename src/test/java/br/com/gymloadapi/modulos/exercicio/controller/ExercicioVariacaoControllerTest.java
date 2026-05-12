@@ -77,10 +77,10 @@ class ExercicioVariacaoControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithUserDetails
     void buscarVariacoesDoExercicio_deveRetornarOk_quandoUsuarioAutenticado() {
         isOk(get(URL + "/1"), mockMvc);
-        verify(service).buscarVariacoesDoExercicio(1);
+        verify(service).buscarVariacoesDoExercicio(1, 1);
     }
 
     @Test

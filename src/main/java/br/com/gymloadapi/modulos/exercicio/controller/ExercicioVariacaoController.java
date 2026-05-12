@@ -31,8 +31,9 @@ public class ExercicioVariacaoController {
     }
 
     @GetMapping("{exercicioId}")
-    public List<ExercicioVariacaoResponse> buscarVariacoesDoExercicio(@PathVariable Integer exercicioId) {
-        return service.buscarVariacoesDoExercicio(exercicioId);
+    public List<ExercicioVariacaoResponse> buscarVariacoesDoExercicio(@PathVariable Integer exercicioId,
+                                                                      @AuthenticationPrincipal Usuario usuario) {
+        return service.buscarVariacoesDoExercicio(exercicioId, usuario.getId());
     }
 
     @PutMapping("{id}/editar")

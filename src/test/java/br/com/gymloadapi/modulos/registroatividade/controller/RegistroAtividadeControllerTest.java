@@ -83,8 +83,16 @@ class RegistroAtividadeControllerTest {
 
         Map.<String, Runnable>of(
             "/destaques?exerciciosIds=1,2,3", () -> verify(service).buscarDestaques(umRegistroAtividadeFiltros(), 1),
-            "/1/completo", () -> verify(service).buscarRegistroAtividadeCompleto(1, 1)
+            "/1/completo", () -> verify(service).buscarRegistroAtividadeCompleto(1, null, 1)
         ).get(endpoint).run();
+    }
+
+    @Test
+    @WithUserDetails
+    void buscarRegistroAtividadeCompleto_deveRetornarOkComVariacaoId_quandoVariacaoIdInformado() {
+        isOk(get(URL + "/1/completo?variacaoId=10"), mockMvc);
+
+        verify(service).buscarRegistroAtividadeCompleto(1, 10, 1);
     }
 
     @Test

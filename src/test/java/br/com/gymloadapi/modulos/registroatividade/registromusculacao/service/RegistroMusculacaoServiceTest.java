@@ -47,7 +47,8 @@ class RegistroMusculacaoServiceTest {
 
     @Test
     void salvarRegistro_deveSalvarRegistroDeMusculacao_quandoSolicitado() {
-        service.salvarRegistro(umRegistroAtividadeRequestParaMusculacao(), umExercicioMusculacao(1), umUsuarioAdmin());
+        service.salvarRegistro(umRegistroAtividadeRequestParaMusculacao(), umExercicioMusculacao(1), null,
+            umUsuarioAdmin());
 
         verify(repository).save(registroMusculacaoCaptor.capture());
 
@@ -108,7 +109,7 @@ class RegistroMusculacaoServiceTest {
 
         when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId())).thenReturn(emptyList());
 
-        assertTrue(service.buscarHistoricoRegistroCompleto(1, usuario.getId()).isEmpty());
+        assertTrue(service.buscarHistoricoRegistroCompleto(1, null, usuario.getId()).isEmpty());
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, usuario.getId());
     }
@@ -120,7 +121,7 @@ class RegistroMusculacaoServiceTest {
         when(repository.findAllByExercicioIdAndUsuarioId(1, usuario.getId()))
             .thenReturn(umaListaRegistroMusculacao());
 
-        var responses = service.buscarHistoricoRegistroCompleto(1, usuario.getId());
+        var responses = service.buscarHistoricoRegistroCompleto(1, null, usuario.getId());
 
         assertAll(
             () -> assertEquals("27.2 (KG)", responses.getFirst().carga()),

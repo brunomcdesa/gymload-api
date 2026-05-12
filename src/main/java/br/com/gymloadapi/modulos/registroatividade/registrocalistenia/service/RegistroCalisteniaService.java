@@ -6,10 +6,10 @@ import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
-import br.com.gymloadapi.modulos.registroatividade.strategy.IRegistroAtividadeStrategy;
 import br.com.gymloadapi.modulos.registroatividade.mapper.RegistroAtividadeMapper;
 import br.com.gymloadapi.modulos.registroatividade.registrocalistenia.model.RegistroCalistenia;
 import br.com.gymloadapi.modulos.registroatividade.registrocalistenia.repository.RegistroCalisteniaRepository;
+import br.com.gymloadapi.modulos.registroatividade.strategy.IRegistroAtividadeStrategy;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,6 +39,19 @@ public class RegistroCalisteniaService implements IRegistroAtividadeStrategy {
     @Override
     public RegistroAtividadeResponse buscarDestaque(Integer exercicioId, Integer usuarioId) {
         var registrosCalistenia = this.getAllByExercicioIdSemVariacao(exercicioId, usuarioId);
+        return this.montarResponseDestaque(exercicioId, registrosCalistenia);
+    }
+
+    @Override
+    public RegistroAtividadeResponse buscarDestaquePorVariacao(Integer exercicioId, Integer variacaoId,
+                                                               Integer usuarioId) {
+        var registrosCalistenia = repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(exercicioId, variacaoId,
+            usuarioId);
+        return this.montarResponseDestaque(exercicioId, registrosCalistenia);
+    }
+
+    private RegistroAtividadeResponse montarResponseDestaque(Integer exercicioId,
+                                                             List<RegistroCalistenia> registrosCalistenia) {
         var destaqueRegistro = this.getDestaqueDoRegistro(registrosCalistenia);
         var ultimoRegistro = this.getUltimoRegistro(registrosCalistenia);
 
@@ -109,10 +122,10 @@ public class RegistroCalisteniaService implements IRegistroAtividadeStrategy {
 
         return optionalMaiorQtdRepeticoes.isPresent()
             ? registrosCalistenia.stream()
-            .filter(registro -> registro.getQtdRepeticoes() == optionalMaiorQtdRepeticoes.getAsInt())
-            .map(RegistroCalistenia::getQtdRepeticoesDestaque)
-            .findFirst()
-            .orElse(null)
+              .filter(registro -> registro.getQtdRepeticoes() == optionalMaiorQtdRepeticoes.getAsInt())
+              .map(RegistroCalistenia::getQtdRepeticoesDestaque)
+              .findFirst()
+              .orElse(null)
             : "-";
     }
 

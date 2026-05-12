@@ -114,7 +114,8 @@ public class RegistroAtividadeService {
                 .orElseThrow(() -> new ValidacaoException("A variação informada não pertence a este exercício."));
         }
         if (request.variacaoId() != null) {
-            throw new ValidacaoException("Este exercício não possui variações. Não informe uma variação ao registrar a atividade.");
+            throw new ValidacaoException(
+                "Este exercício não possui variações. Não informe uma variação ao registrar a atividade.");
         }
         return null;
     }
