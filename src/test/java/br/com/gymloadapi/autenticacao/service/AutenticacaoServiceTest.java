@@ -80,10 +80,44 @@ class AutenticacaoServiceTest {
             ValidacaoException.class,
             () -> service.login(umLoginAdminRequest())
         );
-        assertEquals("Erro ao realizar login. Username ou senha inválidos.", exception.getMessage());
+        assertEquals("Erro ao realizar login. Username/email ou senha inválidos.", exception.getMessage());
 
         verify(authenticationConfiguration).getAuthenticationManager();
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verifyNoInteractions(tokenService);
+    }
+
+    @Test
+    @SneakyThrows
+    void login_deveRetornarToken_quandoIdentificadorEEmail() {
+        var usuario = umUsuarioAdmin();
+
+        when(authenticationConfiguration.getAuthenticationManager()).thenReturn(authenticationManager);
+        when(usuarioService.findByEmail(any(Email.class))).thenReturn(usuario);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(usuario);
+        when(tokenService.generateToken(usuario)).thenReturn("token-jwt-valido");
+
+        assertEquals("token-jwt-valido", service.login(umLoginAdminRequestComEmail()).token());
+
+        verify(usuarioService).findByEmail(any(Email.class));
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(tokenService).generateToken(usuario);
+    }
+
+    @Test
+    @SneakyThrows
+    void login_deveLancarException_quandoEmailNaoEncontrado() {
+        when(authenticationConfiguration.getAuthenticationManager()).thenReturn(authenticationManager);
+        when(usuarioService.findByEmail(any(Email.class))).thenThrow(new ValidacaoException("Usuário não encontrado."));
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.login(umLoginAdminRequestComEmail())
+        );
+        assertEquals("Erro ao realizar login. Username/email ou senha inválidos.", exception.getMessage());
+
+        verify(usuarioService).findByEmail(any(Email.class));
         verifyNoInteractions(tokenService);
     }
 

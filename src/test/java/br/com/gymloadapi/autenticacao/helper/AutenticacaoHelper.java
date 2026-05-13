@@ -8,7 +8,11 @@ import lombok.experimental.UtilityClass;
 public class AutenticacaoHelper {
 
     public static LoginRequest umLoginAdminRequest() {
-        return new LoginRequest("admin", "654321");
+        return new LoginRequest("usuarioAdmin", "654321");
+    }
+
+    public static LoginRequest umLoginAdminRequestComEmail() {
+        return new LoginRequest("testeAdmin@teste.com", "654321");
     }
 
     public static LoginRequest umLoginUserRequest(String password) {

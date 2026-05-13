@@ -44,7 +44,7 @@ class AutenticacaoControllerTest {
     void login_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos(String userName, String password) {
         var request = new LoginRequest(userName, password);
         isBadRequest(post(URL + "/login"), mockMvc, request,
-            "O campo username é obrigatório.",
+            "O campo login é obrigatório.",
             "O campo password é obrigatório."
         );
 

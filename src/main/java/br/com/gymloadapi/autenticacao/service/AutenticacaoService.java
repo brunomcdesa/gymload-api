@@ -36,7 +36,12 @@ public class AutenticacaoService implements UserDetailsService {
     public LoginResponse login(LoginRequest loginRequest) {
         try {
             var authenticationManager = autenticacaoConfiguration.getAuthenticationManager();
-            var usernamePassword = new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password());
+
+            var username = loginRequest.login().contains("@")
+                ? usuarioService.findByEmail(new Email(loginRequest.login())).getUsername()
+                : loginRequest.login();
+
+            var usernamePassword = new UsernamePasswordAuthenticationToken(username, loginRequest.password());
             var auth = authenticationManager.authenticate(usernamePassword);
 
             var token = tokenService.generateToken((Usuario) auth.getPrincipal());
@@ -44,7 +49,7 @@ public class AutenticacaoService implements UserDetailsService {
             return new LoginResponse(token);
         } catch (Exception exception) {
             log.error("Erro ao realizar login", exception);
-            throw new ValidacaoException("Erro ao realizar login. Username ou senha inválidos.");
+            throw new ValidacaoException("Erro ao realizar login. Username/email ou senha inválidos.");
         }
     }
 
