@@ -39,7 +39,6 @@ class RegistroAtividadeRequestTest {
                 "peso: é obrigatório.",
                 "duracao: deve ser nulo",
                 "distancia: deve ser nulo",
-                "tipoPegada: é obrigatório.",
                 "tipoEquipamento: deve ser nulo");
     }
 

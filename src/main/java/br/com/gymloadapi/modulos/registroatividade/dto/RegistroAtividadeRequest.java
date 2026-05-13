@@ -45,7 +45,6 @@ public record RegistroAtividadeRequest(
     Double duracao,
 
     @Null(groups = {Aerobico.class, Calistenia.class})
-    @NotNull(groups = Musculacao.class)
     ETipoPegada tipoPegada,
 
     @Null(groups = {Aerobico.class, Musculacao.class})
