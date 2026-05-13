@@ -1,6 +1,7 @@
 package br.com.gymloadapi.autenticacao.service;
 
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
+import br.com.gymloadapi.modulos.comum.types.Email;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
@@ -13,12 +14,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 
-import static br.com.gymloadapi.autenticacao.helper.AutenticacaoHelper.umLoginAdminRequest;
-import static br.com.gymloadapi.autenticacao.helper.AutenticacaoHelper.umLoginUserRequest;
+import static br.com.gymloadapi.autenticacao.helper.AutenticacaoHelper.*;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuario;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -92,7 +93,7 @@ class AutenticacaoServiceTest {
 
         var exception = assertThrowsExactly(
             ValidacaoException.class,
-            () -> service.alterarSenha(umLoginUserRequest("123456"))
+            () -> service.alterarSenha(umRedefinirSenhaRequestPorUsername("123456"))
         );
         assertEquals("A senha deve ser diferente da senha anterior.", exception.getMessage());
 
@@ -105,9 +106,35 @@ class AutenticacaoServiceTest {
         var usuario = umUsuario();
         when(usuarioService.findByUsername("usuarioUser")).thenReturn(usuario);
 
-        assertDoesNotThrow(() -> service.alterarSenha(umLoginUserRequest("654321")));
+        assertDoesNotThrow(() -> service.alterarSenha(umRedefinirSenhaRequestPorUsername("654321")));
 
         verify(usuarioService).findByUsername("usuarioUser");
         verify(usuarioService).atualizarSenha(eq(usuario), any(String.class));
+    }
+
+    @Test
+    void alterarSenha_deveBuscarPorEmail_quandoIdentifierContemArroba() {
+        var usuario = umUsuario();
+        when(usuarioService.findByEmail(any(Email.class))).thenReturn(usuario);
+
+        assertDoesNotThrow(() -> service.alterarSenha(umRedefinirSenhaRequestPorEmail("654321")));
+
+        verify(usuarioService).findByEmail(any(Email.class));
+        verify(usuarioService).atualizarSenha(eq(usuario), any(String.class));
+        verify(usuarioService, never()).findByUsername(any());
+    }
+
+    @Test
+    void alterarSenha_deveLancarException_quandoNovaSenhaIgualAAAnteriorEIdentifierEEmail() {
+        when(usuarioService.findByEmail(any(Email.class))).thenReturn(umUsuario());
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.alterarSenha(umRedefinirSenhaRequestPorEmail("123456"))
+        );
+        assertEquals("A senha deve ser diferente da senha anterior.", exception.getMessage());
+
+        verify(usuarioService).findByEmail(any(Email.class));
+        verifyNoMoreInteractions(usuarioService);
     }
 }

@@ -2,7 +2,9 @@ package br.com.gymloadapi.autenticacao.service;
 
 import br.com.gymloadapi.autenticacao.dto.LoginRequest;
 import br.com.gymloadapi.autenticacao.dto.LoginResponse;
+import br.com.gymloadapi.autenticacao.dto.RedefinirSenhaRequest;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
+import br.com.gymloadapi.modulos.comum.types.Email;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -46,9 +48,11 @@ public class AutenticacaoService implements UserDetailsService {
         }
     }
 
-    public void alterarSenha(LoginRequest loginRequest) {
-        var usuario = this.findByUsername(loginRequest.username());
-        var novaSenha = loginRequest.password();
+    public void alterarSenha(RedefinirSenhaRequest request) {
+        var usuario = request.identifier().contains("@")
+            ? usuarioService.findByEmail(new Email(request.identifier()))
+            : this.findByUsername(request.identifier());
+        var novaSenha = request.password();
 
         if (isPasswordEquals(novaSenha, usuario.getPassword())) {
             throw new ValidacaoException("A senha deve ser diferente da senha anterior.");

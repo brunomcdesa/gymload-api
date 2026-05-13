@@ -2,6 +2,7 @@ package br.com.gymloadapi.autenticacao.controller;
 
 import br.com.gymloadapi.autenticacao.dto.LoginRequest;
 import br.com.gymloadapi.autenticacao.dto.LoginResponse;
+import br.com.gymloadapi.autenticacao.dto.RedefinirSenhaRequest;
 import br.com.gymloadapi.autenticacao.service.AutenticacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class AutenticacaoController {
 
     @PutMapping("alterar-senha")
     @ResponseStatus(NO_CONTENT)
-    public void alterarSenha(@RequestBody @Valid LoginRequest loginRequest) {
-        service.alterarSenha(loginRequest);
+    public void alterarSenha(@RequestBody @Valid RedefinirSenhaRequest request) {
+        service.alterarSenha(request);
     }
 }

@@ -68,6 +68,11 @@ public class UsuarioService {
             .orElseThrow(() -> new NotFoundException(MSG_USUARIO_NAO_ENCONTRADO));
     }
 
+    public UserDetails findByEmail(Email email) {
+        return repository.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException(MSG_USUARIO_NAO_ENCONTRADO));
+    }
+
     public List<UsuarioResponse> buscarTodos() {
         return repository.findAll().stream()
             .map(usuarioMapper::mapModelToResponse)
