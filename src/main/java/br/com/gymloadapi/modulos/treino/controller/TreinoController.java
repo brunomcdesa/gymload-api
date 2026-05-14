@@ -3,6 +3,7 @@ package br.com.gymloadapi.modulos.treino.controller;
 import br.com.gymloadapi.modulos.comum.enums.ESituacao;
 import br.com.gymloadapi.modulos.treino.dto.TreinoRequest;
 import br.com.gymloadapi.modulos.treino.dto.TreinoResponse;
+import br.com.gymloadapi.modulos.treino.service.TreinoSessaoService;
 import br.com.gymloadapi.modulos.treino.service.TreinoService;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 public class TreinoController {
 
     private final TreinoService service;
+    private final TreinoSessaoService treinoSessaoService;
 
     @PostMapping
     @ResponseStatus(CREATED)
@@ -53,5 +55,11 @@ public class TreinoController {
     @ResponseStatus(NO_CONTENT)
     public void inativar(@PathVariable Integer id, @AuthenticationPrincipal Usuario usuario ) {
         service.inativar(id, usuario.getId());
+    }
+
+    @PostMapping("{id}/finalizar")
+    @ResponseStatus(NO_CONTENT)
+    public void finalizar(@PathVariable Integer id, @AuthenticationPrincipal Usuario usuario) {
+        treinoSessaoService.finalizar(id, usuario);
     }
 }

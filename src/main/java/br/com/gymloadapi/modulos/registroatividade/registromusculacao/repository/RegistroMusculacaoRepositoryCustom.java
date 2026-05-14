@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.registroatividade.registromusculacao.repositor
 
 import br.com.gymloadapi.modulos.registroatividade.registromusculacao.model.RegistroMusculacao;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,4 +14,6 @@ public interface RegistroMusculacaoRepositoryCustom {
                                                                            Integer usuarioId);
 
     Optional<RegistroMusculacao> findLastByExercicioIdAndUsuarioId(Integer exercicioId, Integer usuarioId);
+
+    boolean existeRegistroHojeParaExercicios(List<Integer> exercicioIds, Integer usuarioId, LocalDate hoje);
 }

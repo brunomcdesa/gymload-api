@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.PostConstruct;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -103,6 +104,12 @@ public class RegistroAtividadeService {
 
         this.getStrategyByTipoExercicio(exercicio.getTipoExercicio())
             .repetirRegistro(registroId);
+    }
+
+    public boolean existeRegistroHojeParaExercicios(List<Integer> exercicioIds, Integer usuarioId) {
+        var hoje = LocalDate.now();
+        return strategies.values().stream()
+            .anyMatch(strategy -> strategy.existeRegistroHojeParaExercicios(exercicioIds, usuarioId, hoje));
     }
 
     private ExercicioVariacao validarEBuscarVariacao(RegistroAtividadeRequest request, Exercicio exercicio) {

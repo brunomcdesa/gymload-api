@@ -14,6 +14,7 @@ import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -108,6 +109,11 @@ public class RegistroCalisteniaService implements IRegistroAtividadeStrategy {
 
         var novoRegistroCalistenia = registroAtividadeMapper.copiarRegistroCalistenia(registroCalistenia);
         repository.save(novoRegistroCalistenia);
+    }
+
+    @Override
+    public boolean existeRegistroHojeParaExercicios(List<Integer> exercicioIds, Integer usuarioId, LocalDate hoje) {
+        return repository.existeRegistroHojeParaExercicios(exercicioIds, usuarioId, hoje);
     }
 
     private List<RegistroCalistenia> getAllByExercicioIdSemVariacao(Integer exercicioId, Integer usuarioId) {

@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.registroatividade.registrocalistenia.repositor
 
 import br.com.gymloadapi.modulos.registroatividade.registrocalistenia.model.RegistroCalistenia;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,4 +14,6 @@ public interface RegistroCalisteniaRepositoryCustom {
                                                                            Integer usuarioId);
 
     Optional<RegistroCalistenia> findLastByExercicioIdAndUsuarioId(Integer exercicioId, Integer usuarioId);
+
+    boolean existeRegistroHojeParaExercicios(List<Integer> exercicioIds, Integer usuarioId, LocalDate hoje);
 }

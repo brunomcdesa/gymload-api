@@ -1,4 +1,5 @@
 ---
+name: backend-engineer
 description: >
   Use this skill for ALL backend development tasks involving Java and Spring Boot in this project.
   Triggers: creating or reviewing REST APIs, fixing build failures, writing or fixing unit/integration
@@ -46,7 +47,52 @@ modulos/<nome>/
 
 ---
 
-## 3. Padrões do Projeto
+## 3. Migrations (Flyway)
+
+`ddl-auto: validate` em produção — o Hibernate **não cria nem altera tabelas**. Toda mudança de schema exige uma migration Flyway.
+
+### Quando criar
+- Nova entidade JPA → nova tabela + sequência
+- Novo campo `@Column` → `ALTER TABLE ... ADD COLUMN`
+- Nova FK ou index → `ALTER TABLE` ou `CREATE INDEX`
+
+### Localização e nomenclatura
+`src/main/resources/db/migration/V{n}__{descricao_snake_case}.sql`
+- Dois underscores entre versão e descrição (convenção Flyway)
+- Nunca edite uma migration já aplicada — crie uma nova versão
+
+### Estrutura de uma migration
+
+```sql
+-- V{n}: descrição do que esta migration faz
+
+-- 1. Sequences (antes das tabelas que as usam)
+CREATE SEQUENCE IF NOT EXISTS seq_nome START WITH 1 INCREMENT BY 1;
+
+-- 2. Tabelas
+CREATE TABLE IF NOT EXISTS nome_tabela (
+    id    INTEGER      NOT NULL DEFAULT nextval('seq_nome'),
+    campo VARCHAR(255) NOT NULL,
+    fk_x  INTEGER      NOT NULL,
+    CONSTRAINT pk_nome_tabela   PRIMARY KEY (id),
+    CONSTRAINT fk_nome_tabela_x FOREIGN KEY (fk_x) REFERENCES outra_tabela (id)
+);
+
+-- 3. Indexes (após as tabelas)
+CREATE INDEX IF NOT EXISTS idx_nome_tabela_campo ON nome_tabela (campo);
+```
+
+### Convenções
+- Nomes em **lowercase + snake_case** (PostgreSQL case-insensitive → casa com constantes uppercase no Java)
+- `IF NOT EXISTS` em todo `CREATE` (idempotência)
+- Constraints nomeadas explicitamente: `pk_*`, `fk_*`, `uq_*`
+- Sequências declaradas **antes** das tabelas que as referenciam
+- Entidade `*_historico` sempre junto à principal na mesma migration
+- Testes rodam em H2 com `ddl-auto: create` — não precisam da migration
+
+---
+
+## 4. Padrões do Projeto
 
 ### DTOs como Records
 
@@ -88,6 +134,23 @@ Integer grupoMuscularId;
 request.aplicarGroupValidators(exercicio.getTipoExercicio().getGroupValidator());
 ```
 
+### Streams e coleções — nunca for imperativo
+
+Prefira sempre `stream()` + operações funcionais ou `list.forEach()` sobre `for`/`for-each` imperativo:
+
+```java
+// Correto
+exercicios.stream().map(Exercicio::getId).toList();
+lista.forEach(item -> service.processar(item));
+strategies.values().stream().anyMatch(s -> s.existe(ids, usuarioId, hoje));
+
+// Evitar
+for (var item : lista) { ... }
+for (int i = 0; i < lista.size(); i++) { ... }
+```
+
+Use `AtomicInteger`/`AtomicReference` quando precisar de estado mutável dentro de lambdas.
+
 ### QueryDSL (Repositórios Customizados)
 
 Para queries com filtros dinâmicos:
@@ -112,7 +175,7 @@ Todos os mappers são interfaces `@Mapper`. Inclua:
 
 ---
 
-## 4. Segurança
+## 5. Segurança
 
 ### Roles e Autorização
 
@@ -130,7 +193,7 @@ Todos os mappers são interfaces `@Mapper`. Inclua:
 
 ---
 
-## 5. Controllers
+## 6. Controllers
 
 Controllers são finos — só delegam:
 
@@ -166,7 +229,7 @@ public class ExemploController {
 
 ---
 
-## 6. Testes
+## 7. Testes
 
 ### Service Tests
 
@@ -261,7 +324,7 @@ editar_deveRemoverCaches_quandoAlterarEntidade
 
 ---
 
-## 7. Idioma do Código
+## 8. Idioma do Código
 
 Todo o código é escrito em **português brasileiro**:
 - Nomes de variáveis, métodos e campos: `salvar`, `buscarTodos`, `usuarioId`, `dataCadastro`
@@ -271,7 +334,7 @@ Todo o código é escrito em **português brasileiro**:
 
 ---
 
-## 8. Verificação Antes de Concluir
+## 9. Verificação Antes de Concluir
 
 Após qualquer alteração, execute:
 
@@ -287,6 +350,7 @@ Checklist:
 - [ ] `@Transactional` aplicado corretamente no service
 - [ ] Nenhum N+1 introduzido (use `fetchJoin` no QueryDSL)
 - [ ] Historico salvo em toda operação de escrita
+- [ ] **Migration Flyway criada** para toda mudança de schema (nova tabela, coluna, FK ou index)
 - [ ] Testes cobrem happy path, erros e (se aplicável) cache
 - [ ] Código, variáveis e mensagens em português
 - [ ] Build e checkstyle passando limpos

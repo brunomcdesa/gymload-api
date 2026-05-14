@@ -24,4 +24,14 @@ public class TreinoRepositoryImpl implements TreinoRepositoryCustom {
             .where(treino.id.eq(id))
             .fetchFirst());
     }
+
+    @Override
+    public Optional<Treino> findCompleteByIdAndUsuarioId(Integer id, Integer usuarioId) {
+        return Optional.ofNullable(new JPAQueryFactory(entityManager)
+            .selectFrom(treino)
+            .leftJoin(treino.exercicios).fetchJoin()
+            .leftJoin(treino.usuario, usuario).fetchJoin()
+            .where(treino.id.eq(id).and(treino.usuario.id.eq(usuarioId)))
+            .fetchFirst());
+    }
 }

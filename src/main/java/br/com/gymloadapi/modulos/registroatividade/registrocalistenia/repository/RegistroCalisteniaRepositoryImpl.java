@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,5 +58,15 @@ public class RegistroCalisteniaRepositoryImpl implements RegistroCalisteniaRepos
             .orderBy(registroCalistenia.id.desc())
             .fetchFirst()
         );
+    }
+
+    @Override
+    public boolean existeRegistroHojeParaExercicios(List<Integer> exercicioIds, Integer usuarioId, LocalDate hoje) {
+        return new JPAQueryFactory(entityManager)
+            .selectFrom(registroCalistenia)
+            .where(registroCalistenia.exercicio.id.in(exercicioIds)
+                .and(registroCalistenia.usuario.id.eq(usuarioId))
+                .and(registroCalistenia.dataCadastro.eq(hoje)))
+            .fetchFirst() != null;
     }
 }

@@ -6,6 +6,7 @@ import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import br.com.gymloadapi.modulos.treino.dto.TreinoRequest;
+import br.com.gymloadapi.modulos.treino.service.TreinoSessaoService;
 import br.com.gymloadapi.modulos.treino.service.TreinoService;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,8 @@ class TreinoControllerTest {
     private MockMvc mockMvc;
     @MockitoBean
     private TreinoService service;
+    @MockitoBean
+    private TreinoSessaoService treinoSessaoService;
 
     @Test
     @WithAnonymousUser

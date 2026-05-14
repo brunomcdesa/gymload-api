@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,5 +55,15 @@ public class RegistroAerobicoRepositoryImpl implements RegistroAerobicoRepositor
             .orderBy(registroAerobico.id.desc())
             .fetchFirst()
         );
+    }
+
+    @Override
+    public boolean existeRegistroHojeParaExercicios(List<Integer> exercicioIds, Integer usuarioId, LocalDate hoje) {
+        return new JPAQueryFactory(entityManager)
+            .selectFrom(registroAerobico)
+            .where(registroAerobico.exercicio.id.in(exercicioIds)
+                .and(registroAerobico.usuario.id.eq(usuarioId))
+                .and(registroAerobico.dataCadastro.eq(hoje)))
+            .fetchFirst() != null;
     }
 }

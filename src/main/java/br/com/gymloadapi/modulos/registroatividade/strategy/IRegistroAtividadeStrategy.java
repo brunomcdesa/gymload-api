@@ -7,6 +7,7 @@ import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IRegistroAtividadeStrategy {
@@ -28,4 +29,6 @@ public interface IRegistroAtividadeStrategy {
     void repetirUltimoRegistro(Exercicio exercicio, Usuario usuario);
 
     void repetirRegistro(Integer registroId);
+
+    boolean existeRegistroHojeParaExercicios(List<Integer> exercicioIds, Integer usuarioId, LocalDate hoje);
 }

@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface TreinoRepositoryCustom {
 
     Optional<Treino> findCompleteById(Integer id);
+
+    Optional<Treino> findCompleteByIdAndUsuarioId(Integer id, Integer usuarioId);
 }

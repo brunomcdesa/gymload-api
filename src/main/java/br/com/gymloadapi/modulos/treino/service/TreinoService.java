@@ -76,6 +76,11 @@ public class TreinoService {
         this.saveComHistorico(treino, usuarioId, INATIVACAO);
     }
 
+    public Treino findByIdAndUsuarioId(Integer id, Integer usuarioId) {
+        return repository.findCompleteByIdAndUsuarioId(id, usuarioId)
+            .orElseThrow(() -> new NotFoundException("Treino não encontrado."));
+    }
+
     private Treino findCompleteById(Integer id) {
         return repository.findCompleteById(id)
             .orElseThrow(() -> new NotFoundException("Treino não encontrado."));
