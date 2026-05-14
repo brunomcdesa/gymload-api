@@ -14,13 +14,11 @@ import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO;
-import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.CACHE_TODOS_TREINOS_DO_USUARIO;
+import static br.com.gymloadapi.modulos.cache.utils.CacheUtils.CACHE_TREINOS_DO_USUARIO_POR_SITUACAO;
 import static br.com.gymloadapi.modulos.comum.enums.EAcao.*;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.INATIVO;
@@ -34,10 +32,7 @@ public class TreinoService {
     private final ExercicioService exercicioService;
     private final TreinoHistoricoService historicoService;
 
-    @Caching(evict = {
-        @CacheEvict(value = CACHE_TODOS_TREINOS_DO_USUARIO, key = "#usuario.id"),
-        @CacheEvict(value = CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO, key = "#usuario.id")
-    })
+    @CacheEvict(value = CACHE_TREINOS_DO_USUARIO_POR_SITUACAO, allEntries = true)
     public void salvar(TreinoRequest request, Usuario usuario) {
         var exercicios = exercicioService.findByIdIn(request.exerciciosIds());
         var treino = treinoMapper.mapToModel(request, usuario, exercicios);
@@ -45,24 +40,14 @@ public class TreinoService {
         this.saveComHistorico(treino, usuario.getId(), CADASTRO);
     }
 
-    @Cacheable(value = CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO, key = "#usuarioId")
-    public List<TreinoResponse> listarTodosAtivosDoUsuario(Integer usuarioId) {
-        return this.findAllByUsuarioIdAndSituacoes(usuarioId, List.of(ATIVO)).stream()
+    @Cacheable(value = CACHE_TREINOS_DO_USUARIO_POR_SITUACAO, key = "#usuarioId + '_' + #situacao.name()")
+    public List<TreinoResponse> listarPorSituacao(Integer usuarioId, ESituacao situacao) {
+        return this.findAllByUsuarioIdAndSituacoes(usuarioId, List.of(situacao)).stream()
             .map(treinoMapper::mapToResponse)
             .toList();
     }
 
-    @Cacheable(value = CACHE_TODOS_TREINOS_DO_USUARIO, key = "#usuarioId")
-    public List<TreinoResponse> listarTodosDoUsuario(Integer usuarioId) {
-        return this.findAllByUsuarioIdAndSituacoes(usuarioId, List.of(ATIVO, INATIVO)).stream()
-            .map(treinoMapper::mapToResponse)
-            .toList();
-    }
-
-    @Caching(evict = {
-        @CacheEvict(value = CACHE_TODOS_TREINOS_DO_USUARIO, key = "#usuarioId"),
-        @CacheEvict(value = CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO, key = "#usuarioId")
-    })
+    @CacheEvict(value = CACHE_TREINOS_DO_USUARIO_POR_SITUACAO, allEntries = true)
     public void editar(Integer id, TreinoRequest request, Integer usuarioId) {
         var treino = this.findCompleteById(id);
         if (!treino.getExerciciosIds().equals(request.exerciciosIds()) || !treino.getNome().equals(request.nome())) {
@@ -73,10 +58,7 @@ public class TreinoService {
         }
     }
 
-    @Caching(evict = {
-        @CacheEvict(value = CACHE_TODOS_TREINOS_DO_USUARIO, key = "#usuarioId"),
-        @CacheEvict(value = CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO, key = "#usuarioId")
-    })
+    @CacheEvict(value = CACHE_TREINOS_DO_USUARIO_POR_SITUACAO, allEntries = true)
     public void ativar(Integer id, Integer usuarioId) {
         var treino = this.findCompleteById(id);
         this.validarSituacao(treino.getSituacao(), ATIVO);
@@ -85,10 +67,7 @@ public class TreinoService {
         this.saveComHistorico(treino, usuarioId, ATIVACAO);
     }
 
-    @Caching(evict = {
-        @CacheEvict(value = CACHE_TODOS_TREINOS_DO_USUARIO, key = "#usuarioId"),
-        @CacheEvict(value = CACHE_TODOS_TREINOS_ATIVOS_DO_USUARIO, key = "#usuarioId")
-    })
+    @CacheEvict(value = CACHE_TREINOS_DO_USUARIO_POR_SITUACAO, allEntries = true)
     public void inativar(Integer id, Integer usuarioId) {
         var treino = this.findCompleteById(id);
         this.validarSituacao(treino.getSituacao(), INATIVO);

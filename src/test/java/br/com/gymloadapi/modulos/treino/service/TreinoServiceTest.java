@@ -99,28 +99,28 @@ class TreinoServiceTest {
 
     @Test
     void salvar_deveRemoverCachesTreinos_quandoSalvarTreinoNovoParaOUsuario() {
-        service.listarTodosAtivosDoUsuario(1);
-        service.listarTodosDoUsuario(1);
+        service.listarPorSituacao(1, ATIVO);
+        service.listarPorSituacao(1, INATIVO);
 
         service.salvar(umTreinoRequest(), umUsuarioAdmin());
 
-        service.listarTodosAtivosDoUsuario(1);
-        service.listarTodosDoUsuario(1);
+        service.listarPorSituacao(1, ATIVO);
+        service.listarPorSituacao(1, INATIVO);
 
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
-        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO, INATIVO));
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(INATIVO));
         verify(exercicioService).findByIdIn(List.of(1, 2));
         verify(repository).save(any(Treino.class));
         verify(historicoService).salvar(any(Treino.class), eq(1), eq(CADASTRO));
     }
 
     @Test
-    void listarTodosAtivosDoUsuario_deveRetornarTreinosAtivosDoUsuario_quandoSolicitado() {
+    void listarPorSituacao_deveRetornarTreinosAtivos_quandoSituacaoAtivo() {
         var usuario = umUsuarioAdmin();
         when(repository.findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO)))
             .thenReturn(List.of(umTreino(ATIVO)));
 
-        var response = service.listarTodosAtivosDoUsuario(usuario.getId());
+        var response = service.listarPorSituacao(usuario.getId(), ATIVO);
         assertAll(
             () -> assertEquals(1, response.getFirst().id()),
             () -> assertEquals("Um Treino", response.getFirst().nome()),
@@ -132,39 +132,27 @@ class TreinoServiceTest {
     }
 
     @Test
-    void listarTodosAtivosDoUsuario_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
-        service.listarTodosAtivosDoUsuario(1);
-        service.listarTodosAtivosDoUsuario(1);
-        service.listarTodosAtivosDoUsuario(1);
-
-        verify(repository).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
-    }
-
-    @Test
-    void listarTodosDoUsuario_deveRetornarTodosOsTreinosDoUsuario_quandoSolicitado() {
+    void listarPorSituacao_deveRetornarApenasInativos_quandoSituacaoInativo() {
         var usuario = umUsuarioAdmin();
-        when(repository.findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO, INATIVO)))
-            .thenReturn(List.of(umTreino(ATIVO), umTreino(INATIVO)));
+        when(repository.findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(INATIVO)))
+            .thenReturn(List.of(umTreino(INATIVO)));
 
-        var response = service.listarTodosDoUsuario(usuario.getId());
+        var response = service.listarPorSituacao(usuario.getId(), INATIVO);
         assertAll(
-            () -> assertEquals(1, response.getFirst().id()),
-            () -> assertEquals("Um Treino", response.getFirst().nome()),
-            () -> assertEquals(LocalDate.of(2025, 4, 6), response.getFirst().dataCadastro()),
-            () -> assertEquals(ATIVO, response.getFirst().situacao()),
-            () -> assertEquals(INATIVO, response.getLast().situacao())
+            () -> assertEquals(1, response.size()),
+            () -> assertEquals(INATIVO, response.getFirst().situacao())
         );
 
-        verify(repository).findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO, INATIVO));
+        verify(repository).findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(INATIVO));
     }
 
     @Test
-    void listarTodosDoUsuario_deveRetornarDadosDoCache_quandoSolicitadoVariasVezes() {
-        service.listarTodosDoUsuario(1);
-        service.listarTodosDoUsuario(1);
-        service.listarTodosDoUsuario(1);
+    void listarPorSituacao_deveRetornarDadosDoCache_quandoMesmaSituacaoSolicitadaVariasVezes() {
+        service.listarPorSituacao(1, ATIVO);
+        service.listarPorSituacao(1, ATIVO);
+        service.listarPorSituacao(1, ATIVO);
 
-        verify(repository).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO, INATIVO));
+        verify(repository).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
     }
 
     @Test
@@ -237,16 +225,16 @@ class TreinoServiceTest {
         when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
         when(exercicioService.findByIdIn(List.of(1, 2))).thenReturn(umaListaDeExercicios());
 
-        service.listarTodosAtivosDoUsuario(1);
-        service.listarTodosDoUsuario(1);
+        service.listarPorSituacao(1, ATIVO);
+        service.listarPorSituacao(1, INATIVO);
 
         service.editar(1, maisUmTreinoRequest(), 1);
 
-        service.listarTodosAtivosDoUsuario(1);
-        service.listarTodosDoUsuario(1);
+        service.listarPorSituacao(1, ATIVO);
+        service.listarPorSituacao(1, INATIVO);
 
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
-        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO, INATIVO));
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(INATIVO));
         verify(exercicioService).findByIdIn(List.of(1, 2));
         verify(repository).findCompleteById(1);
         verify(repository).save(any(Treino.class));
@@ -297,16 +285,16 @@ class TreinoServiceTest {
     void ativar_deveRemoverCachesTreinos_quandoAtivarUmTreinoDoUsuario() {
         when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(INATIVO)));
 
-        service.listarTodosAtivosDoUsuario(1);
-        service.listarTodosDoUsuario(1);
+        service.listarPorSituacao(1, ATIVO);
+        service.listarPorSituacao(1, INATIVO);
 
         service.ativar(1, 1);
 
-        service.listarTodosAtivosDoUsuario(1);
-        service.listarTodosDoUsuario(1);
+        service.listarPorSituacao(1, ATIVO);
+        service.listarPorSituacao(1, INATIVO);
 
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
-        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO, INATIVO));
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(INATIVO));
         verify(repository).findCompleteById(1);
         verify(repository).save(any(Treino.class));
         verify(historicoService).salvar(any(Treino.class), eq(1), eq(ATIVACAO));
@@ -356,16 +344,16 @@ class TreinoServiceTest {
     void inativar_deveRemoverCachesTreinos_quandoInativarUmTreinoDoUsuario() {
         when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
 
-        service.listarTodosAtivosDoUsuario(1);
-        service.listarTodosDoUsuario(1);
+        service.listarPorSituacao(1, ATIVO);
+        service.listarPorSituacao(1, INATIVO);
 
         service.inativar(1, 1);
 
-        service.listarTodosAtivosDoUsuario(1);
-        service.listarTodosDoUsuario(1);
+        service.listarPorSituacao(1, ATIVO);
+        service.listarPorSituacao(1, INATIVO);
 
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
-        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO, INATIVO));
+        verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(INATIVO));
         verify(repository).findCompleteById(1);
         verify(repository).save(any(Treino.class));
         verify(historicoService).salvar(any(Treino.class), eq(1), eq(INATIVACAO));

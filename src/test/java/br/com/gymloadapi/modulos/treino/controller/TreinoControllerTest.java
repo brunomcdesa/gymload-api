@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import static br.com.gymloadapi.helper.TestsHelper.*;
+import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
+import static br.com.gymloadapi.modulos.comum.enums.ESituacao.INATIVO;
 import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.umTreinoRequest;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static java.util.Collections.emptyList;
@@ -88,8 +90,8 @@ class TreinoControllerTest {
             .param("buscarInativos", String.valueOf(buscarInativos)), mockMvc);
 
         Map.<String, Runnable>of(
-            "true", () -> verify(service).listarTodosDoUsuario(1),
-            "false", () -> verify(service).listarTodosAtivosDoUsuario(1)
+            "true", () -> verify(service).listarPorSituacao(1, INATIVO),
+            "false", () -> verify(service).listarPorSituacao(1, ATIVO)
         ).get(buscarInativos).run();
     }
 
@@ -97,7 +99,7 @@ class TreinoControllerTest {
     @WithUserDetails
     void listarTodosDoUsuario_deveRetornarOk_quandoNaoInformarParametros() {
         isOk(get(URL), mockMvc);
-        verify(service).listarTodosAtivosDoUsuario(1);
+        verify(service).listarPorSituacao(1, ATIVO);
     }
 
     @ParameterizedTest

@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.treino.controller;
 
+import br.com.gymloadapi.modulos.comum.enums.ESituacao;
 import br.com.gymloadapi.modulos.treino.dto.TreinoRequest;
 import br.com.gymloadapi.modulos.treino.dto.TreinoResponse;
 import br.com.gymloadapi.modulos.treino.service.TreinoService;
@@ -31,9 +32,8 @@ public class TreinoController {
     @GetMapping
     public List<TreinoResponse> listarTodosDoUsuario(@AuthenticationPrincipal Usuario usuario,
                                                      @RequestParam(defaultValue = "false") boolean buscarInativos) {
-        return buscarInativos
-            ? service.listarTodosDoUsuario(usuario.getId())
-            : service.listarTodosAtivosDoUsuario(usuario.getId());
+        var situacao = buscarInativos ? ESituacao.INATIVO : ESituacao.ATIVO;
+        return service.listarPorSituacao(usuario.getId(), situacao);
     }
 
     @PutMapping("{id}/editar")
