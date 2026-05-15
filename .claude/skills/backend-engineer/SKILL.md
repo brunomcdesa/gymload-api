@@ -1,6 +1,7 @@
 ---
 name: backend-engineer
 description: >
+  Always trigger on any task or change involving the gymload-api project.
   Use this skill for ALL backend development tasks involving Java and Spring Boot in this project.
   Triggers: creating or reviewing REST APIs, fixing build failures, writing or fixing unit/integration
   tests (JUnit, Mockito), analyzing security vulnerabilities, improving database queries

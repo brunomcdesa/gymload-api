@@ -1,6 +1,9 @@
 package br.com.gymloadapi.modulos.treino.controller;
 
 import br.com.gymloadapi.modulos.comum.enums.ESituacao;
+import br.com.gymloadapi.modulos.treino.dto.TreinoCompartilhadoResponse;
+import br.com.gymloadapi.modulos.treino.dto.TreinoCompartilhamentoTokenResponse;
+import br.com.gymloadapi.modulos.treino.dto.TreinoImportarRequest;
 import br.com.gymloadapi.modulos.treino.dto.TreinoRequest;
 import br.com.gymloadapi.modulos.treino.dto.TreinoResponse;
 import br.com.gymloadapi.modulos.treino.service.TreinoSessaoService;
@@ -33,9 +36,10 @@ public class TreinoController {
 
     @GetMapping
     public List<TreinoResponse> listarTodosDoUsuario(@AuthenticationPrincipal Usuario usuario,
-                                                     @RequestParam(defaultValue = "false") boolean buscarInativos) {
+                                                     @RequestParam(defaultValue = "false") boolean buscarInativos,
+                                                     @RequestParam(defaultValue = "false") boolean buscarImportados) {
         var situacao = buscarInativos ? ESituacao.INATIVO : ESituacao.ATIVO;
-        return service.listarPorSituacao(usuario.getId(), situacao);
+        return service.listarPorSituacao(usuario.getId(), situacao, buscarImportados);
     }
 
     @PutMapping("{id}/editar")
@@ -53,7 +57,7 @@ public class TreinoController {
 
     @PutMapping("{id}/inativar")
     @ResponseStatus(NO_CONTENT)
-    public void inativar(@PathVariable Integer id, @AuthenticationPrincipal Usuario usuario ) {
+    public void inativar(@PathVariable Integer id, @AuthenticationPrincipal Usuario usuario) {
         service.inativar(id, usuario.getId());
     }
 
@@ -61,5 +65,24 @@ public class TreinoController {
     @ResponseStatus(NO_CONTENT)
     public void finalizar(@PathVariable Integer id, @AuthenticationPrincipal Usuario usuario) {
         treinoSessaoService.finalizar(id, usuario);
+    }
+
+    @PostMapping("{id}/compartilhar")
+    @ResponseStatus(CREATED)
+    public TreinoCompartilhamentoTokenResponse compartilhar(@PathVariable Integer id,
+                                                            @AuthenticationPrincipal Usuario usuario) {
+        return service.compartilhar(id, usuario.getId());
+    }
+
+    @GetMapping("compartilhado/{codigo}")
+    public TreinoCompartilhadoResponse buscarCompartilhado(@PathVariable String codigo) {
+        return service.buscarCompartilhado(codigo);
+    }
+
+    @PostMapping("importar")
+    @ResponseStatus(CREATED)
+    public void importar(@RequestBody @Valid TreinoImportarRequest request,
+                         @AuthenticationPrincipal Usuario usuario) {
+        service.importar(request, usuario);
     }
 }

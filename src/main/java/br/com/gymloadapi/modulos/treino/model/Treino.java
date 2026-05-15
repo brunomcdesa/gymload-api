@@ -44,6 +44,9 @@ public class Treino {
         foreignKey = @ForeignKey(name = "FK_USUARIO"), nullable = false)
     private Usuario usuario;
 
+    @Column(nullable = false)
+    private Boolean importado;
+
     @ManyToMany
     @OrderColumn(name = "ORDEM_EXERCICIO")
     @SuppressWarnings("Indentation")

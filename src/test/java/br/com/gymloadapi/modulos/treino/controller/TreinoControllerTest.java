@@ -6,6 +6,7 @@ import br.com.gymloadapi.config.security.JwtAccessDeinedHandler;
 import br.com.gymloadapi.config.security.SecurityConfiguration;
 import br.com.gymloadapi.modulos.comum.service.BackBlazeService;
 import br.com.gymloadapi.modulos.treino.dto.TreinoRequest;
+import br.com.gymloadapi.modulos.treino.dto.TreinoImportarRequest;
 import br.com.gymloadapi.modulos.treino.service.TreinoSessaoService;
 import br.com.gymloadapi.modulos.treino.service.TreinoService;
 import br.com.gymloadapi.modulos.usuario.service.UsuarioService;
@@ -28,6 +29,7 @@ import java.util.Map;
 import static br.com.gymloadapi.helper.TestsHelper.*;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.ATIVO;
 import static br.com.gymloadapi.modulos.comum.enums.ESituacao.INATIVO;
+import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.umTreinoImportarRequest;
 import static br.com.gymloadapi.modulos.treino.helper.TreinoHelper.umTreinoRequest;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 import static java.util.Collections.emptyList;
@@ -93,8 +95,8 @@ class TreinoControllerTest {
             .param("buscarInativos", String.valueOf(buscarInativos)), mockMvc);
 
         Map.<String, Runnable>of(
-            "true", () -> verify(service).listarPorSituacao(1, INATIVO),
-            "false", () -> verify(service).listarPorSituacao(1, ATIVO)
+            "true", () -> verify(service).listarPorSituacao(1, INATIVO, false),
+            "false", () -> verify(service).listarPorSituacao(1, ATIVO, false)
         ).get(buscarInativos).run();
     }
 
@@ -102,7 +104,7 @@ class TreinoControllerTest {
     @WithUserDetails
     void listarTodosDoUsuario_deveRetornarOk_quandoNaoInformarParametros() {
         isOk(get(URL), mockMvc);
-        verify(service).listarPorSituacao(1, ATIVO);
+        verify(service).listarPorSituacao(1, ATIVO, false);
     }
 
     @ParameterizedTest
@@ -144,5 +146,51 @@ class TreinoControllerTest {
             "/1/ativar", () -> verify(service).ativar(1, 1),
             "/1/inativar", () -> verify(service).inativar(1, 1)
         ).get(endpoint).run();
+    }
+
+    @Test
+    @WithAnonymousUser
+    void compartilhar_deveRetornarUnauthorized_quandoUsuarioNaoAutenticado() {
+        isUnauthorized(post(URL + "/1/compartilhar"), mockMvc);
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithUserDetails
+    void compartilhar_deveRetornarCreated_quandoUsuarioAutenticado() {
+        isCreated(post(URL + "/1/compartilhar"), mockMvc);
+        verify(service).compartilhar(1, 1);
+    }
+
+    @Test
+    @WithAnonymousUser
+    void buscarCompartilhado_deveRetornarOk_quandoCodigoValido() {
+        isOk(get(URL + "/compartilhado/A3K9XZ72"), mockMvc);
+        verify(service).buscarCompartilhado("A3K9XZ72");
+    }
+
+    @Test
+    @WithAnonymousUser
+    void importar_deveRetornarUnauthorized_quandoUsuarioNaoAutenticado() {
+        isUnauthorized(post(URL + "/importar"), mockMvc);
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser
+    void importar_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos() {
+        var request = new TreinoImportarRequest(null, null);
+        isBadRequest(post(URL + "/importar"), mockMvc, request,
+            "O campo codigo é obrigatório.",
+            "O campo nome é obrigatório.");
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithUserDetails
+    void importar_deveRetornarCreated_quandoCamposObrigatoriosValidos() {
+        var request = umTreinoImportarRequest();
+        isCreated(post(URL + "/importar"), mockMvc, request);
+        verify(service).importar(request, umUsuarioAdmin());
     }
 }

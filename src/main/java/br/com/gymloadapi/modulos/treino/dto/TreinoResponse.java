@@ -10,6 +10,7 @@ public record TreinoResponse(
     String nome,
     @DatePatternResponse
     LocalDate dataCadastro,
-    ESituacao situacao
+    ESituacao situacao,
+    Boolean importado
 ) {
 }

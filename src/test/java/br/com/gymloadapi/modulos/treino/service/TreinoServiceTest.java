@@ -3,10 +3,14 @@ package br.com.gymloadapi.modulos.treino.service;
 import br.com.gymloadapi.modulos.cache.config.CacheConfig;
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
+import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapper;
+import br.com.gymloadapi.modulos.exercicio.mapper.ExercicioMapperImpl;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.treino.mapper.TreinoMapper;
 import br.com.gymloadapi.modulos.treino.mapper.TreinoMapperImpl;
 import br.com.gymloadapi.modulos.treino.model.Treino;
+import br.com.gymloadapi.modulos.treino.model.TreinoCompartilhamento;
+import br.com.gymloadapi.modulos.treino.repository.TreinoCompartilhamentoRepository;
 import br.com.gymloadapi.modulos.treino.repository.TreinoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,15 +48,29 @@ class TreinoServiceTest {
 
     @TestConfiguration
     static class TestServiceConfig {
+        @Autowired
+        private TreinoRepository repository;
+        @Autowired
+        private ExercicioService exercicioService;
+        @Autowired
+        private TreinoHistoricoService treinoHistoricoService;
+        @Autowired
+        private TreinoCompartilhamentoRepository compartilhamentoRepository;
+
         @Bean
         public TreinoMapper treinoMapper() {
             return new TreinoMapperImpl();
         }
 
         @Bean
-        public TreinoService treinoService(TreinoRepository repository, TreinoMapper treinoMapper,
-                                           ExercicioService exercicioService, TreinoHistoricoService treinoHistoricoService) {
-            return new TreinoService(treinoMapper, repository, exercicioService, treinoHistoricoService);
+        public ExercicioMapper exercicioMapper() {
+            return new ExercicioMapperImpl();
+        }
+
+        @Bean
+        public TreinoService treinoService(TreinoMapper treinoMapper, ExercicioMapper exercicioMapper) {
+            return new TreinoService(treinoMapper, repository, exercicioService, exercicioMapper,
+                treinoHistoricoService, compartilhamentoRepository);
         }
     }
 
@@ -66,8 +84,12 @@ class TreinoServiceTest {
     private ExercicioService exercicioService;
     @MockitoBean
     private TreinoHistoricoService historicoService;
+    @MockitoBean
+    private TreinoCompartilhamentoRepository compartilhamentoRepository;
     @Captor
     private ArgumentCaptor<Treino> captor;
+    @Captor
+    private ArgumentCaptor<TreinoCompartilhamento> compartilhamentoCaptor;
 
     @BeforeEach
     void setUp() {
@@ -99,13 +121,13 @@ class TreinoServiceTest {
 
     @Test
     void salvar_deveRemoverCachesTreinos_quandoSalvarTreinoNovoParaOUsuario() {
-        service.listarPorSituacao(1, ATIVO);
-        service.listarPorSituacao(1, INATIVO);
+        service.listarPorSituacao(1, ATIVO, false);
+        service.listarPorSituacao(1, INATIVO, false);
 
         service.salvar(umTreinoRequest(), umUsuarioAdmin());
 
-        service.listarPorSituacao(1, ATIVO);
-        service.listarPorSituacao(1, INATIVO);
+        service.listarPorSituacao(1, ATIVO, false);
+        service.listarPorSituacao(1, INATIVO, false);
 
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(INATIVO));
@@ -120,7 +142,7 @@ class TreinoServiceTest {
         when(repository.findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO)))
             .thenReturn(List.of(umTreino(ATIVO)));
 
-        var response = service.listarPorSituacao(usuario.getId(), ATIVO);
+        var response = service.listarPorSituacao(usuario.getId(), ATIVO, false);
         assertAll(
             () -> assertEquals(1, response.getFirst().id()),
             () -> assertEquals("Um Treino", response.getFirst().nome()),
@@ -137,7 +159,7 @@ class TreinoServiceTest {
         when(repository.findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(INATIVO)))
             .thenReturn(List.of(umTreino(INATIVO)));
 
-        var response = service.listarPorSituacao(usuario.getId(), INATIVO);
+        var response = service.listarPorSituacao(usuario.getId(), INATIVO, false);
         assertAll(
             () -> assertEquals(1, response.size()),
             () -> assertEquals(INATIVO, response.getFirst().situacao())
@@ -147,10 +169,22 @@ class TreinoServiceTest {
     }
 
     @Test
+    void listarPorSituacao_deveRetornarApenasImportados_quandoBuscarImportadosAtivo() {
+        var usuario = umUsuarioAdmin();
+        when(repository.findByUsuarioIdAndSituacaoIn(usuario.getId(), List.of(ATIVO)))
+            .thenReturn(List.of(umTreino(ATIVO), umTreinoImportado(ATIVO)));
+
+        var response = service.listarPorSituacao(usuario.getId(), ATIVO, true);
+
+        assertEquals(1, response.size());
+        assertTrue(response.getFirst().importado());
+    }
+
+    @Test
     void listarPorSituacao_deveRetornarDadosDoCache_quandoMesmaSituacaoSolicitadaVariasVezes() {
-        service.listarPorSituacao(1, ATIVO);
-        service.listarPorSituacao(1, ATIVO);
-        service.listarPorSituacao(1, ATIVO);
+        service.listarPorSituacao(1, ATIVO, false);
+        service.listarPorSituacao(1, ATIVO, false);
+        service.listarPorSituacao(1, ATIVO, false);
 
         verify(repository).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
     }
@@ -225,13 +259,13 @@ class TreinoServiceTest {
         when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
         when(exercicioService.findByIdIn(List.of(1, 2))).thenReturn(umaListaDeExercicios());
 
-        service.listarPorSituacao(1, ATIVO);
-        service.listarPorSituacao(1, INATIVO);
+        service.listarPorSituacao(1, ATIVO, false);
+        service.listarPorSituacao(1, INATIVO, false);
 
         service.editar(1, maisUmTreinoRequest(), 1);
 
-        service.listarPorSituacao(1, ATIVO);
-        service.listarPorSituacao(1, INATIVO);
+        service.listarPorSituacao(1, ATIVO, false);
+        service.listarPorSituacao(1, INATIVO, false);
 
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(INATIVO));
@@ -285,13 +319,13 @@ class TreinoServiceTest {
     void ativar_deveRemoverCachesTreinos_quandoAtivarUmTreinoDoUsuario() {
         when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(INATIVO)));
 
-        service.listarPorSituacao(1, ATIVO);
-        service.listarPorSituacao(1, INATIVO);
+        service.listarPorSituacao(1, ATIVO, false);
+        service.listarPorSituacao(1, INATIVO, false);
 
         service.ativar(1, 1);
 
-        service.listarPorSituacao(1, ATIVO);
-        service.listarPorSituacao(1, INATIVO);
+        service.listarPorSituacao(1, ATIVO, false);
+        service.listarPorSituacao(1, INATIVO, false);
 
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(INATIVO));
@@ -344,18 +378,136 @@ class TreinoServiceTest {
     void inativar_deveRemoverCachesTreinos_quandoInativarUmTreinoDoUsuario() {
         when(repository.findCompleteById(1)).thenReturn(Optional.of(umTreino(ATIVO)));
 
-        service.listarPorSituacao(1, ATIVO);
-        service.listarPorSituacao(1, INATIVO);
+        service.listarPorSituacao(1, ATIVO, false);
+        service.listarPorSituacao(1, INATIVO, false);
 
         service.inativar(1, 1);
 
-        service.listarPorSituacao(1, ATIVO);
-        service.listarPorSituacao(1, INATIVO);
+        service.listarPorSituacao(1, ATIVO, false);
+        service.listarPorSituacao(1, INATIVO, false);
 
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(ATIVO));
         verify(repository, times(2)).findByUsuarioIdAndSituacaoIn(1, List.of(INATIVO));
         verify(repository).findCompleteById(1);
         verify(repository).save(any(Treino.class));
         verify(historicoService).salvar(any(Treino.class), eq(1), eq(INATIVACAO));
+    }
+
+    @Test
+    void compartilhar_deveGerarNovoToken_quandoNaoExistirTokenValido() {
+        when(repository.findCompleteByIdAndUsuarioId(1, 1)).thenReturn(Optional.of(umTreino(ATIVO)));
+        when(compartilhamentoRepository.findByUsuarioIdAndNomeTreinoAndExerciciosIdsAndDataExpiracaoAfter(
+            anyInt(), anyString(), anyString(), any())).thenReturn(Optional.empty());
+
+        var response = service.compartilhar(1, 1);
+
+        verify(compartilhamentoRepository).save(compartilhamentoCaptor.capture());
+        assertAll(
+            () -> assertNotNull(response.codigo()),
+            () -> assertEquals(8, response.codigo().length()),
+            () -> assertNotNull(response.dataExpiracao())
+        );
+    }
+
+    @Test
+    void compartilhar_deveReutilizarToken_quandoExistirTokenValidoComMesmoSnapshot() {
+        when(repository.findCompleteByIdAndUsuarioId(1, 1)).thenReturn(Optional.of(umTreino(ATIVO)));
+        when(compartilhamentoRepository.findByUsuarioIdAndNomeTreinoAndExerciciosIdsAndDataExpiracaoAfter(
+            anyInt(), anyString(), anyString(), any())).thenReturn(Optional.of(umTreinoCompartilhamento()));
+
+        var response = service.compartilhar(1, 1);
+
+        verify(compartilhamentoRepository, never()).save(any());
+        assertEquals("A3K9XZ72", response.codigo());
+    }
+
+    @Test
+    void compartilhar_deveLancarException_quandoTreinoEstiverInativo() {
+        when(repository.findCompleteByIdAndUsuarioId(1, 1)).thenReturn(Optional.of(umTreino(INATIVO)));
+
+        var exception = assertThrowsExactly(ValidacaoException.class, () -> service.compartilhar(1, 1));
+
+        assertEquals("Não é possível compartilhar um treino inativo.", exception.getMessage());
+        verify(compartilhamentoRepository, never()).save(any());
+    }
+
+    @Test
+    void buscarCompartilhado_deveRetornarDadosDoTreino_quandoCodigoValido() {
+        when(compartilhamentoRepository.findByCodigo("A3K9XZ72"))
+            .thenReturn(Optional.of(umTreinoCompartilhamento()));
+        when(exercicioService.findByIdIn(List.of(1, 2))).thenReturn(umaListaDeExercicios());
+
+        var response = service.buscarCompartilhado("A3K9XZ72");
+
+        assertAll(
+            () -> assertEquals("Um Treino", response.nomeTreino()),
+            () -> assertFalse(response.exercicios().isEmpty())
+        );
+    }
+
+    @Test
+    void buscarCompartilhado_deveLancarException_quandoCodigoNaoEncontrado() {
+        when(compartilhamentoRepository.findByCodigo("INVALIDO")).thenReturn(Optional.empty());
+
+        var exception = assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.buscarCompartilhado("INVALIDO")
+        );
+        assertEquals("Compartilhamento não encontrado.", exception.getMessage());
+    }
+
+    @Test
+    void buscarCompartilhado_deveLancarException_quandoCodigoExpirado() {
+        when(compartilhamentoRepository.findByCodigo("EXPIRED1"))
+            .thenReturn(Optional.of(umTreinoCompartilhamentoExpirado()));
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.buscarCompartilhado("EXPIRED1")
+        );
+        assertEquals("Este código expirou.", exception.getMessage());
+    }
+
+    @Test
+    void importar_deveCriarTreinoImportado_quandoTokenValido() {
+        when(compartilhamentoRepository.findByCodigo("A3K9XZ72"))
+            .thenReturn(Optional.of(umTreinoCompartilhamento()));
+        when(exercicioService.findByIdIn(List.of(1, 2))).thenReturn(umaListaDeExercicios());
+
+        service.importar(umTreinoImportarRequest(), umUsuarioAdmin());
+
+        verify(repository).save(captor.capture());
+        verify(historicoService).salvar(any(Treino.class), eq(1), eq(CADASTRO));
+
+        var treino = captor.getValue();
+        assertAll(
+            () -> assertTrue(treino.getImportado()),
+            () -> assertEquals("Um Treino Importado", treino.getNome()),
+            () -> assertEquals(ATIVO, treino.getSituacao())
+        );
+    }
+
+    @Test
+    void importar_deveLancarException_quandoCodigoExpirado() {
+        when(compartilhamentoRepository.findByCodigo("A3K9XZ72"))
+            .thenReturn(Optional.of(umTreinoCompartilhamentoExpirado()));
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.importar(umTreinoImportarRequest(), umUsuarioAdmin())
+        );
+        assertEquals("Este código expirou.", exception.getMessage());
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void importar_deveLancarException_quandoCodigoNaoEncontrado() {
+        when(compartilhamentoRepository.findByCodigo("A3K9XZ72")).thenReturn(Optional.empty());
+
+        assertThrowsExactly(
+            NotFoundException.class,
+            () -> service.importar(umTreinoImportarRequest(), umUsuarioAdmin())
+        );
+        verify(repository, never()).save(any());
     }
 }

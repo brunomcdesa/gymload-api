@@ -64,6 +64,8 @@ public class SecurityConfiguration {
                 .authenticated()
                 .requestMatchers("/api/tipos-variacoes/**")
                 .hasRole(ADMIN.name())
+                .requestMatchers(GET, "/api/treinos/compartilhado/**")
+                .permitAll()
                 .anyRequest().authenticated()
             )
             .build();
