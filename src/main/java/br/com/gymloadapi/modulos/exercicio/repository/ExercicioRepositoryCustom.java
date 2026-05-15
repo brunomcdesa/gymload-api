@@ -11,5 +11,7 @@ public interface ExercicioRepositoryCustom {
 
     List<Exercicio> findAllCompleteByPredicate(Predicate predicate);
 
+    List<Exercicio> findByIdIn(List<Integer> ids);
+
     List<Exercicio> buscarExerciciosPorTreino(Integer treinoId);
 }
