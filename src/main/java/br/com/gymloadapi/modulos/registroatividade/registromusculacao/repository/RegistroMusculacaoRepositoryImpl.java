@@ -69,4 +69,24 @@ public class RegistroMusculacaoRepositoryImpl implements RegistroMusculacaoRepos
                 .and(registroMusculacao.dataCadastro.eq(hoje)))
             .fetchFirst() != null;
     }
+
+    @Override
+    public void migrarRegistrosSemVariacao(Integer exercicioId, Integer variacaoPadraoId) {
+        new JPAQueryFactory(entityManager)
+            .update(registroMusculacao)
+            .where(registroMusculacao.exercicio.id.eq(exercicioId)
+                .and(registroMusculacao.exercicioVariacao.isNull()))
+            .set(registroMusculacao.exercicioVariacao.id, variacaoPadraoId)
+            .execute();
+    }
+
+    @Override
+    public void moverRegistros(List<Integer> registroIds, Integer variacaoDestinoId, Integer usuarioId) {
+        new JPAQueryFactory(entityManager)
+            .update(registroMusculacao)
+            .where(registroMusculacao.id.in(registroIds)
+                .and(registroMusculacao.usuario.id.eq(usuarioId)))
+            .set(registroMusculacao.exercicioVariacao.id, variacaoDestinoId)
+            .execute();
+    }
 }

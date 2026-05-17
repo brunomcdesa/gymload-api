@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.exercicio.model;
 
 import br.com.gymloadapi.modulos.tipovariacao.model.TipoVariacao;
 import lombok.*;
+import lombok.Builder.Default;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -31,6 +32,10 @@ public class ExercicioVariacao {
 
     @Column(nullable = false)
     private Integer usuarioCadastroId;
+
+    @Default
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean padrao = false;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "FK_EXERCICIO", referencedColumnName = "ID",

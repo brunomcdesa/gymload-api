@@ -22,6 +22,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.function.Function;
@@ -47,12 +48,18 @@ public class ExercicioVariacaoService {
     private final ExercicioVariacaoHistoricoService historicoService;
     private final ApplicationContext applicationContext;
 
+    @Transactional
     @Caching(evict = {
         @CacheEvict(value = CACHE_EXERCICIOS_VARIACOES_POR_EXERCICIO_ID, allEntries = true)
     })
     public void salvar(ExercicioVariacaoRequest request, Integer usuarioAutenticadoId) {
         var exercicio = exercicioService.findById(request.exercicioBaseId());
         this.aplicarValidacoes(request, exercicio);
+
+        if (!repository.existsByExercicio_Id(exercicio.getId())) {
+            this.migrarRegistrosPadraoSeNecessario(exercicio, usuarioAutenticadoId);
+        }
+
         var tipoVariacao = mapNull(request.tipoVariacaoId(), tipoVariacaoService::buscarPorId);
         var nomeVariacao = mapNullWithBackup(tipoVariacao,
             _tipoVariacao -> this.getNomeVariacao(exercicio.getNome(), _tipoVariacao.getNome()),
@@ -106,8 +113,20 @@ public class ExercicioVariacaoService {
             this.mapTipoVariacaoResponse(variacao.getTipoVariacao()),
             tipoExercicio == MUSCULACAO ? this.getUltimoValor(destaque, RegistroAtividadeResponse::ultimoPeso) : null,
             tipoExercicio == AEROBICO ? this.getUltimoValor(destaque, RegistroAtividadeResponse::ultimaDistancia) : null,
-            tipoExercicio == CALISTENIA ? this.getUltimaSerie(destaque) : null
+            tipoExercicio == CALISTENIA ? this.getUltimaSerie(destaque) : null,
+            variacao.isPadrao()
         );
+    }
+
+    private void migrarRegistrosPadraoSeNecessario(Exercicio exercicio, Integer usuarioId) {
+        var strategy = this.getStrategyByTipoExercicio(exercicio.getTipoExercicio());
+        if (strategy.contarRegistrosSemVariacao(exercicio.getId()) == 0) {
+            return;
+        }
+        var variacaoPadrao = exercicioMapper.mapToExercicioVariacao(exercicio, usuarioId, null, "Padrão");
+        variacaoPadrao.setPadrao(true);
+        this.saveComHistorico(variacaoPadrao, usuarioId, CADASTRO);
+        strategy.migrarRegistrosSemVariacao(exercicio.getId(), variacaoPadrao.getId());
     }
 
     private String getUltimoValor(RegistroAtividadeResponse response,

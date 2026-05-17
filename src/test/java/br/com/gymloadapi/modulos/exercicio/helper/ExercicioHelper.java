@@ -163,6 +163,17 @@ public class ExercicioHelper {
             .build();
     }
 
+    public static ExercicioVariacao umExercicioVariacaoPadrao() {
+        return ExercicioVariacao.builder()
+            .id(99)
+            .usuarioCadastroId(1)
+            .dataCadastro(LocalDateTime.of(2025, 8, 6, 10, 30))
+            .exercicio(umExercicioMusculacaoComVariacao(1))
+            .nome("Padrão")
+            .padrao(true)
+            .build();
+    }
+
     public static List<ExercicioVariacao> umaListaExercicioVariacao() {
         return List.of(umExercicioVariacao(), outroExercicioVariacao());
     }

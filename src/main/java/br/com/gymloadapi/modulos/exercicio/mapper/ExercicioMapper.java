@@ -48,6 +48,7 @@ public interface ExercicioMapper {
     ExercicioHistorico mapToHistorico(Exercicio exercicio, Integer usuarioId, EAcao acao);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "padrao", ignore = true)
     @Mapping(target = "nome", source = "nomeVariacao")
     @Mapping(target = "exercicio", source = "exercicio")
     @Mapping(target = "tipoVariacao", source = "tipoVariacao")

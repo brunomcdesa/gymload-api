@@ -103,12 +103,14 @@ class ExercicioVariacaoServiceTest {
     void salvar_deveSalvarNovaVariacao_quandoSolicitado() {
         when(exercicioService.findById(1)).thenReturn(umExercicioMusculacaoComVariacao(1));
         when(repository.existsByTipoVariacao_IdAndExercicio_Id(1, 1)).thenReturn(false);
+        when(repository.existsByExercicio_Id(1)).thenReturn(true);
         when(tipoVariacaoService.buscarPorId(1)).thenReturn(umTipoVariacao());
 
         service.salvar(umExercicioVariacaoRequestComTipoVariacao(), 1);
 
         verify(exercicioService).findById(1);
         verify(repository).existsByTipoVariacao_IdAndExercicio_Id(1, 1);
+        verify(repository).existsByExercicio_Id(1);
         verify(tipoVariacaoService).buscarPorId(1);
         verify(repository).save(exercicioVariacaoCaptor.capture());
         verifyNoMoreInteractions(repository);
@@ -129,11 +131,13 @@ class ExercicioVariacaoServiceTest {
 
         when(exercicioService.findById(1)).thenReturn(exercicio);
         when(repository.existsByNomeIgnoreCase("Abdominal Supra")).thenReturn(false);
+        when(repository.existsByExercicio_Id(1)).thenReturn(true);
 
         service.salvar(umExercicioVariacaoRequestSemTipoVariacao(), 1);
 
         verify(exercicioService).findById(1);
         verify(repository).existsByNomeIgnoreCase("Abdominal Supra");
+        verify(repository).existsByExercicio_Id(1);
         verify(repository).save(exercicioVariacaoCaptor.capture());
         verifyNoMoreInteractions(repository);
 
@@ -528,5 +532,44 @@ class ExercicioVariacaoServiceTest {
         verify(repository).findCompleteById(1);
         verify(repository, times(2)).findAllByExercicioId(1);
         verify(repository, times(2)).findAllByExercicioId(2);
+    }
+
+    @Test
+    void salvar_deveCriarVariacaoPadraoEMigrarRegistros_quandoPrimeiraVariacaoEExistemRegistrosSemVariacao() {
+        when(exercicioService.findById(1)).thenReturn(umExercicioMusculacaoComVariacao(1));
+        when(repository.existsByTipoVariacao_IdAndExercicio_Id(1, 1)).thenReturn(false);
+        when(repository.existsByExercicio_Id(1)).thenReturn(false);
+        when(registroMusculacaoService.contarRegistrosSemVariacao(1)).thenReturn(3L);
+        when(tipoVariacaoService.buscarPorId(1)).thenReturn(umTipoVariacao());
+
+        service.salvar(umExercicioVariacaoRequestComTipoVariacao(), 1);
+
+        verify(repository).existsByExercicio_Id(1);
+        verify(registroMusculacaoService).contarRegistrosSemVariacao(1);
+        verify(registroMusculacaoService).migrarRegistrosSemVariacao(eq(1), any());
+        verify(repository, times(2)).save(exercicioVariacaoCaptor.capture());
+        var capturadas = exercicioVariacaoCaptor.getAllValues();
+        assertAll(
+            () -> assertTrue(capturadas.get(0).isPadrao()),
+            () -> assertEquals("Padrão", capturadas.get(0).getNome()),
+            () -> assertFalse(capturadas.get(1).isPadrao())
+        );
+    }
+
+    @Test
+    void salvar_naoDeveCriarVariacaoPadrao_quandoPrimeiraVariacaoENaoExistemRegistrosSemVariacao() {
+        when(exercicioService.findById(1)).thenReturn(umExercicioMusculacaoComVariacao(1));
+        when(repository.existsByTipoVariacao_IdAndExercicio_Id(1, 1)).thenReturn(false);
+        when(repository.existsByExercicio_Id(1)).thenReturn(false);
+        when(registroMusculacaoService.contarRegistrosSemVariacao(1)).thenReturn(0L);
+        when(tipoVariacaoService.buscarPorId(1)).thenReturn(umTipoVariacao());
+
+        service.salvar(umExercicioVariacaoRequestComTipoVariacao(), 1);
+
+        verify(repository).existsByExercicio_Id(1);
+        verify(registroMusculacaoService).contarRegistrosSemVariacao(1);
+        verify(registroMusculacaoService, never()).migrarRegistrosSemVariacao(anyInt(), any());
+        verify(repository).save(exercicioVariacaoCaptor.capture());
+        assertFalse(exercicioVariacaoCaptor.getValue().isPadrao());
     }
 }

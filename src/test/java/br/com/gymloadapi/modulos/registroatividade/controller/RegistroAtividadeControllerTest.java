@@ -155,4 +155,32 @@ class RegistroAtividadeControllerTest {
             "/exercicio/1/repetir-registro/1", () -> verify(service).repetirRegistro(1, 1)
         ).get(endpoint).run();
     }
+
+    @Test
+    @WithAnonymousUser
+    void moverRegistros_deveRetornarUnauthorized_quandoUsuarioNaoAutenticado() {
+        isUnauthorized(patch(URL + "/mover-variacao"), mockMvc);
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser
+    void moverRegistros_deveRetornarBadRequest_quandoCamposObrigatoriosInvalidos() {
+        isBadRequest(patch(URL + "/mover-variacao"), mockMvc, umMoverRegistrosRequestComCamposNull(),
+            "O campo exercicioId é obrigatório.",
+            "O campo registroIds é obrigatório.",
+            "O campo variacaoDestinoId é obrigatório.");
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithUserDetails
+    void moverRegistros_deveRetornarNoContent_quandoSolicitadoComSucesso() {
+        var request = umMoverRegistrosRequest();
+        isNoContent(patch(URL + "/mover-variacao"), mockMvc, request);
+
+        verify(service).moverRegistros(request, umUsuarioAdmin());
+    }
 }

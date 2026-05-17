@@ -69,4 +69,24 @@ public class RegistroCalisteniaRepositoryImpl implements RegistroCalisteniaRepos
                 .and(registroCalistenia.dataCadastro.eq(hoje)))
             .fetchFirst() != null;
     }
+
+    @Override
+    public void migrarRegistrosSemVariacao(Integer exercicioId, Integer variacaoPadraoId) {
+        new JPAQueryFactory(entityManager)
+            .update(registroCalistenia)
+            .where(registroCalistenia.exercicio.id.eq(exercicioId)
+                .and(registroCalistenia.exercicioVariacao.isNull()))
+            .set(registroCalistenia.exercicioVariacao.id, variacaoPadraoId)
+            .execute();
+    }
+
+    @Override
+    public void moverRegistros(List<Integer> registroIds, Integer variacaoDestinoId, Integer usuarioId) {
+        new JPAQueryFactory(entityManager)
+            .update(registroCalistenia)
+            .where(registroCalistenia.id.in(registroIds)
+                .and(registroCalistenia.usuario.id.eq(usuarioId)))
+            .set(registroCalistenia.exercicioVariacao.id, variacaoDestinoId)
+            .execute();
+    }
 }

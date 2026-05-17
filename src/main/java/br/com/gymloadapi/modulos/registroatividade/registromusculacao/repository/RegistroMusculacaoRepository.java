@@ -13,4 +13,8 @@ public interface RegistroMusculacaoRepository extends JpaRepository<RegistroMusc
 
     Optional<RegistroMusculacao> findFirstByExercicioVariacao_IdAndUsuario_IdOrderByIdDesc(Integer variacaoId,
                                                                                             Integer usuarioId);
+
+    long countByExercicio_IdAndExercicioVariacaoIsNull(Integer exercicioId);
+
+    long countByExercicioVariacao_Id(Integer variacaoId);
 }

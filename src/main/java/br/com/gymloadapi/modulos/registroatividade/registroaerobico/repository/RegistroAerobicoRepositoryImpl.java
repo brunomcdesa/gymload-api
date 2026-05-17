@@ -66,4 +66,24 @@ public class RegistroAerobicoRepositoryImpl implements RegistroAerobicoRepositor
                 .and(registroAerobico.dataCadastro.eq(hoje)))
             .fetchFirst() != null;
     }
+
+    @Override
+    public void migrarRegistrosSemVariacao(Integer exercicioId, Integer variacaoPadraoId) {
+        new JPAQueryFactory(entityManager)
+            .update(registroAerobico)
+            .where(registroAerobico.exercicio.id.eq(exercicioId)
+                .and(registroAerobico.exercicioVariacao.isNull()))
+            .set(registroAerobico.exercicioVariacao.id, variacaoPadraoId)
+            .execute();
+    }
+
+    @Override
+    public void moverRegistros(List<Integer> registroIds, Integer variacaoDestinoId, Integer usuarioId) {
+        new JPAQueryFactory(entityManager)
+            .update(registroAerobico)
+            .where(registroAerobico.id.in(registroIds)
+                .and(registroAerobico.usuario.id.eq(usuarioId)))
+            .set(registroAerobico.exercicioVariacao.id, variacaoDestinoId)
+            .execute();
+    }
 }

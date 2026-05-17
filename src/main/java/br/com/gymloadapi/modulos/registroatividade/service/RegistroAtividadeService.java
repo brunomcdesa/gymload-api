@@ -7,6 +7,7 @@ import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.exercicio.repository.ExercicioVariacaoRepository;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
+import br.com.gymloadapi.modulos.registroatividade.dto.MoverRegistrosRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeFiltros;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
@@ -110,6 +111,24 @@ public class RegistroAtividadeService {
         var hoje = LocalDate.now();
         return strategies.values().stream()
             .anyMatch(strategy -> strategy.existeRegistroHojeParaExercicios(exercicioIds, usuarioId, hoje));
+    }
+
+    @Transactional
+    public void moverRegistros(MoverRegistrosRequest request, Usuario usuario) {
+        var exercicio = this.findExercicioById(request.exercicioId());
+        exercicioVariacaoRepository
+            .findByIdAndExercicio_Id(request.variacaoDestinoId(), exercicio.getId())
+            .orElseThrow(() -> new ValidacaoException("A variação de destino não pertence a este exercício."));
+
+        var strategy = this.getStrategyByTipoExercicio(exercicio.getTipoExercicio());
+        strategy.moverRegistros(request.registroIds(), request.variacaoDestinoId(), usuario.getId());
+
+        exercicioVariacaoRepository.findByExercicio_IdAndPadraoTrue(exercicio.getId())
+            .ifPresent(padrao -> {
+                if (strategy.contarRegistrosPorVariacao(padrao.getId()) == 0) {
+                    exercicioVariacaoRepository.deleteById(padrao.getId());
+                }
+            });
     }
 
     private ExercicioVariacao validarEBuscarVariacao(RegistroAtividadeRequest request, Exercicio exercicio) {

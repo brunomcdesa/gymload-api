@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.registroatividade.controller;
 
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
+import br.com.gymloadapi.modulos.registroatividade.dto.MoverRegistrosRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeFiltros;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
@@ -67,5 +68,12 @@ public class RegistroAtividadeController {
     @PostMapping("exercicio/{exercicioId}/repetir-registro/{registroId}")
     public void repetirRegistro(@PathVariable Integer exercicioId, @PathVariable Integer registroId) {
         service.repetirRegistro(exercicioId, registroId);
+    }
+
+    @ResponseStatus(NO_CONTENT)
+    @PatchMapping("mover-variacao")
+    public void moverRegistros(@RequestBody @Valid MoverRegistrosRequest request,
+                               @AuthenticationPrincipal Usuario usuario) {
+        service.moverRegistros(request, usuario);
     }
 }

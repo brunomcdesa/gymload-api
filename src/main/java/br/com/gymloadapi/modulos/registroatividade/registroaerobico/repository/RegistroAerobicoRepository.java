@@ -13,4 +13,8 @@ public interface RegistroAerobicoRepository extends JpaRepository<RegistroAerobi
 
     Optional<RegistroAerobico> findFirstByExercicioVariacao_IdAndUsuario_IdOrderByIdDesc(Integer variacaoId,
                                                                                           Integer usuarioId);
+
+    long countByExercicio_IdAndExercicioVariacaoIsNull(Integer exercicioId);
+
+    long countByExercicioVariacao_Id(Integer variacaoId);
 }

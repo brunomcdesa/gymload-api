@@ -16,4 +16,8 @@ public interface ExercicioVariacaoRepository extends JpaRepository<ExercicioVari
     boolean existsByNomeIgnoreCase(String nome);
 
     Optional<ExercicioVariacao> findByIdAndExercicio_Id(Integer id, Integer exercicioId);
+
+    boolean existsByExercicio_Id(Integer exercicioId);
+
+    Optional<ExercicioVariacao> findByExercicio_IdAndPadraoTrue(Integer exercicioId);
 }

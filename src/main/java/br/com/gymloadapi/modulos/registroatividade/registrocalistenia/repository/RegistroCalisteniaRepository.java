@@ -13,4 +13,8 @@ public interface RegistroCalisteniaRepository extends JpaRepository<RegistroCali
 
     Optional<RegistroCalistenia> findFirstByExercicioVariacao_IdAndUsuario_IdOrderByIdDesc(Integer variacaoId,
                                                                                             Integer usuarioId);
+
+    long countByExercicio_IdAndExercicioVariacaoIsNull(Integer exercicioId);
+
+    long countByExercicioVariacao_Id(Integer variacaoId);
 }

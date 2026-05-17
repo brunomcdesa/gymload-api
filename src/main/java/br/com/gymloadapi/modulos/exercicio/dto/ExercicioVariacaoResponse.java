@@ -12,6 +12,7 @@ public record ExercicioVariacaoResponse(
     TipoVariacaoResponse tipoVariacao,
     String ultimaCarga,
     String ultimaDistancia,
-    String ultimaSerie
+    String ultimaSerie,
+    boolean padrao
 ) {
 }

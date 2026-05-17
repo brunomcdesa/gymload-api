@@ -147,6 +147,26 @@ public class RegistroMusculacaoService implements IRegistroAtividadeStrategy {
             .orElse("-");
     }
 
+    @Override
+    public void migrarRegistrosSemVariacao(Integer exercicioId, Integer variacaoPadraoId) {
+        repository.migrarRegistrosSemVariacao(exercicioId, variacaoPadraoId);
+    }
+
+    @Override
+    public void moverRegistros(List<Integer> registroIds, Integer variacaoDestinoId, Integer usuarioId) {
+        repository.moverRegistros(registroIds, variacaoDestinoId, usuarioId);
+    }
+
+    @Override
+    public long contarRegistrosSemVariacao(Integer exercicioId) {
+        return repository.countByExercicio_IdAndExercicioVariacaoIsNull(exercicioId);
+    }
+
+    @Override
+    public long contarRegistrosPorVariacao(Integer variacaoId) {
+        return repository.countByExercicioVariacao_Id(variacaoId);
+    }
+
     private RegistroMusculacao findById(Integer id) {
         return repository.findById(id)
             .orElseThrow(() -> new NotFoundException("Registro de musculação não encontrado."));

@@ -2,6 +2,7 @@ package br.com.gymloadapi.modulos.registroatividade.helper;
 
 import br.com.gymloadapi.modulos.comum.enums.EUnidadePeso;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
+import br.com.gymloadapi.modulos.registroatividade.dto.MoverRegistrosRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeFiltros;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
@@ -84,5 +85,13 @@ public class RegistroAtividadeHelper {
             LocalDate.of(2025, 4, 4), null, null, null, null,
             "Abdomen", 30, 4, null, null, null
         );
+    }
+
+    public static MoverRegistrosRequest umMoverRegistrosRequest() {
+        return new MoverRegistrosRequest(1, List.of(10, 20), 5);
+    }
+
+    public static MoverRegistrosRequest umMoverRegistrosRequestComCamposNull() {
+        return new MoverRegistrosRequest(null, null, null);
     }
 }

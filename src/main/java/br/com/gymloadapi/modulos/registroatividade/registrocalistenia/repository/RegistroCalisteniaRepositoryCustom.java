@@ -16,4 +16,8 @@ public interface RegistroCalisteniaRepositoryCustom {
     Optional<RegistroCalistenia> findLastByExercicioIdAndUsuarioId(Integer exercicioId, Integer usuarioId);
 
     boolean existeRegistroHojeParaExercicios(List<Integer> exercicioIds, Integer usuarioId, LocalDate hoje);
+
+    void migrarRegistrosSemVariacao(Integer exercicioId, Integer variacaoPadraoId);
+
+    void moverRegistros(List<Integer> registroIds, Integer variacaoDestinoId, Integer usuarioId);
 }

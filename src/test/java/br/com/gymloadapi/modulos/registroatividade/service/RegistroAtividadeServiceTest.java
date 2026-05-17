@@ -23,6 +23,7 @@ import static br.com.gymloadapi.modulos.comum.enums.ETipoEquipamento.HALTER;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.*;
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.*;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuario;
+import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -495,5 +496,75 @@ class RegistroAtividadeServiceTest {
         verify(exercicioService).findById(3);
         verify(registroCalisteniaService).repetirRegistro(3);
         verifyNoInteractions(registroMusculacaoService, registroAerobicoService);
+    }
+
+    @Test
+    void moverRegistros_deveMoverRegistros_quandoSolicitado() {
+        var exercicio = umExercicioMusculacao(1);
+        var variacaoDestino = umExercicioVariacao();
+
+        when(exercicioService.findById(1)).thenReturn(exercicio);
+        when(exercicioVariacaoRepository.findByIdAndExercicio_Id(5, 1)).thenReturn(Optional.of(variacaoDestino));
+        when(exercicioVariacaoRepository.findByExercicio_IdAndPadraoTrue(1)).thenReturn(empty());
+
+        var request = umMoverRegistrosRequest();
+        var usuario = umUsuario();
+        service.moverRegistros(request, usuario);
+
+        verify(exercicioService).findById(1);
+        verify(exercicioVariacaoRepository).findByIdAndExercicio_Id(5, 1);
+        verify(registroMusculacaoService).moverRegistros(List.of(10, 20), 5, 2);
+        verify(exercicioVariacaoRepository).findByExercicio_IdAndPadraoTrue(1);
+        verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
+    }
+
+    @Test
+    void moverRegistros_deveDeletarVariacaoPadrao_quandoTodosOsRegistrosForemMovidos() {
+        var exercicio = umExercicioMusculacao(1);
+        var variacaoDestino = umExercicioVariacao();
+        var variacaoPadrao = umExercicioVariacaoPadrao();
+
+        when(exercicioService.findById(1)).thenReturn(exercicio);
+        when(exercicioVariacaoRepository.findByIdAndExercicio_Id(5, 1)).thenReturn(Optional.of(variacaoDestino));
+        when(exercicioVariacaoRepository.findByExercicio_IdAndPadraoTrue(1)).thenReturn(Optional.of(variacaoPadrao));
+        when(registroMusculacaoService.contarRegistrosPorVariacao(99)).thenReturn(0L);
+
+        service.moverRegistros(umMoverRegistrosRequest(), umUsuario());
+
+        verify(registroMusculacaoService).moverRegistros(List.of(10, 20), 5, 2);
+        verify(registroMusculacaoService).contarRegistrosPorVariacao(99);
+        verify(exercicioVariacaoRepository).deleteById(99);
+    }
+
+    @Test
+    void moverRegistros_naoDeveDeletarVariacaoPadrao_quandoAindaExistiremRegistros() {
+        var exercicio = umExercicioMusculacao(1);
+        var variacaoDestino = umExercicioVariacao();
+        var variacaoPadrao = umExercicioVariacaoPadrao();
+
+        when(exercicioService.findById(1)).thenReturn(exercicio);
+        when(exercicioVariacaoRepository.findByIdAndExercicio_Id(5, 1)).thenReturn(Optional.of(variacaoDestino));
+        when(exercicioVariacaoRepository.findByExercicio_IdAndPadraoTrue(1)).thenReturn(Optional.of(variacaoPadrao));
+        when(registroMusculacaoService.contarRegistrosPorVariacao(99)).thenReturn(3L);
+
+        service.moverRegistros(umMoverRegistrosRequest(), umUsuario());
+
+        verify(registroMusculacaoService).contarRegistrosPorVariacao(99);
+        verify(exercicioVariacaoRepository, never()).deleteById(anyInt());
+    }
+
+    @Test
+    void moverRegistros_deveLancarException_quandoVariacaoDestinoNaoPertenceAoExercicio() {
+        when(exercicioService.findById(1)).thenReturn(umExercicioMusculacao(1));
+        when(exercicioVariacaoRepository.findByIdAndExercicio_Id(5, 1)).thenReturn(empty());
+
+        var exception = assertThrowsExactly(
+            ValidacaoException.class,
+            () -> service.moverRegistros(umMoverRegistrosRequest(), umUsuario())
+        );
+        assertEquals("A variação de destino não pertence a este exercício.", exception.getMessage());
+
+        verify(exercicioVariacaoRepository).findByIdAndExercicio_Id(5, 1);
+        verifyNoInteractions(registroMusculacaoService, registroAerobicoService, registroCalisteniaService);
     }
 }
