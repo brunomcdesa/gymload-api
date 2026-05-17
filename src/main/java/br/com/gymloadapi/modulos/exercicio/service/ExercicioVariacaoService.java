@@ -125,7 +125,8 @@ public class ExercicioVariacaoService {
         }
         var variacaoPadrao = exercicioMapper.mapToExercicioVariacao(exercicio, usuarioId, null, "Padrão");
         variacaoPadrao.setPadrao(true);
-        this.saveComHistorico(variacaoPadrao, usuarioId, CADASTRO);
+        repository.saveAndFlush(variacaoPadrao);
+        historicoService.salvar(variacaoPadrao, usuarioId, CADASTRO);
         strategy.migrarRegistrosSemVariacao(exercicio.getId(), variacaoPadrao.getId());
     }
 

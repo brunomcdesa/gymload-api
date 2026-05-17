@@ -546,14 +546,15 @@ class ExercicioVariacaoServiceTest {
 
         verify(repository).existsByExercicio_Id(1);
         verify(registroMusculacaoService).contarRegistrosSemVariacao(1);
-        verify(registroMusculacaoService).migrarRegistrosSemVariacao(eq(1), any());
-        verify(repository, times(2)).save(exercicioVariacaoCaptor.capture());
-        var capturadas = exercicioVariacaoCaptor.getAllValues();
+        verify(repository).saveAndFlush(exercicioVariacaoCaptor.capture());
+        var padrao = exercicioVariacaoCaptor.getValue();
         assertAll(
-            () -> assertTrue(capturadas.get(0).isPadrao()),
-            () -> assertEquals("Padrão", capturadas.get(0).getNome()),
-            () -> assertFalse(capturadas.get(1).isPadrao())
+            () -> assertTrue(padrao.isPadrao()),
+            () -> assertEquals("Padrão", padrao.getNome())
         );
+        verify(registroMusculacaoService).migrarRegistrosSemVariacao(eq(1), any());
+        verify(repository).save(exercicioVariacaoCaptor.capture());
+        assertFalse(exercicioVariacaoCaptor.getValue().isPadrao());
     }
 
     @Test
