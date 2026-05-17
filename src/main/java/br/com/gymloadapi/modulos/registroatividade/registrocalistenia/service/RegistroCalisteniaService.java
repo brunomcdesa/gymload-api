@@ -1,6 +1,7 @@
 package br.com.gymloadapi.modulos.registroatividade.registrocalistenia.service;
 
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
+import br.com.gymloadapi.modulos.dashboard.dto.RecordeRecenteResponse;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static br.com.gymloadapi.modulos.comum.utils.ValidacaoUtils.validarUsuarioAlteracao;
 import static java.lang.String.format;
@@ -166,6 +168,33 @@ public class RegistroCalisteniaService implements IRegistroAtividadeStrategy {
     @Override
     public long contarRegistrosPorVariacao(Integer variacaoId) {
         return repository.countByExercicioVariacao_Id(variacaoId);
+    }
+
+    @Override
+    public List<RecordeRecenteResponse> buscarRecordePessoalResume(Integer usuarioId) {
+        var todos = repository.findTodosPrsPorUsuarioId(usuarioId);
+        return todos.stream()
+            .collect(Collectors.groupingBy(r -> r.getExercicio().getId()))
+            .values().stream()
+            .map(registros -> {
+                var maiorReps = registros.stream()
+                    .mapToInt(RegistroCalistenia::getQtdRepeticoes)
+                    .max()
+                    .orElse(0);
+                return registros.stream()
+                    .filter(r -> r.getQtdRepeticoes() == maiorReps)
+                    .max(Comparator.comparing(RegistroCalistenia::getDataCadastro))
+                    .map(r -> new RecordeRecenteResponse(
+                        r.getExercicio().getId(),
+                        r.getExercicio().getNome(),
+                        "CALISTENIA",
+                        r.getQtdRepeticoesDestaque(),
+                        r.getDataCadastro()
+                    ))
+                    .orElse(null);
+            })
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     private RegistroCalistenia findById(Integer id) {

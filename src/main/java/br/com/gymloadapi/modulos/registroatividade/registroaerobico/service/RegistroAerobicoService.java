@@ -1,15 +1,16 @@
 package br.com.gymloadapi.modulos.registroatividade.registroaerobico.service;
 
 import br.com.gymloadapi.modulos.comum.exception.NotFoundException;
+import br.com.gymloadapi.modulos.dashboard.dto.RecordeRecenteResponse;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeRequest;
 import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
-import br.com.gymloadapi.modulos.registroatividade.strategy.IRegistroAtividadeStrategy;
 import br.com.gymloadapi.modulos.registroatividade.mapper.RegistroAtividadeMapper;
 import br.com.gymloadapi.modulos.registroatividade.registroaerobico.model.RegistroAerobico;
 import br.com.gymloadapi.modulos.registroatividade.registroaerobico.repository.RegistroAerobicoRepository;
+import br.com.gymloadapi.modulos.registroatividade.strategy.IRegistroAtividadeStrategy;
 import br.com.gymloadapi.modulos.usuario.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static br.com.gymloadapi.modulos.comum.utils.ValidacaoUtils.validarUsuarioAlteracao;
 import static java.lang.String.format;
@@ -138,6 +140,33 @@ public class RegistroAerobicoService implements IRegistroAtividadeStrategy {
     @Override
     public long contarRegistrosPorVariacao(Integer variacaoId) {
         return repository.countByExercicioVariacao_Id(variacaoId);
+    }
+
+    @Override
+    public List<RecordeRecenteResponse> buscarRecordePessoalResume(Integer usuarioId) {
+        var todos = repository.findTodosPrsPorUsuarioId(usuarioId);
+        return todos.stream()
+            .collect(Collectors.groupingBy(r -> r.getExercicio().getId()))
+            .values().stream()
+            .map(registros -> {
+                var maiorDistancia = registros.stream()
+                    .mapToDouble(RegistroAerobico::getDistancia)
+                    .max()
+                    .orElse(0);
+                return registros.stream()
+                    .filter(r -> r.getDistancia() == maiorDistancia)
+                    .max(Comparator.comparing(RegistroAerobico::getDataCadastro))
+                    .map(r -> new RecordeRecenteResponse(
+                        r.getExercicio().getId(),
+                        r.getExercicio().getNome(),
+                        "AEROBICO",
+                        r.getDistanciaFormatada(),
+                        r.getDataCadastro()
+                    ))
+                    .orElse(null);
+            })
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     private RegistroAerobico findById(Integer id) {

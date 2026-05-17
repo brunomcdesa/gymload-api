@@ -1,5 +1,6 @@
 package br.com.gymloadapi.modulos.registroatividade.strategy;
 
+import br.com.gymloadapi.modulos.dashboard.dto.RecordeRecenteResponse;
 import br.com.gymloadapi.modulos.exercicio.model.Exercicio;
 import br.com.gymloadapi.modulos.exercicio.model.ExercicioVariacao;
 import br.com.gymloadapi.modulos.registroatividade.dto.HistoricoRegistroAtividadeResponse;
@@ -39,4 +40,6 @@ public interface IRegistroAtividadeStrategy {
     long contarRegistrosSemVariacao(Integer exercicioId);
 
     long contarRegistrosPorVariacao(Integer variacaoId);
+
+    List<RecordeRecenteResponse> buscarRecordePessoalResume(Integer usuarioId);
 }

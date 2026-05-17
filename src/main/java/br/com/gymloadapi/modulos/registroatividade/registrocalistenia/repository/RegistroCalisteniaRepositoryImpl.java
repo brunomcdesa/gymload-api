@@ -89,4 +89,14 @@ public class RegistroCalisteniaRepositoryImpl implements RegistroCalisteniaRepos
             .set(registroCalistenia.exercicioVariacao.id, variacaoDestinoId)
             .execute();
     }
+
+    @Override
+    public List<RegistroCalistenia> findTodosPrsPorUsuarioId(Integer usuarioId) {
+        return new JPAQueryFactory(entityManager)
+            .selectFrom(registroCalistenia)
+            .innerJoin(registroCalistenia.exercicio, exercicio).fetchJoin()
+            .innerJoin(registroCalistenia.usuario, usuario).fetchJoin()
+            .where(registroCalistenia.usuario.id.eq(usuarioId))
+            .fetch();
+    }
 }

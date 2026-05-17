@@ -20,4 +20,6 @@ public interface RegistroAerobicoRepositoryCustom {
     void migrarRegistrosSemVariacao(Integer exercicioId, Integer variacaoPadraoId);
 
     void moverRegistros(List<Integer> registroIds, Integer variacaoDestinoId, Integer usuarioId);
+
+    List<RegistroAerobico> findTodosPrsPorUsuarioId(Integer usuarioId);
 }

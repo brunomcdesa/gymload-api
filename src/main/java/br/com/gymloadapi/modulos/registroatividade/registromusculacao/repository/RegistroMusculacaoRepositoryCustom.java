@@ -20,4 +20,6 @@ public interface RegistroMusculacaoRepositoryCustom {
     void migrarRegistrosSemVariacao(Integer exercicioId, Integer variacaoPadraoId);
 
     void moverRegistros(List<Integer> registroIds, Integer variacaoDestinoId, Integer usuarioId);
+
+    List<RegistroMusculacao> findTodosPrsPorUsuarioId(Integer usuarioId);
 }

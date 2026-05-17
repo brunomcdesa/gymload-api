@@ -89,4 +89,14 @@ public class RegistroMusculacaoRepositoryImpl implements RegistroMusculacaoRepos
             .set(registroMusculacao.exercicioVariacao.id, variacaoDestinoId)
             .execute();
     }
+
+    @Override
+    public List<RegistroMusculacao> findTodosPrsPorUsuarioId(Integer usuarioId) {
+        return new JPAQueryFactory(entityManager)
+            .selectFrom(registroMusculacao)
+            .innerJoin(registroMusculacao.exercicio, exercicio).fetchJoin()
+            .innerJoin(registroMusculacao.usuario, usuario).fetchJoin()
+            .where(registroMusculacao.usuario.id.eq(usuarioId))
+            .fetch();
+    }
 }

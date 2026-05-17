@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -60,5 +63,61 @@ class RegistroAerobicoRepositoryTest {
     @CsvSource(value = {"9999,1", "2,999999"})
     void findLastByExercicioIdAndUsuarioId_deveRetornarOptionalVazio_quandoNaoEncontrarNenhumRegistroParaOExercicioOuParaOUsuario(Integer exercicioId, Integer usuarioId) {
         assertTrue(repository.findLastByExercicioIdAndUsuarioId(exercicioId, usuarioId).isEmpty());
+    }
+
+    @Test
+    void findAllByExercicioIdAndVariacaoIdAndUsuarioId_deveRetornarListaVazia_quandoNaoExistiremRegistrosComVariacao() {
+        assertTrue(repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(2, 1, 1).isEmpty());
+    }
+
+    @Test
+    void existeRegistroHojeParaExercicios_deveRetornarTrue_quandoExistirRegistroNaDataInformada() {
+        assertTrue(repository.existeRegistroHojeParaExercicios(List.of(2), 1, LocalDate.of(2025, 3, 4)));
+    }
+
+    @Test
+    void existeRegistroHojeParaExercicios_deveRetornarFalse_quandoNaoExistirRegistroNaDataInformada() {
+        assertFalse(repository.existeRegistroHojeParaExercicios(List.of(2), 1, LocalDate.now()));
+    }
+
+    @Test
+    void migrarRegistrosSemVariacao_deveMigrarRegistrosSemVariacaoParaVariacaoPadrao_quandoSolicitado() {
+        repository.migrarRegistrosSemVariacao(2, 1);
+
+        var registrosSemVariacao = repository.findAllByExercicioIdAndUsuarioId(2, 1);
+        var registrosComVariacao1 = repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(2, 1, 1);
+
+        assertAll(
+            () -> assertTrue(registrosSemVariacao.isEmpty()),
+            () -> assertEquals(2, registrosComVariacao1.size())
+        );
+    }
+
+    @Test
+    void moverRegistros_deveMoverRegistrosParaVariacaoDestino_quandoSolicitado() {
+        repository.moverRegistros(List.of(1), 1, 1);
+
+        var registrosVariacao1 = repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(2, 1, 1);
+
+        assertAll(
+            () -> assertEquals(1, registrosVariacao1.size()),
+            () -> assertEquals(1, registrosVariacao1.getFirst().getId())
+        );
+    }
+
+    @Test
+    void findTodosPrsPorUsuarioId_deveRetornarTodosOsRegistrosDoUsuario_quandoEncontrarRegistros() {
+        var registros = repository.findTodosPrsPorUsuarioId(1);
+
+        assertAll(
+            () -> assertEquals(2, registros.size()),
+            () -> assertTrue(registros.stream().allMatch(r -> r.getUsuario().getId().equals(1))),
+            () -> assertTrue(registros.stream().allMatch(r -> r.getExercicio().getId().equals(2)))
+        );
+    }
+
+    @Test
+    void findTodosPrsPorUsuarioId_deveRetornarListaVazia_quandoNaoEncontrarRegistrosParaOUsuario() {
+        assertTrue(repository.findTodosPrsPorUsuarioId(999999).isEmpty());
     }
 }

@@ -1,5 +1,9 @@
 package br.com.gymloadapi.modulos.dashboard.service;
 
+import br.com.gymloadapi.modulos.dashboard.dto.RecordeRecenteResponse;
+import br.com.gymloadapi.modulos.registroatividade.registroaerobico.service.RegistroAerobicoService;
+import br.com.gymloadapi.modulos.registroatividade.registrocalistenia.service.RegistroCalisteniaService;
+import br.com.gymloadapi.modulos.registroatividade.registromusculacao.service.RegistroMusculacaoService;
 import br.com.gymloadapi.modulos.treino.repository.TreinoSessaoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +18,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -28,8 +33,12 @@ class DashboardServiceTest {
     static class TestServiceConfig {
 
         @Bean
-        public DashboardService dashboardService(TreinoSessaoRepository repository) {
-            return new DashboardService(repository);
+        public DashboardService dashboardService(TreinoSessaoRepository repository,
+                                                 RegistroMusculacaoService registroMusculacaoService,
+                                                 RegistroCalisteniaService registroCalisteniaService,
+                                                 RegistroAerobicoService registroAerobicoService) {
+            return new DashboardService(repository, registroMusculacaoService, registroCalisteniaService,
+                registroAerobicoService);
         }
     }
 
@@ -37,6 +46,12 @@ class DashboardServiceTest {
     private DashboardService service;
     @MockitoBean
     private TreinoSessaoRepository repository;
+    @MockitoBean
+    private RegistroMusculacaoService registroMusculacaoService;
+    @MockitoBean
+    private RegistroCalisteniaService registroCalisteniaService;
+    @MockitoBean
+    private RegistroAerobicoService registroAerobicoService;
 
     @Test
     void buscarStats_deveCalcularStreakCorretamente_quandoHaDiasConsecutivos() {
@@ -44,7 +59,10 @@ class DashboardServiceTest {
         var datas = List.of(hoje, hoje.minusDays(1), hoje.minusDays(2));
         when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(datas);
         when(repository.countSessoesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(3L);
-        when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(List.of());
+        when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(emptyList());
+        when(registroMusculacaoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroCalisteniaService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroAerobicoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
 
         var stats = service.buscarStats(1);
 
@@ -58,7 +76,10 @@ class DashboardServiceTest {
         var datas = List.of(hoje, hoje.minusDays(2));
         when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(datas);
         when(repository.countSessoesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(2L);
-        when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(List.of());
+        when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(emptyList());
+        when(registroMusculacaoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroCalisteniaService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroAerobicoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
 
         var stats = service.buscarStats(1);
 
@@ -67,9 +88,12 @@ class DashboardServiceTest {
 
     @Test
     void buscarStats_deveRetornarStreakZero_quandoNaoHaSessoes() {
-        when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(List.of());
+        when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(emptyList());
         when(repository.countSessoesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(0L);
-        when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(List.of());
+        when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(emptyList());
+        when(registroMusculacaoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroCalisteniaService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroAerobicoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
 
         var stats = service.buscarStats(1);
 
@@ -79,9 +103,12 @@ class DashboardServiceTest {
 
     @Test
     void buscarStats_deveRetornarTreinosMesCorreto() {
-        when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(List.of());
+        when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(emptyList());
         when(repository.countSessoesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(12L);
-        when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(List.of());
+        when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(emptyList());
+        when(registroMusculacaoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroCalisteniaService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroAerobicoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
 
         var stats = service.buscarStats(1);
 
@@ -92,10 +119,13 @@ class DashboardServiceTest {
     void buscarStats_deveMarcarDotsDaSemanaCorretamente() {
         var monday = LocalDate.now().with(DayOfWeek.MONDAY);
         var wednesday = monday.plusDays(2);
-        when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(List.of());
+        when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(emptyList());
         when(repository.countSessoesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(0L);
         when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any()))
             .thenReturn(List.of(monday, wednesday));
+        when(registroMusculacaoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroCalisteniaService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroAerobicoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
 
         var stats = service.buscarStats(1);
 
@@ -105,5 +135,74 @@ class DashboardServiceTest {
             () -> assertTrue(stats.diasSemana()[2], "Quarta deve estar marcada"),
             () -> assertFalse(stats.diasSemana()[6], "Domingo não deve estar marcado")
         );
+    }
+
+    @Test
+    void buscarStats_deveRetornarListaVaziaDeRecordesRecentes_quandoNaoHaRegistros() {
+        when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(emptyList());
+        when(repository.countSessoesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(0L);
+        when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(emptyList());
+        when(registroMusculacaoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroCalisteniaService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroAerobicoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+
+        var stats = service.buscarStats(1);
+
+        assertAll(
+            () -> assertTrue(stats.recordesRecentes().isEmpty()),
+            () -> assertEquals(0, stats.prsEssaSemana())
+        );
+    }
+
+    @Test
+    void buscarStats_deveRetornarAteCincoRecordesRecentes_ordenadosPorDataDecrescente() {
+        var segunda = LocalDate.now().with(DayOfWeek.MONDAY);
+        var recordes = List.of(
+            new RecordeRecenteResponse(1, "Supino", "MUSCULACAO", "100.0 (KG)", segunda),
+            new RecordeRecenteResponse(2, "Agachamento", "MUSCULACAO", "120.0 (KG)", segunda.plusDays(1)),
+            new RecordeRecenteResponse(3, "Esteira", "AEROBICO", "10.0 km", segunda.plusDays(2)),
+            new RecordeRecenteResponse(4, "Barra Fixa", "CALISTENIA", "20 reps", segunda.plusDays(3)),
+            new RecordeRecenteResponse(5, "Levantamento", "MUSCULACAO", "80.0 (KG)", segunda.plusDays(4)),
+            new RecordeRecenteResponse(6, "Rosca", "MUSCULACAO", "30.0 (KG)", segunda.plusDays(5))
+        );
+        when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(emptyList());
+        when(repository.countSessoesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(0L);
+        when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(emptyList());
+        when(registroMusculacaoService.buscarRecordePessoalResume(1)).thenReturn(recordes);
+        when(registroCalisteniaService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroAerobicoService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+
+        var stats = service.buscarStats(1);
+
+        assertAll(
+            () -> assertEquals(5, stats.recordesRecentes().size()),
+            () -> assertEquals(6, stats.recordesRecentes().getFirst().exercicioId()),
+            () -> assertEquals(5, stats.recordesRecentes().get(1).exercicioId()),
+            () -> assertEquals(4, stats.recordesRecentes().get(2).exercicioId()),
+            () -> assertEquals(3, stats.recordesRecentes().get(3).exercicioId()),
+            () -> assertEquals(2, stats.recordesRecentes().getLast().exercicioId())
+        );
+    }
+
+    @Test
+    void buscarStats_deveContarPrsEssaSemanaCorretamente() {
+        var monday = LocalDate.now().with(DayOfWeek.MONDAY);
+        var recordesSemana = List.of(
+            new RecordeRecenteResponse(1, "Supino", "MUSCULACAO", "100.0 (KG)", monday),
+            new RecordeRecenteResponse(2, "Agachamento", "MUSCULACAO", "120.0 (KG)", monday.plusDays(1))
+        );
+        var recordeForaDaSemana = List.of(
+            new RecordeRecenteResponse(3, "Esteira", "AEROBICO", "10.0 km", monday.minusDays(7))
+        );
+        when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(emptyList());
+        when(repository.countSessoesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(0L);
+        when(repository.findDistinctDatesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(emptyList());
+        when(registroMusculacaoService.buscarRecordePessoalResume(1)).thenReturn(recordesSemana);
+        when(registroCalisteniaService.buscarRecordePessoalResume(1)).thenReturn(emptyList());
+        when(registroAerobicoService.buscarRecordePessoalResume(1)).thenReturn(recordeForaDaSemana);
+
+        var stats = service.buscarStats(1);
+
+        assertEquals(2, stats.prsEssaSemana());
     }
 }

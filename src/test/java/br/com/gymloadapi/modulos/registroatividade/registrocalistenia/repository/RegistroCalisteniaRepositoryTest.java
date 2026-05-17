@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -67,5 +70,76 @@ class RegistroCalisteniaRepositoryTest {
     @CsvSource(value = {"9999,1", "3,999999"})
     void findLastByExercicioIdAndUsuarioId_deveRetornarOptionalVazio_quandoNaoEncontrarNenhumRegistroParaOExercicioOuParaOUsuario(Integer exercicioId, Integer usuarioId) {
         assertTrue(repository.findLastByExercicioIdAndUsuarioId(exercicioId, usuarioId).isEmpty());
+    }
+
+    @Test
+    @SuppressWarnings("LineLength")
+    void findAllByExercicioIdAndVariacaoIdAndUsuarioId_deveRetornarRegistros_quandoEncontrarRegistrosParaExercicioVariacaoEUsuario() {
+        var registros = repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(4, 4, 1);
+
+        assertAll(
+            () -> assertEquals(1, registros.size()),
+            () -> assertEquals(3, registros.getFirst().getId()),
+            () -> assertEquals(20, registros.getFirst().getQtdRepeticoes()),
+            () -> assertEquals(4, registros.getFirst().getExercicio().getId()),
+            () -> assertEquals(1, registros.getFirst().getUsuario().getId())
+        );
+    }
+
+    @ParameterizedTest
+    @SuppressWarnings("LineLength")
+    @CsvSource(value = {"9999,4,1", "4,9999,1", "4,4,9999"})
+    void findAllByExercicioIdAndVariacaoIdAndUsuarioId_deveRetornarListaVazia_quandoNaoEncontrarRegistros(Integer exercicioId, Integer variacaoId, Integer usuarioId) {
+        assertTrue(repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(exercicioId, variacaoId, usuarioId).isEmpty());
+    }
+
+    @Test
+    void existeRegistroHojeParaExercicios_deveRetornarTrue_quandoExistirRegistroNaDataInformada() {
+        assertTrue(repository.existeRegistroHojeParaExercicios(List.of(3), 1, LocalDate.of(2025, 3, 4)));
+    }
+
+    @Test
+    void existeRegistroHojeParaExercicios_deveRetornarFalse_quandoNaoExistirRegistroNaDataInformada() {
+        assertFalse(repository.existeRegistroHojeParaExercicios(List.of(3), 1, LocalDate.now()));
+    }
+
+    @Test
+    void migrarRegistrosSemVariacao_deveMigrarRegistrosSemVariacaoParaVariacaoPadrao_quandoSolicitado() {
+        repository.migrarRegistrosSemVariacao(3, 4);
+
+        var registrosSemVariacao = repository.findAllByExercicioIdAndUsuarioId(3, 1);
+        var registrosComVariacao4 = repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(3, 4, 1);
+
+        assertAll(
+            () -> assertTrue(registrosSemVariacao.isEmpty()),
+            () -> assertEquals(2, registrosComVariacao4.size())
+        );
+    }
+
+    @Test
+    void moverRegistros_deveMoverRegistrosParaVariacaoDestino_quandoSolicitado() {
+        repository.moverRegistros(List.of(1), 4, 1);
+
+        var registrosVariacao4 = repository.findAllByExercicioIdAndVariacaoIdAndUsuarioId(3, 4, 1);
+
+        assertAll(
+            () -> assertEquals(1, registrosVariacao4.size()),
+            () -> assertEquals(1, registrosVariacao4.getFirst().getId())
+        );
+    }
+
+    @Test
+    void findTodosPrsPorUsuarioId_deveRetornarTodosOsRegistrosDoUsuario_quandoEncontrarRegistros() {
+        var registros = repository.findTodosPrsPorUsuarioId(1);
+
+        assertAll(
+            () -> assertEquals(3, registros.size()),
+            () -> assertTrue(registros.stream().allMatch(r -> r.getUsuario().getId().equals(1)))
+        );
+    }
+
+    @Test
+    void findTodosPrsPorUsuarioId_deveRetornarListaVazia_quandoNaoEncontrarRegistrosParaOUsuario() {
+        assertTrue(repository.findTodosPrsPorUsuarioId(999999).isEmpty());
     }
 }

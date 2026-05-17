@@ -17,9 +17,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.PRONADA;
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.SUPINADA;
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.outroExercicioMusculacao;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacao;
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.umRegistroAtividadeRequestParaMusculacao;
 import static br.com.gymloadapi.modulos.registroatividade.registromusculacao.helper.RegistroMusculacaoHelper.umRegistroMusculacao;
@@ -314,5 +318,68 @@ class RegistroMusculacaoServiceTest {
 
         verify(repository).findById(1);
         verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    void buscarRecordePessoalResume_deveRetornarListaVazia_quandoNaoHaRegistros() {
+        when(repository.findTodosPrsPorUsuarioId(1)).thenReturn(emptyList());
+
+        var resultado = service.buscarRecordePessoalResume(1);
+
+        assertTrue(resultado.isEmpty());
+        verify(repository).findTodosPrsPorUsuarioId(1);
+    }
+
+    @Test
+    void buscarRecordePessoalResume_deveRetornarUmRecordePorExercicio_quandoHaRegistros() {
+        var registroExercicio1 = RegistroMusculacao.builder()
+            .id(10)
+            .peso(22.5)
+            .unidadePeso(KG)
+            .qtdRepeticoes(12)
+            .qtdSeries(4)
+            .dataCadastro(LocalDate.of(2025, 4, 4))
+            .exercicio(umExercicioMusculacao(1))
+            .usuario(umUsuarioAdmin())
+            .tipoPegada(SUPINADA)
+            .build();
+        var registroExercicio1MaiorPeso = RegistroMusculacao.builder()
+            .id(11)
+            .peso(30.0)
+            .unidadePeso(KG)
+            .qtdRepeticoes(8)
+            .qtdSeries(3)
+            .dataCadastro(LocalDate.of(2025, 4, 10))
+            .exercicio(umExercicioMusculacao(1))
+            .usuario(umUsuarioAdmin())
+            .tipoPegada(PRONADA)
+            .build();
+        var registroExercicio2 = RegistroMusculacao.builder()
+            .id(20)
+            .peso(80.0)
+            .unidadePeso(KG)
+            .qtdRepeticoes(5)
+            .qtdSeries(5)
+            .dataCadastro(LocalDate.of(2025, 4, 8))
+            .exercicio(outroExercicioMusculacao(2))
+            .usuario(umUsuarioAdmin())
+            .tipoPegada(PRONADA)
+            .build();
+        when(repository.findTodosPrsPorUsuarioId(1))
+            .thenReturn(List.of(registroExercicio1, registroExercicio1MaiorPeso, registroExercicio2));
+
+        var resultado = service.buscarRecordePessoalResume(1);
+
+        assertAll(
+            () -> assertEquals(2, resultado.size()),
+            () -> assertTrue(resultado.stream().anyMatch(r -> r.exercicioId().equals(1)
+                && r.valorPr().equals("30.0 (KG)")
+                && r.dataPr().equals(LocalDate.of(2025, 4, 10))
+                && r.tipoExercicio().equals("MUSCULACAO"))),
+            () -> assertTrue(resultado.stream().anyMatch(r -> r.exercicioId().equals(2)
+                && r.valorPr().equals("80.0 (KG)")
+                && r.dataPr().equals(LocalDate.of(2025, 4, 8))))
+        );
+        verify(repository).findTodosPrsPorUsuarioId(1);
     }
 }

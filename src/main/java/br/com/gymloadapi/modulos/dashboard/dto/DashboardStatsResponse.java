@@ -1,4 +1,12 @@
 package br.com.gymloadapi.modulos.dashboard.dto;
 
-public record DashboardStatsResponse(int streak, long treinosMes, boolean[] diasSemana) {
+import java.util.List;
+
+public record DashboardStatsResponse(
+    int streak,
+    long treinosMes,
+    boolean[] diasSemana,
+    int prsEssaSemana,
+    List<RecordeRecenteResponse> recordesRecentes
+) {
 }
