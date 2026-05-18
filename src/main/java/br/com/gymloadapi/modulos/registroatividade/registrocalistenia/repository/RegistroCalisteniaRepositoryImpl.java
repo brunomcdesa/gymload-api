@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static br.com.gymloadapi.modulos.exercicio.model.QExercicio.exercicio;
+import static br.com.gymloadapi.modulos.exercicio.model.QExercicioVariacao.exercicioVariacao;
 import static br.com.gymloadapi.modulos.grupomuscular.model.QGrupoMuscular.grupoMuscular;
 import static br.com.gymloadapi.modulos.registroatividade.registrocalistenia.model.QRegistroCalistenia.registroCalistenia;
 import static br.com.gymloadapi.modulos.usuario.model.QUsuario.usuario;
@@ -96,6 +97,7 @@ public class RegistroCalisteniaRepositoryImpl implements RegistroCalisteniaRepos
             .selectFrom(registroCalistenia)
             .innerJoin(registroCalistenia.exercicio, exercicio).fetchJoin()
             .innerJoin(registroCalistenia.usuario, usuario).fetchJoin()
+            .leftJoin(registroCalistenia.exercicioVariacao, exercicioVariacao).fetchJoin()
             .where(registroCalistenia.usuario.id.eq(usuarioId))
             .fetch();
     }

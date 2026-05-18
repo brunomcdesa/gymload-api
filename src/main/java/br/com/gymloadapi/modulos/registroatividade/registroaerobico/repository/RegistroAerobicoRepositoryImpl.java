@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static br.com.gymloadapi.modulos.exercicio.model.QExercicio.exercicio;
+import static br.com.gymloadapi.modulos.exercicio.model.QExercicioVariacao.exercicioVariacao;
 import static br.com.gymloadapi.modulos.registroatividade.registroaerobico.model.QRegistroAerobico.registroAerobico;
 import static br.com.gymloadapi.modulos.usuario.model.QUsuario.usuario;
 
@@ -93,6 +94,7 @@ public class RegistroAerobicoRepositoryImpl implements RegistroAerobicoRepositor
             .selectFrom(registroAerobico)
             .innerJoin(registroAerobico.exercicio, exercicio).fetchJoin()
             .innerJoin(registroAerobico.usuario, usuario).fetchJoin()
+            .leftJoin(registroAerobico.exercicioVariacao, exercicioVariacao).fetchJoin()
             .where(registroAerobico.usuario.id.eq(usuarioId))
             .fetch();
     }

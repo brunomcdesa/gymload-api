@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static br.com.gymloadapi.modulos.exercicio.model.QExercicio.exercicio;
+import static br.com.gymloadapi.modulos.exercicio.model.QExercicioVariacao.exercicioVariacao;
 import static br.com.gymloadapi.modulos.grupomuscular.model.QGrupoMuscular.grupoMuscular;
 import static br.com.gymloadapi.modulos.registroatividade.registromusculacao.model.QRegistroMusculacao.registroMusculacao;
 import static br.com.gymloadapi.modulos.usuario.model.QUsuario.usuario;
@@ -96,6 +97,7 @@ public class RegistroMusculacaoRepositoryImpl implements RegistroMusculacaoRepos
             .selectFrom(registroMusculacao)
             .innerJoin(registroMusculacao.exercicio, exercicio).fetchJoin()
             .innerJoin(registroMusculacao.usuario, usuario).fetchJoin()
+            .leftJoin(registroMusculacao.exercicioVariacao, exercicioVariacao).fetchJoin()
             .where(registroMusculacao.usuario.id.eq(usuarioId))
             .fetch();
     }

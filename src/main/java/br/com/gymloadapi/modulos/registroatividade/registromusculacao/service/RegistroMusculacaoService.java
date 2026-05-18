@@ -173,27 +173,35 @@ public class RegistroMusculacaoService implements IRegistroAtividadeStrategy {
     public List<RecordeRecenteResponse> buscarRecordePessoalResume(Integer usuarioId) {
         var todos = repository.findTodosPrsPorUsuarioId(usuarioId);
         return todos.stream()
-            .collect(Collectors.groupingBy(r -> r.getExercicio().getId()))
+            .collect(Collectors.groupingBy(registro -> {
+                var variacaoId = registro.getExercicioVariacao() != null ? registro.getExercicioVariacao().getId() : null;
+                return registro.getExercicio().getId() + "_" + variacaoId;
+            }))
             .values().stream()
-            .map(registros -> {
-                var maiorPeso = registros.stream()
-                    .mapToDouble(RegistroMusculacao::getPeso)
-                    .max()
-                    .orElse(0);
-                return registros.stream()
-                    .filter(r -> r.getPeso() == maiorPeso)
-                    .max(Comparator.comparing(RegistroMusculacao::getDataCadastro))
-                    .map(r -> new RecordeRecenteResponse(
-                        r.getExercicio().getId(),
-                        r.getExercicio().getNome(),
-                        "MUSCULACAO",
-                        r.getPesoComUnidadePeso(),
-                        r.getDataCadastro()
-                    ))
-                    .orElse(null);
-            })
+            .map(this::buildRecordePrMusculacao)
             .filter(Objects::nonNull)
             .toList();
+    }
+
+    private RecordeRecenteResponse buildRecordePrMusculacao(List<RegistroMusculacao> registros) {
+        var maiorPeso = registros.stream()
+            .mapToDouble(RegistroMusculacao::getPeso)
+            .max()
+            .orElse(0);
+        return registros.stream()
+            .filter(registro -> registro.getPeso() == maiorPeso)
+            .max(Comparator.comparing(RegistroMusculacao::getDataCadastro))
+            .map(registro -> new RecordeRecenteResponse(
+                registro.getExercicio().getId(),
+                registro.getExercicio().getNome(),
+                "MUSCULACAO",
+                registro.getPesoComUnidadePeso(),
+                registro.getDataCadastro(),
+                registro.getExercicioVariacao() != null ? registro.getExercicioVariacao().getId() : null,
+                registro.getExercicioVariacao() != null ? registro.getExercicioVariacao().getNome() : null,
+                registro.getExercicio().getPossuiVariacao()
+            ))
+            .orElse(null);
     }
 
     private RegistroMusculacao findById(Integer id) {

@@ -7,6 +7,9 @@ public record RecordeRecenteResponse(
     String exercicioNome,
     String tipoExercicio,
     String valorPr,
-    LocalDate dataPr
+    LocalDate dataPr,
+    Integer variacaoId,
+    String variacaoNome,
+    Boolean possuiVariacao
 ) {
 }

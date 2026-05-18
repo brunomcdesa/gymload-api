@@ -174,27 +174,35 @@ public class RegistroCalisteniaService implements IRegistroAtividadeStrategy {
     public List<RecordeRecenteResponse> buscarRecordePessoalResume(Integer usuarioId) {
         var todos = repository.findTodosPrsPorUsuarioId(usuarioId);
         return todos.stream()
-            .collect(Collectors.groupingBy(r -> r.getExercicio().getId()))
+            .collect(Collectors.groupingBy(registro -> {
+                var variacaoId = registro.getExercicioVariacao() != null ? registro.getExercicioVariacao().getId() : null;
+                return registro.getExercicio().getId() + "_" + variacaoId;
+            }))
             .values().stream()
-            .map(registros -> {
-                var maiorReps = registros.stream()
-                    .mapToInt(RegistroCalistenia::getQtdRepeticoes)
-                    .max()
-                    .orElse(0);
-                return registros.stream()
-                    .filter(r -> r.getQtdRepeticoes() == maiorReps)
-                    .max(Comparator.comparing(RegistroCalistenia::getDataCadastro))
-                    .map(r -> new RecordeRecenteResponse(
-                        r.getExercicio().getId(),
-                        r.getExercicio().getNome(),
-                        "CALISTENIA",
-                        r.getQtdRepeticoesDestaque(),
-                        r.getDataCadastro()
-                    ))
-                    .orElse(null);
-            })
+            .map(this::buildRecordePrCalistenia)
             .filter(Objects::nonNull)
             .toList();
+    }
+
+    private RecordeRecenteResponse buildRecordePrCalistenia(List<RegistroCalistenia> registros) {
+        var maiorReps = registros.stream()
+            .mapToInt(RegistroCalistenia::getQtdRepeticoes)
+            .max()
+            .orElse(0);
+        return registros.stream()
+            .filter(registro -> registro.getQtdRepeticoes() == maiorReps)
+            .max(Comparator.comparing(RegistroCalistenia::getDataCadastro))
+            .map(registro -> new RecordeRecenteResponse(
+                registro.getExercicio().getId(),
+                registro.getExercicio().getNome(),
+                "CALISTENIA",
+                registro.getQtdRepeticoesDestaque(),
+                registro.getDataCadastro(),
+                registro.getExercicioVariacao() != null ? registro.getExercicioVariacao().getId() : null,
+                registro.getExercicioVariacao() != null ? registro.getExercicioVariacao().getNome() : null,
+                registro.getExercicio().getPossuiVariacao()
+            ))
+            .orElse(null);
     }
 
     private RegistroCalistenia findById(Integer id) {
