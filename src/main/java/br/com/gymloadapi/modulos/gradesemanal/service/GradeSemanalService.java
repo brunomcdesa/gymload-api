@@ -32,6 +32,7 @@ public class GradeSemanalService {
     private final TreinoService treinoService;
     private final TreinoSessaoRepository treinoSessaoRepository;
 
+    @Transactional(readOnly = true)
     public Optional<GradeSemanalHojeResponse> buscarHoje(Integer usuarioId) {
         var diaSemana = EDiaSemana.fromDayOfWeek(LocalDate.now().getDayOfWeek());
         return repository.findByUsuarioIdAndDiaSemana(usuarioId, diaSemana)
@@ -43,6 +44,7 @@ public class GradeSemanalService {
             });
     }
 
+    @Transactional(readOnly = true)
     public List<GradeSemanalResponse> listar(Integer usuarioId) {
         return repository.findByUsuarioId(usuarioId).stream()
             .filter(grade -> grade.getTreino().getSituacao() == ESituacao.ATIVO)
