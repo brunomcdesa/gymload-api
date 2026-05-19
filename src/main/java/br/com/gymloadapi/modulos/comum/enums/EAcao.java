@@ -6,5 +6,6 @@ public enum EAcao {
     ATIVACAO,
     INATIVACAO,
     EDICAO,
+    EXCLUSAO,
     ALTERACAO_SENHA
 }

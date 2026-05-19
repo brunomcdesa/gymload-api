@@ -4,7 +4,11 @@ import br.com.gymloadapi.modulos.treino.model.TreinoSessao;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+
 @Repository
 public interface TreinoSessaoRepository extends JpaRepository<TreinoSessao, Integer>,
     TreinoSessaoRepositoryCustom {
+
+    boolean existsByUsuarioIdAndTreinoIdAndDataSessao(Integer usuarioId, Integer treinoId, LocalDate dataSessao);
 }
