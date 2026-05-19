@@ -158,12 +158,12 @@ class DashboardServiceTest {
     void buscarStats_deveRetornarAteCincoRecordesRecentes_ordenadosPorDataDecrescente() {
         var segunda = LocalDate.now().with(DayOfWeek.MONDAY);
         var recordes = List.of(
-            new RecordeRecenteResponse(1, "Supino", "MUSCULACAO", "100.0 (KG)", segunda),
-            new RecordeRecenteResponse(2, "Agachamento", "MUSCULACAO", "120.0 (KG)", segunda.plusDays(1)),
-            new RecordeRecenteResponse(3, "Esteira", "AEROBICO", "10.0 km", segunda.plusDays(2)),
-            new RecordeRecenteResponse(4, "Barra Fixa", "CALISTENIA", "20 reps", segunda.plusDays(3)),
-            new RecordeRecenteResponse(5, "Levantamento", "MUSCULACAO", "80.0 (KG)", segunda.plusDays(4)),
-            new RecordeRecenteResponse(6, "Rosca", "MUSCULACAO", "30.0 (KG)", segunda.plusDays(5))
+            new RecordeRecenteResponse(1, "Supino", "MUSCULACAO", "100.0 (KG)", segunda, null, null, false),
+            new RecordeRecenteResponse(2, "Agachamento", "MUSCULACAO", "120.0 (KG)", segunda.plusDays(1), null, null, false),
+            new RecordeRecenteResponse(3, "Esteira", "AEROBICO", "10.0 km", segunda.plusDays(2), null, null, false),
+            new RecordeRecenteResponse(4, "Barra Fixa", "CALISTENIA", "20 reps", segunda.plusDays(3), null, null, false),
+            new RecordeRecenteResponse(5, "Levantamento", "MUSCULACAO", "80.0 (KG)", segunda.plusDays(4), null, null, false),
+            new RecordeRecenteResponse(6, "Rosca", "MUSCULACAO", "30.0 (KG)", segunda.plusDays(5), null, null, false)
         );
         when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(emptyList());
         when(repository.countSessoesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(0L);
@@ -188,11 +188,11 @@ class DashboardServiceTest {
     void buscarStats_deveContarPrsEssaSemanaCorretamente() {
         var monday = LocalDate.now().with(DayOfWeek.MONDAY);
         var recordesSemana = List.of(
-            new RecordeRecenteResponse(1, "Supino", "MUSCULACAO", "100.0 (KG)", monday),
-            new RecordeRecenteResponse(2, "Agachamento", "MUSCULACAO", "120.0 (KG)", monday.plusDays(1))
+            new RecordeRecenteResponse(1, "Supino", "MUSCULACAO", "100.0 (KG)", monday, null, null, false),
+            new RecordeRecenteResponse(2, "Agachamento", "MUSCULACAO", "120.0 (KG)", monday.plusDays(1), null, null, false)
         );
         var recordeForaDaSemana = List.of(
-            new RecordeRecenteResponse(3, "Esteira", "AEROBICO", "10.0 km", monday.minusDays(7))
+            new RecordeRecenteResponse(3, "Esteira", "AEROBICO", "10.0 km", monday.minusDays(7), null, null, false)
         );
         when(repository.findDistinctDatesByUsuarioId(1)).thenReturn(emptyList());
         when(repository.countSessoesByUsuarioIdBetween(eq(1), any(), any())).thenReturn(0L);
