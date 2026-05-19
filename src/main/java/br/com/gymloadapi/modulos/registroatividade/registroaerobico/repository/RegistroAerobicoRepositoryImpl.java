@@ -32,6 +32,19 @@ public class RegistroAerobicoRepositoryImpl implements RegistroAerobicoRepositor
     }
 
     @Override
+    public List<RegistroAerobico> findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(Integer exercicioId,
+                                                                                      Integer usuarioId) {
+        return new JPAQueryFactory(entityManager)
+            .selectFrom(registroAerobico)
+            .innerJoin(registroAerobico.exercicio, exercicio).fetchJoin()
+            .innerJoin(registroAerobico.usuario, usuario).fetchJoin()
+            .leftJoin(registroAerobico.exercicioVariacao, exercicioVariacao).fetchJoin()
+            .where(registroAerobico.exercicio.id.eq(exercicioId)
+                .and(registroAerobico.usuario.id.eq(usuarioId)))
+            .fetch();
+    }
+
+    @Override
     public List<RegistroAerobico> findAllByExercicioIdAndVariacaoIdAndUsuarioId(Integer exercicioId,
                                                                                  Integer variacaoId,
                                                                                  Integer usuarioId) {

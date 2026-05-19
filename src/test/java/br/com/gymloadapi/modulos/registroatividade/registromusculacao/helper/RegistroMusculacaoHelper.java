@@ -8,7 +8,10 @@ import java.util.List;
 
 import static br.com.gymloadapi.modulos.comum.enums.ETipoPegada.*;
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.outroExercicioVariacao;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacao;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioMusculacaoComVariacao;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioVariacao;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 
 @UtilityClass
@@ -61,5 +64,33 @@ public class RegistroMusculacaoHelper {
 
     public static List<RegistroMusculacao> umaListaRegistroMusculacao() {
         return List.of(umRegistroMusculacao(), outroRegistroMusculacao(), maisUmRegistroMusculacao());
+    }
+
+    public static List<RegistroMusculacao> umaListaRegistroMusculacaoComVariacoes() {
+        var registroDestaque = RegistroMusculacao.builder()
+            .id(10)
+            .peso(80.0)
+            .unidadePeso(KG)
+            .qtdRepeticoes(8)
+            .dataCadastro(LocalDate.of(2025, 4, 4))
+            .qtdSeries(4)
+            .exercicio(umExercicioMusculacaoComVariacao(1))
+            .exercicioVariacao(umExercicioVariacao())
+            .usuario(umUsuarioAdmin())
+            .tipoPegada(PRONADA)
+            .build();
+        var registroUltimo = RegistroMusculacao.builder()
+            .id(20)
+            .peso(65.0)
+            .unidadePeso(KG)
+            .qtdRepeticoes(10)
+            .dataCadastro(LocalDate.of(2025, 4, 5))
+            .qtdSeries(3)
+            .exercicio(umExercicioMusculacaoComVariacao(1))
+            .exercicioVariacao(outroExercicioVariacao())
+            .usuario(umUsuarioAdmin())
+            .tipoPegada(SUPINADA)
+            .build();
+        return List.of(registroDestaque, registroUltimo);
     }
 }

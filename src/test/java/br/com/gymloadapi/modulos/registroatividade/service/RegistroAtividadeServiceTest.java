@@ -3,6 +3,7 @@ package br.com.gymloadapi.modulos.registroatividade.service;
 import br.com.gymloadapi.modulos.comum.exception.ValidacaoException;
 import br.com.gymloadapi.modulos.exercicio.repository.ExercicioVariacaoRepository;
 import br.com.gymloadapi.modulos.exercicio.service.ExercicioService;
+import br.com.gymloadapi.modulos.registroatividade.dto.RegistroAtividadeResponse;
 import br.com.gymloadapi.modulos.registroatividade.registroaerobico.service.RegistroAerobicoService;
 import br.com.gymloadapi.modulos.registroatividade.registrocalistenia.service.RegistroCalisteniaService;
 import br.com.gymloadapi.modulos.registroatividade.registromusculacao.service.RegistroMusculacaoService;
@@ -217,22 +218,31 @@ class RegistroAtividadeServiceTest {
     }
 
     @Test
-    void buscarDestaques_deveRetornarResponseSemDados_quandoExercicioPossuirVariacoes() {
-        var exercicioMusculacaoComVariacao = umExercicioMusculacaoComVariacao(1);
-        when(exercicioService.findByIdIn(List.of(1, 2, 3))).thenReturn(List.of(exercicioMusculacaoComVariacao));
+    void buscarDestaques_deveChamarBuscarDestaqueAgregadoEInjetarQtdVariacoes_quandoExercicioPossuiVariacao() {
+        var exercicioComVariacao = umExercicioMusculacaoComVariacao(1);
+        var responseAgregado = new RegistroAtividadeResponse(1, "80.0 (KG)", "65.0 (KG)", null, null,
+            "SUPINO RETO - Halter", "SUPINO RETO - Barra", null);
+
+        when(exercicioService.findByIdIn(List.of(1, 2, 3))).thenReturn(List.of(exercicioComVariacao));
+        when(registroMusculacaoService.buscarDestaqueAgregado(1, 1)).thenReturn(responseAgregado);
+        when(exercicioVariacaoRepository.countByExercicio_Id(1)).thenReturn(3L);
 
         var responses = service.buscarDestaques(umRegistroAtividadeFiltros(), 1);
 
         assertAll(
             () -> assertEquals(1, responses.getFirst().exercicioId()),
-            () -> assertNull(responses.getFirst().destaque()),
-            () -> assertNull(responses.getFirst().ultimoPeso()),
-            () -> assertNull(responses.getFirst().ultimaDistancia()),
-            () -> assertNull(responses.getFirst().ultimaQtdMaxRepeticoes())
+            () -> assertEquals("80.0 (KG)", responses.getFirst().destaque()),
+            () -> assertEquals("65.0 (KG)", responses.getFirst().ultimoPeso()),
+            () -> assertEquals("SUPINO RETO - Halter", responses.getFirst().nomeVariacaoDestaque()),
+            () -> assertEquals("SUPINO RETO - Barra", responses.getFirst().nomeVariacaoUltima()),
+            () -> assertEquals(3, responses.getFirst().qtdVariacoes())
         );
 
         verify(exercicioService).findByIdIn(List.of(1, 2, 3));
-        verifyNoInteractions(registroMusculacaoService, registroAerobicoService, registroCalisteniaService);
+        verify(registroMusculacaoService).buscarDestaqueAgregado(1, 1);
+        verify(exercicioVariacaoRepository).countByExercicio_Id(1);
+        verify(registroMusculacaoService, never()).buscarDestaque(anyInt(), anyInt());
+        verifyNoInteractions(registroAerobicoService, registroCalisteniaService);
     }
 
     @Test

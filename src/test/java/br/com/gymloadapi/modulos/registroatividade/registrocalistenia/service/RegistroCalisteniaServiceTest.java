@@ -100,6 +100,46 @@ class RegistroCalisteniaServiceTest {
     }
 
     @Test
+    void buscarDestaqueAgregado_deveRetornarTracos_quandoNaoHaRegistrosEmNenhumaVariacao() {
+        var usuario = umUsuarioAdmin();
+
+        when(repository.findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, usuario.getId()))
+            .thenReturn(emptyList());
+
+        var response = service.buscarDestaqueAgregado(1, usuario.getId());
+
+        assertAll(
+            () -> assertEquals(1, response.exercicioId()),
+            () -> assertEquals("-", response.destaque()),
+            () -> assertNull(response.ultimaQtdMaxRepeticoes()),
+            () -> assertNull(response.nomeVariacaoDestaque()),
+            () -> assertNull(response.nomeVariacaoUltima())
+        );
+
+        verify(repository).findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, usuario.getId());
+    }
+
+    @Test
+    void buscarDestaqueAgregado_deveRetornarMaiorRepsEUltimoComNomesDeVariacao_quandoExisteRegistros() {
+        var usuario = umUsuarioAdmin();
+
+        when(repository.findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, usuario.getId()))
+            .thenReturn(umaListaRegistroCalisteniaComVariacoes());
+
+        var response = service.buscarDestaqueAgregado(1, usuario.getId());
+
+        assertAll(
+            () -> assertEquals(1, response.exercicioId()),
+            () -> assertEquals("50 reps", response.destaque()),
+            () -> assertEquals(25, response.ultimaQtdMaxRepeticoes()),
+            () -> assertEquals("SUPINO RETO - Halter", response.nomeVariacaoDestaque()),
+            () -> assertEquals("SUPINO RETO - Barra", response.nomeVariacaoUltima())
+        );
+
+        verify(repository).findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, usuario.getId());
+    }
+
+    @Test
     void buscarHistoricoRegistroCompleto_deveRetornarListaVazia_quandoExercicioNaoPossuirNenhumRegistroCalistenia() {
         var usuario = umUsuarioAdmin();
 

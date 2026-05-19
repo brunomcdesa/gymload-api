@@ -10,6 +10,8 @@ public interface RegistroMusculacaoRepositoryCustom {
 
     List<RegistroMusculacao> findAllByExercicioIdAndUsuarioId(Integer exercicioId, Integer usuarioId);
 
+    List<RegistroMusculacao> findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(Integer exercicioId, Integer usuarioId);
+
     List<RegistroMusculacao> findAllByExercicioIdAndVariacaoIdAndUsuarioId(Integer exercicioId, Integer variacaoId,
                                                                            Integer usuarioId);
 

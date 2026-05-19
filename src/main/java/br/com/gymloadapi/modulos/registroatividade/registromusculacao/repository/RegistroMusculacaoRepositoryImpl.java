@@ -34,6 +34,20 @@ public class RegistroMusculacaoRepositoryImpl implements RegistroMusculacaoRepos
     }
 
     @Override
+    public List<RegistroMusculacao> findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(Integer exercicioId,
+                                                                                        Integer usuarioId) {
+        return new JPAQueryFactory(entityManager)
+            .selectFrom(registroMusculacao)
+            .innerJoin(registroMusculacao.exercicio, exercicio).fetchJoin()
+            .innerJoin(exercicio.grupoMuscular, grupoMuscular).fetchJoin()
+            .innerJoin(registroMusculacao.usuario, usuario).fetchJoin()
+            .leftJoin(registroMusculacao.exercicioVariacao, exercicioVariacao).fetchJoin()
+            .where(registroMusculacao.exercicio.id.eq(exercicioId)
+                .and(registroMusculacao.usuario.id.eq(usuarioId)))
+            .fetch();
+    }
+
+    @Override
     public List<RegistroMusculacao> findAllByExercicioIdAndVariacaoIdAndUsuarioId(Integer exercicioId,
                                                                                    Integer variacaoId,
                                                                                    Integer usuarioId) {

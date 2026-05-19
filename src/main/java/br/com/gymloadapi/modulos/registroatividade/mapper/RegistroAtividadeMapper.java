@@ -91,6 +91,7 @@ public interface RegistroAtividadeMapper {
     void editarRegistroCalistenia(RegistroAtividadeRequest request,
                                   @MappingTarget RegistroCalistenia registroCalistenia);
 
+    @BeanMapping(unmappedTargetPolicy = ReportingPolicy.IGNORE)
     RegistroAtividadeResponse mapToRegistroAtividadeResponse(Integer exercicioId, String destaque, String ultimoPeso,
                                                              String ultimaDistancia,
                                                              Integer ultimaQtdMaxRepeticoes);

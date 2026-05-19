@@ -10,6 +10,8 @@ public interface RegistroAerobicoRepositoryCustom {
 
     List<RegistroAerobico> findAllByExercicioIdAndUsuarioId(Integer exercicioId, Integer usuarioId);
 
+    List<RegistroAerobico> findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(Integer exercicioId, Integer usuarioId);
+
     List<RegistroAerobico> findAllByExercicioIdAndVariacaoIdAndUsuarioId(Integer exercicioId, Integer variacaoId,
                                                                          Integer usuarioId);
 

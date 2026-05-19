@@ -28,6 +28,7 @@ import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExerc
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.umRegistroAtividadeRequestParaMusculacao;
 import static br.com.gymloadapi.modulos.registroatividade.registromusculacao.helper.RegistroMusculacaoHelper.umRegistroMusculacao;
 import static br.com.gymloadapi.modulos.registroatividade.registromusculacao.helper.RegistroMusculacaoHelper.umaListaRegistroMusculacao;
+import static br.com.gymloadapi.modulos.registroatividade.registromusculacao.helper.RegistroMusculacaoHelper.umaListaRegistroMusculacaoComVariacoes;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.*;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -105,6 +106,46 @@ class RegistroMusculacaoServiceTest {
         );
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, usuario.getId());
+    }
+
+    @Test
+    void buscarDestaqueAgregado_deveRetornarTracos_quandoNaoHaRegistrosEmNenhumaVariacao() {
+        var usuario = umUsuarioAdmin();
+
+        when(repository.findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, usuario.getId()))
+            .thenReturn(emptyList());
+
+        var response = service.buscarDestaqueAgregado(1, usuario.getId());
+
+        assertAll(
+            () -> assertEquals(1, response.exercicioId()),
+            () -> assertEquals("-", response.destaque()),
+            () -> assertEquals("-", response.ultimoPeso()),
+            () -> assertNull(response.nomeVariacaoDestaque()),
+            () -> assertNull(response.nomeVariacaoUltima())
+        );
+
+        verify(repository).findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, usuario.getId());
+    }
+
+    @Test
+    void buscarDestaqueAgregado_deveRetornarMaiorPesoEUltimoComNomesDeVariacao_quandoExisteRegistros() {
+        var usuario = umUsuarioAdmin();
+
+        when(repository.findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, usuario.getId()))
+            .thenReturn(umaListaRegistroMusculacaoComVariacoes());
+
+        var response = service.buscarDestaqueAgregado(1, usuario.getId());
+
+        assertAll(
+            () -> assertEquals(1, response.exercicioId()),
+            () -> assertEquals("80.0 (KG)", response.destaque()),
+            () -> assertEquals("65.0 (KG)", response.ultimoPeso()),
+            () -> assertEquals("SUPINO RETO - Halter", response.nomeVariacaoDestaque()),
+            () -> assertEquals("SUPINO RETO - Barra", response.nomeVariacaoUltima())
+        );
+
+        verify(repository).findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, usuario.getId());
     }
 
     @Test

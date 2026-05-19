@@ -53,6 +53,40 @@ public class RegistroCalisteniaService implements IRegistroAtividadeStrategy {
         return this.montarResponseDestaque(exercicioId, registrosCalistenia);
     }
 
+    @Override
+    public RegistroAtividadeResponse buscarDestaqueAgregado(Integer exercicioId, Integer usuarioId) {
+        var registros = repository.findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(exercicioId, usuarioId);
+        if (registros.isEmpty()) {
+            return new RegistroAtividadeResponse(exercicioId, "-", null, null, null, null, null, null);
+        }
+
+        var maiorReps = registros.stream().mapToInt(RegistroCalistenia::getQtdRepeticoes).max().getAsInt();
+        var registroDestaque = registros.stream()
+            .filter(registro -> registro.getQtdRepeticoes() == maiorReps)
+            .findFirst()
+            .orElseThrow();
+        var ultimoId = registros.stream().mapToInt(RegistroCalistenia::getId).max().getAsInt();
+        var registroUltimo = registros.stream()
+            .filter(registro -> Objects.equals(registro.getId(), ultimoId))
+            .findFirst()
+            .orElseThrow();
+
+        return new RegistroAtividadeResponse(
+            exercicioId,
+            registroDestaque.getQtdRepeticoesDestaque(),
+            null,
+            null,
+            registroUltimo.getQtdRepeticoes(),
+            getNomeVariacao(registroDestaque),
+            getNomeVariacao(registroUltimo),
+            null
+        );
+    }
+
+    private static String getNomeVariacao(RegistroCalistenia registro) {
+        return registro.getExercicioVariacao() != null ? registro.getExercicioVariacao().getNome() : null;
+    }
+
     private RegistroAtividadeResponse montarResponseDestaque(Integer exercicioId,
                                                              List<RegistroCalistenia> registrosCalistenia) {
         var destaqueRegistro = this.getDestaqueDoRegistro(registrosCalistenia);

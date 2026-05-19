@@ -54,6 +54,40 @@ public class RegistroAerobicoService implements IRegistroAtividadeStrategy {
         return this.montarResponseDestaque(exercicioId, registrosAerobico);
     }
 
+    @Override
+    public RegistroAtividadeResponse buscarDestaqueAgregado(Integer exercicioId, Integer usuarioId) {
+        var registros = repository.findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(exercicioId, usuarioId);
+        if (registros.isEmpty()) {
+            return new RegistroAtividadeResponse(exercicioId, "-", null, "-", null, null, null, null);
+        }
+
+        var maiorDistancia = registros.stream().mapToDouble(RegistroAerobico::getDistancia).max().getAsDouble();
+        var registroDestaque = registros.stream()
+            .filter(registro -> registro.getDistancia() == maiorDistancia)
+            .findFirst()
+            .orElseThrow();
+        var ultimoId = registros.stream().mapToInt(RegistroAerobico::getId).max().getAsInt();
+        var registroUltimo = registros.stream()
+            .filter(registro -> Objects.equals(registro.getId(), ultimoId))
+            .findFirst()
+            .orElseThrow();
+
+        return new RegistroAtividadeResponse(
+            exercicioId,
+            registroDestaque.getDistanciaFormatada(),
+            null,
+            registroUltimo.getDistanciaFormatada(),
+            null,
+            getNomeVariacao(registroDestaque),
+            getNomeVariacao(registroUltimo),
+            null
+        );
+    }
+
+    private static String getNomeVariacao(RegistroAerobico registro) {
+        return registro.getExercicioVariacao() != null ? registro.getExercicioVariacao().getNome() : null;
+    }
+
     private RegistroAtividadeResponse montarResponseDestaque(Integer exercicioId,
                                                              List<RegistroAerobico> registrosAerobico) {
         var destaqueRegistro = this.getDestaqueDoRegistro(registrosAerobico);

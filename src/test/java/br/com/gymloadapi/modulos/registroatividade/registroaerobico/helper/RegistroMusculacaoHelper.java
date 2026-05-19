@@ -6,7 +6,9 @@ import lombok.experimental.UtilityClass;
 import java.time.LocalDate;
 import java.util.List;
 
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.outroExercicioVariacao;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioAerobico;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioVariacao;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuario;
 
 @UtilityClass
@@ -38,5 +40,29 @@ public class RegistroMusculacaoHelper {
 
     public static List<RegistroAerobico> umaListaDeRegistrosAerobicos() {
         return List.of(umRegistroAerobico(), outroRegistroAerobico());
+    }
+
+    public static List<RegistroAerobico> umaListaRegistroAerobicoComVariacoes() {
+        var registroDestaque = RegistroAerobico.builder()
+            .id(10)
+            .observacao("Observacao")
+            .dataCadastro(LocalDate.of(2025, 4, 4))
+            .exercicio(umExercicioAerobico(1))
+            .exercicioVariacao(umExercicioVariacao())
+            .usuario(umUsuario())
+            .distancia(30.0)
+            .duracao(2.0)
+            .build();
+        var registroUltimo = RegistroAerobico.builder()
+            .id(20)
+            .observacao("Observacao")
+            .dataCadastro(LocalDate.of(2025, 4, 5))
+            .exercicio(umExercicioAerobico(1))
+            .exercicioVariacao(outroExercicioVariacao())
+            .usuario(umUsuario())
+            .distancia(18.0)
+            .duracao(1.5)
+            .build();
+        return List.of(registroDestaque, registroUltimo);
     }
 }

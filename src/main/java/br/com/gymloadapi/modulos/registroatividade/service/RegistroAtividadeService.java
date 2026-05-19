@@ -53,12 +53,13 @@ public class RegistroAtividadeService {
         var responses = new ArrayList<RegistroAtividadeResponse>();
 
         exercicios.forEach(exercicio -> {
+            var strategy = this.getStrategyByTipoExercicio(exercicio.getTipoExercicio());
             if (Boolean.TRUE.equals(exercicio.getPossuiVariacao())) {
-                responses.add(new RegistroAtividadeResponse(exercicio.getId(), null, null, null, null));
+                var qtdVariacoes = (int) exercicioVariacaoRepository.countByExercicio_Id(exercicio.getId());
+                responses.add(strategy.buscarDestaqueAgregado(exercicio.getId(), usuarioId)
+                    .comQtdVariacoes(qtdVariacoes));
             } else {
-                var response = this.getStrategyByTipoExercicio(exercicio.getTipoExercicio())
-                    .buscarDestaque(exercicio.getId(), usuarioId);
-                responses.add(response);
+                responses.add(strategy.buscarDestaque(exercicio.getId(), usuarioId));
             }
         });
 

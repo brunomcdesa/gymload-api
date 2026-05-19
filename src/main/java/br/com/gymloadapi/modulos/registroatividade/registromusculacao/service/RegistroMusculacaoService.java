@@ -52,6 +52,40 @@ public class RegistroMusculacaoService implements IRegistroAtividadeStrategy {
         return this.montarResponseDestaque(exercicioId, registrosMusculacao);
     }
 
+    @Override
+    public RegistroAtividadeResponse buscarDestaqueAgregado(Integer exercicioId, Integer usuarioId) {
+        var registros = repository.findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(exercicioId, usuarioId);
+        if (registros.isEmpty()) {
+            return new RegistroAtividadeResponse(exercicioId, "-", "-", null, null, null, null, null);
+        }
+
+        var maiorPeso = registros.stream().mapToDouble(RegistroMusculacao::getPeso).max().getAsDouble();
+        var registroDestaque = registros.stream()
+            .filter(registro -> registro.getPeso() == maiorPeso)
+            .findFirst()
+            .orElseThrow();
+        var ultimoId = registros.stream().mapToInt(RegistroMusculacao::getId).max().getAsInt();
+        var registroUltimo = registros.stream()
+            .filter(registro -> Objects.equals(registro.getId(), ultimoId))
+            .findFirst()
+            .orElseThrow();
+
+        return new RegistroAtividadeResponse(
+            exercicioId,
+            registroDestaque.getPesoComUnidadePeso(),
+            registroUltimo.getPesoComUnidadePeso(),
+            null,
+            null,
+            getNomeVariacao(registroDestaque),
+            getNomeVariacao(registroUltimo),
+            null
+        );
+    }
+
+    private static String getNomeVariacao(RegistroMusculacao registro) {
+        return registro.getExercicioVariacao() != null ? registro.getExercicioVariacao().getNome() : null;
+    }
+
     private RegistroAtividadeResponse montarResponseDestaque(Integer exercicioId,
                                                              List<RegistroMusculacao> registrosMusculacao) {
         var destaqueRegistro = this.getDestaqueDoRegistro(registrosMusculacao);

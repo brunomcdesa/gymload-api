@@ -21,6 +21,7 @@ import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExerc
 import static br.com.gymloadapi.modulos.registroatividade.helper.RegistroAtividadeHelper.umRegistroAtividadeRequestParaAerobico;
 import static br.com.gymloadapi.modulos.registroatividade.registroaerobico.helper.RegistroMusculacaoHelper.umRegistroAerobico;
 import static br.com.gymloadapi.modulos.registroatividade.registroaerobico.helper.RegistroMusculacaoHelper.umaListaDeRegistrosAerobicos;
+import static br.com.gymloadapi.modulos.registroatividade.registroaerobico.helper.RegistroMusculacaoHelper.umaListaRegistroAerobicoComVariacoes;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.*;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -86,6 +87,41 @@ class RegistroAerobicoServiceTest {
         );
 
         verify(repository).findAllByExercicioIdAndUsuarioId(1, 1);
+    }
+
+    @Test
+    void buscarDestaqueAgregado_deveRetornarTracos_quandoNaoHaRegistrosEmNenhumaVariacao() {
+        when(repository.findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, 1)).thenReturn(emptyList());
+
+        var response = service.buscarDestaqueAgregado(1, 1);
+
+        assertAll(
+            () -> assertEquals(1, response.exercicioId()),
+            () -> assertEquals("-", response.destaque()),
+            () -> assertEquals("-", response.ultimaDistancia()),
+            () -> assertNull(response.nomeVariacaoDestaque()),
+            () -> assertNull(response.nomeVariacaoUltima())
+        );
+
+        verify(repository).findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, 1);
+    }
+
+    @Test
+    void buscarDestaqueAgregado_deveRetornarMaiorDistanciaEUltimoComNomesDeVariacao_quandoExisteRegistros() {
+        when(repository.findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, 1))
+            .thenReturn(umaListaRegistroAerobicoComVariacoes());
+
+        var response = service.buscarDestaqueAgregado(1, 1);
+
+        assertAll(
+            () -> assertEquals(1, response.exercicioId()),
+            () -> assertEquals("30.0 km", response.destaque()),
+            () -> assertEquals("18.0 km", response.ultimaDistancia()),
+            () -> assertEquals("SUPINO RETO - Halter", response.nomeVariacaoDestaque()),
+            () -> assertEquals("SUPINO RETO - Barra", response.nomeVariacaoUltima())
+        );
+
+        verify(repository).findAllByExercicioIdAndUsuarioIdIncluindoVariacoes(1, 1);
     }
 
     @Test

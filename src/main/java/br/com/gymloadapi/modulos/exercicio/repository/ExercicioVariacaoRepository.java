@@ -19,5 +19,7 @@ public interface ExercicioVariacaoRepository extends JpaRepository<ExercicioVari
 
     boolean existsByExercicio_Id(Integer exercicioId);
 
+    long countByExercicio_Id(Integer exercicioId);
+
     Optional<ExercicioVariacao> findByExercicio_IdAndPadraoTrue(Integer exercicioId);
 }

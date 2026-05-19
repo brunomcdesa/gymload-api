@@ -7,7 +7,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static br.com.gymloadapi.modulos.comum.enums.EUnidadePeso.KG;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.outroExercicioVariacao;
 import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioCalistenia;
+import static br.com.gymloadapi.modulos.exercicio.helper.ExercicioHelper.umExercicioVariacao;
 import static br.com.gymloadapi.modulos.usuario.helper.UsuarioHelper.umUsuarioAdmin;
 
 @UtilityClass
@@ -55,5 +57,31 @@ public class RegistroCalisteniaHelper {
 
     public static List<RegistroCalistenia> umaListaRegistroCalistenia() {
         return List.of(umRegistroCalistenia(), outroRegistroCalistenia(), maisUmRegistroCalistenia());
+    }
+
+    public static List<RegistroCalistenia> umaListaRegistroCalisteniaComVariacoes() {
+        var registroDestaque = RegistroCalistenia.builder()
+            .id(10)
+            .qtdRepeticoes(50)
+            .dataCadastro(LocalDate.of(2025, 4, 4))
+            .qtdSeries(4)
+            .observacao("Observacao")
+            .exercicio(umExercicioCalistenia(1))
+            .exercicioVariacao(umExercicioVariacao())
+            .usuario(umUsuarioAdmin())
+            .build();
+        var registroUltimo = RegistroCalistenia.builder()
+            .id(20)
+            .qtdRepeticoes(25)
+            .pesoAdicional(5.0)
+            .unidadePeso(KG)
+            .dataCadastro(LocalDate.of(2025, 4, 5))
+            .qtdSeries(3)
+            .observacao("Observacao")
+            .exercicio(umExercicioCalistenia(1))
+            .exercicioVariacao(outroExercicioVariacao())
+            .usuario(umUsuarioAdmin())
+            .build();
+        return List.of(registroDestaque, registroUltimo);
     }
 }
