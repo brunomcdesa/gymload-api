@@ -1,16 +1,29 @@
--- V1.1: cria tabelas e sequences que o V1 (baseline) não executou
---        e migra dados de registro_carga → registro_musculacao
---                        registro_cardio → registro_aerobico
+-- V1.1: corrige schema herdado do Hibernate (pré-Flyway) para o estado esperado pelo V1
+--        e migra dados: registro_carga → registro_musculacao, registro_cardio → registro_aerobico
 
 -- Sequences ausentes do V1
-CREATE SEQUENCE IF NOT EXISTS seq_usuario_historico    START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS seq_tipo_variacao        START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS seq_usuario_historico       START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS seq_tipo_variacao           START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS seq_tipo_variacao_historico START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS seq_exercicio_historico  START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS seq_exercicio_variacao   START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS seq_registro_musculacao  START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS seq_registro_aerobico    START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS seq_registro_calistenia  START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS seq_exercicio_historico     START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS seq_exercicio_variacao      START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS seq_registro_musculacao     START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS seq_registro_aerobico       START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS seq_registro_calistenia     START WITH 1 INCREMENT BY 1;
+
+-- Troca o DEFAULT de usuario.id de usuario_temp_id_seq → seq_usuario e remove a sequence legada
+ALTER TABLE usuario ALTER COLUMN id SET DEFAULT nextval('seq_usuario');
+DROP SEQUENCE IF EXISTS usuario_temp_id_seq;
+
+-- Colunas ausentes na tabela usuario
+ALTER TABLE usuario ADD COLUMN IF NOT EXISTS email         VARCHAR(255);
+ALTER TABLE usuario ADD COLUMN IF NOT EXISTS idade         INTEGER;
+ALTER TABLE usuario ADD COLUMN IF NOT EXISTS peso_corporal FLOAT8;
+ALTER TABLE usuario ADD COLUMN IF NOT EXISTS altura        FLOAT8;
+ALTER TABLE usuario ADD COLUMN IF NOT EXISTS sexo          VARCHAR(15);
+
+-- Coluna ausente na tabela exercicio
+ALTER TABLE exercicio ADD COLUMN IF NOT EXISTS possui_variacao BOOLEAN;
 
 -- Tabelas ausentes do V1
 CREATE TABLE IF NOT EXISTS usuario_historico (
@@ -152,6 +165,4 @@ BEGIN
         DROP TABLE registro_cardio;
         DROP SEQUENCE IF EXISTS seq_registro_cardio;
     END IF;
-
-    DROP SEQUENCE IF EXISTS usuario_temp_id_seq;
 END $$;
