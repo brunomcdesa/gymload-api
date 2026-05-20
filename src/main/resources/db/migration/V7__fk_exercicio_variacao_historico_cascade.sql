@@ -1,5 +1,8 @@
 ALTER TABLE exercicio_variacao_historico
-    DROP CONSTRAINT fk_exercicio_variacao_hist_variacao;
+    DROP CONSTRAINT IF EXISTS fk_exercicio_variacao;
+
+ALTER TABLE exercicio_variacao_historico
+    DROP CONSTRAINT IF EXISTS fk_exercicio_variacao_hist_variacao;
 
 ALTER TABLE exercicio_variacao_historico
     ADD CONSTRAINT fk_exercicio_variacao_hist_variacao
